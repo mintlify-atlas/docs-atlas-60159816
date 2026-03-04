@@ -1,0 +1,466 @@
+---
+title: 'Chart Class API'
+description: 'Complete reference for the Highcharts Chart class'
+---
+
+# Chart Class
+
+The Chart class is the main entry point for creating and managing Highcharts visualizations. It controls rendering, updates, and lifecycle management.
+
+**Source**: `ts/Core/Chart/Chart.ts:285`
+
+## Constructor
+
+### Highcharts.Chart()
+
+Creates a new chart instance.
+
+<ParamField path="renderTo" type="string | HTMLElement">
+  The DOM element to render to, or its id
+</ParamField>
+
+<ParamField path="options" type="Highcharts.Options" required>
+  The chart configuration object
+</ParamField>
+
+<ParamField path="callback" type="Function">
+  Function to run when the chart has loaded. Equivalent to `chart.events.load`
+</ParamField>
+
+```javascript
+// Using element ID
+const chart = new Highcharts.Chart('container', {
+  title: { text: 'My Chart' },
+  series: [{ data: [1, 3, 2, 4] }]
+});
+
+// Using DOM element
+const element = document.getElementById('container');
+const chart = new Highcharts.Chart(element, options);
+
+// With callback
+const chart = new Highcharts.Chart('container', options, function(chart) {
+  console.log('Chart loaded');
+});
+```
+
+## Static Methods
+
+### Highcharts.chart()
+
+Factory function for creating basic charts (recommended approach).
+
+```javascript
+const chart = Highcharts.chart('container', {
+  title: { text: 'My Chart' },
+  series: [{ data: [1, 3, 2, 4] }]
+});
+```
+
+**Returns**: `Highcharts.Chart`
+
+**Source**: `ts/Core/Chart/Chart.ts:333`
+
+## Properties
+
+### chart.axes
+
+<ResponseField name="axes" type="Array<Highcharts.Axis>" required>
+  All axes in the chart (xAxis, yAxis, colorAxis, etc.)
+</ResponseField>
+
+```javascript
+chart.axes.forEach(axis => {
+  console.log(axis.isXAxis ? 'X-Axis' : 'Y-Axis');
+});
+```
+
+### chart.series
+
+<ResponseField name="series" type="Array<Highcharts.Series>" required>
+  All series in the chart
+</ResponseField>
+
+```javascript
+chart.series.forEach(series => {
+  console.log(series.name, series.data.length);
+});
+```
+
+### chart.xAxis
+
+<ResponseField name="xAxis" type="Array<Highcharts.Axis>">
+  All x-axes in the chart
+</ResponseField>
+
+```javascript
+// Access first x-axis
+const xAxis = chart.xAxis[0];
+xAxis.setExtremes(0, 100);
+```
+
+### chart.yAxis
+
+<ResponseField name="yAxis" type="Array<Highcharts.Axis>">
+  All y-axes in the chart
+</ResponseField>
+
+### chart.container
+
+<ResponseField name="container" type="HTMLElement" required>
+  The HTML container element
+</ResponseField>
+
+```javascript
+chart.container.style.border = '1px solid black';
+```
+
+### chart.chartWidth
+
+<ResponseField name="chartWidth" type="number" required>
+  Current pixel width of the chart
+</ResponseField>
+
+### chart.chartHeight
+
+<ResponseField name="chartHeight" type="number" required>
+  Current pixel height of the chart
+</ResponseField>
+
+### chart.options
+
+<ResponseField name="options" type="Highcharts.Options" required>
+  Current chart configuration options
+</ResponseField>
+
+### chart.index
+
+<ResponseField name="index" type="number" required>
+  Position in the `Highcharts.charts` array
+</ResponseField>
+
+## Methods
+
+### chart.addSeries()
+
+Add a new series to the chart after render time.
+
+<ParamField path="options" type="SeriesOptions" required>
+  Series configuration object
+</ParamField>
+
+<ParamField path="redraw" type="boolean" default="true">
+  Whether to redraw the chart after adding
+</ParamField>
+
+<ParamField path="animation" type="boolean | AnimationOptions">
+  Animation options for the series
+</ParamField>
+
+```javascript
+chart.addSeries({
+  type: 'line',
+  name: 'New Series',
+  data: [1, 2, 3, 4, 5]
+});
+
+// Without redraw
+chart.addSeries({ data: [5, 4, 3] }, false);
+chart.addSeries({ data: [2, 3, 4] }, false);
+chart.redraw(); // Redraw once
+```
+
+**Returns**: `Highcharts.Series`
+
+### chart.addAxis()
+
+Add a new axis to the chart after render time.
+
+<ParamField path="options" type="AxisOptions" required>
+  Axis configuration object
+</ParamField>
+
+<ParamField path="isX" type="boolean" default="false">
+  Whether it's an X axis (true) or Y axis (false)
+</ParamField>
+
+<ParamField path="redraw" type="boolean" default="true">
+  Whether to redraw the chart
+</ParamField>
+
+```javascript
+// Add secondary Y axis
+chart.addAxis({
+  id: 'secondary-y',
+  title: { text: 'Secondary Axis' },
+  opposite: true
+}, false, true);
+```
+
+**Returns**: `Highcharts.Axis`
+
+### chart.get()
+
+Get an axis, series, or point object by ID.
+
+<ParamField path="id" type="string" required>
+  The ID of the object to find
+</ParamField>
+
+```javascript
+const series = chart.get('sales-series');
+const xAxis = chart.get('primary-x');
+const point = chart.get('point-1');
+```
+
+**Returns**: `Highcharts.Axis | Highcharts.Series | Highcharts.Point | undefined`
+
+### chart.update()
+
+Update the chart options after initialization.
+
+<ParamField path="options" type="Highcharts.Options" required>
+  New chart options to merge
+</ParamField>
+
+<ParamField path="redraw" type="boolean" default="true">
+  Whether to redraw the chart
+</ParamField>
+
+<ParamField path="oneToOne" type="boolean" default="false">
+  Whether to update one-to-one or recursively merge
+</ParamField>
+
+<ParamField path="animation" type="boolean | AnimationOptions">
+  Animation configuration
+</ParamField>
+
+```javascript
+// Update chart title and colors
+chart.update({
+  title: { text: 'Updated Title' },
+  colors: ['#ff0000', '#00ff00', '#0000ff']
+});
+
+// Update multiple options
+chart.update({
+  chart: { backgroundColor: '#f0f0f0' },
+  plotOptions: {
+    series: { animation: false }
+  }
+});
+```
+
+### chart.redraw()
+
+Redraw the chart after changes have been made.
+
+<ParamField path="animation" type="boolean | AnimationOptions">
+  Animation options
+</ParamField>
+
+```javascript
+// Make multiple changes without redrawing
+chart.series[0].addPoint([10, 20], false);
+chart.series[1].addPoint([15, 25], false);
+chart.redraw(); // Single redraw
+```
+
+### chart.reflow()
+
+Reflow the chart to fit the container size.
+
+```javascript
+// After container resize
+window.addEventListener('resize', () => {
+  chart.reflow();
+});
+```
+
+### chart.setSize()
+
+Resize the chart to specific dimensions.
+
+<ParamField path="width" type="number | null">
+  New width in pixels (null to maintain current)
+</ParamField>
+
+<ParamField path="height" type="number | null">
+  New height in pixels (null to maintain current)
+</ParamField>
+
+<ParamField path="animation" type="boolean | AnimationOptions">
+  Animation configuration
+</ParamField>
+
+```javascript
+// Set to 800x600
+chart.setSize(800, 600);
+
+// Only change height
+chart.setSize(null, 400);
+
+// With animation
+chart.setSize(1000, 500, { duration: 1000 });
+```
+
+### chart.setTitle()
+
+Set the chart title and subtitle.
+
+<ParamField path="title" type="TitleOptions">
+  New title options
+</ParamField>
+
+<ParamField path="subtitle" type="SubtitleOptions">
+  New subtitle options
+</ParamField>
+
+<ParamField path="redraw" type="boolean" default="true">
+  Whether to redraw
+</ParamField>
+
+```javascript
+chart.setTitle(
+  { text: 'New Title' },
+  { text: 'New Subtitle' }
+);
+```
+
+### chart.showLoading()
+
+Display a loading indicator.
+
+<ParamField path="message" type="string">
+  Custom loading message
+</ParamField>
+
+```javascript
+chart.showLoading('Loading data...');
+
+// Fetch data
+fetch('/api/data')
+  .then(res => res.json())
+  .then(data => {
+    chart.series[0].setData(data);
+    chart.hideLoading();
+  });
+```
+
+### chart.hideLoading()
+
+Hide the loading indicator.
+
+```javascript
+chart.hideLoading();
+```
+
+### chart.destroy()
+
+Destroy the chart and free resources.
+
+```javascript
+// Clean up when done
+chart.destroy();
+```
+
+### chart.zoomOut()
+
+Zoom out from a zoomed chart.
+
+```javascript
+chart.zoomOut();
+```
+
+**Source**: `ts/Core/Chart/ChartBase.ts:163`
+
+### chart.showResetZoom()
+
+Display the zoom reset button.
+
+**Source**: `ts/Core/Chart/ChartBase.ts:156`
+
+## Events
+
+Chart events are configured in the `chart.events` option:
+
+```javascript
+Highcharts.chart('container', {
+  chart: {
+    events: {
+      load: function() {
+        console.log('Chart loaded');
+      },
+      redraw: function() {
+        console.log('Chart redrawn');
+      },
+      render: function() {
+        console.log('Chart rendered');
+      },
+      click: function(event) {
+        console.log('Clicked at', event.xAxis[0].value);
+      },
+      addSeries: function(event) {
+        console.log('Series added:', event.options);
+      }
+    }
+  }
+});
+```
+
+See [Events API](/api/events) for complete event documentation.
+
+## Example: Complete Chart Lifecycle
+
+```javascript
+// Create chart
+const chart = Highcharts.chart('container', {
+  chart: {
+    type: 'line',
+    events: {
+      load: function() {
+        const chart = this;
+        
+        // Add series dynamically after 1 second
+        setTimeout(() => {
+          chart.addSeries({
+            name: 'Dynamic Series',
+            data: [5, 7, 3, 9]
+          });
+        }, 1000);
+      }
+    }
+  },
+  title: { text: 'Interactive Chart' },
+  xAxis: { categories: ['A', 'B', 'C', 'D'] },
+  series: [{
+    name: 'Initial Series',
+    data: [1, 3, 2, 4]
+  }]
+});
+
+// Update after 2 seconds
+setTimeout(() => {
+  chart.update({
+    title: { text: 'Updated Chart' },
+    chart: { backgroundColor: '#f0f0f0' }
+  });
+}, 2000);
+
+// Resize after 3 seconds
+setTimeout(() => {
+  chart.setSize(800, 400, true);
+}, 3000);
+
+// Clean up after 10 seconds
+setTimeout(() => {
+  chart.destroy();
+}, 10000);
+```
+
+## See Also
+
+- [Chart Options](/api/chart-options) - Configuration reference
+- [Series Class](/api/series) - Working with data series
+- [Methods API](/api/methods) - All chart methods
+- [Events API](/api/events) - Event handling

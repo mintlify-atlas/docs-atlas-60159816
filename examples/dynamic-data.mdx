@@ -1,0 +1,469 @@
+---
+title: Dynamic Data Examples
+description: Learn how to create charts that update in real-time and respond to user interactions
+---
+
+## Overview
+
+Highcharts provides powerful APIs for updating charts dynamically. This guide shows you how to create interactive, real-time charts that respond to user input and live data.
+
+## Live Data Updates
+
+Create a chart that updates automatically with new data points every second.
+
+```javascript
+// On chart load, start an interval that adds points to the chart
+const onChartLoad = function () {
+    const chart = this,
+        series = chart.series[0];
+
+    setInterval(function () {
+        const x = (new Date()).getTime(), // current time
+            y = Math.random();
+
+        series.addPoint([x, y], true, true);
+    }, 1000);
+};
+
+// Create the initial data
+const data = (function () {
+    const data = [];
+    const time = new Date().getTime();
+
+    for (let i = -19; i <= 0; i += 1) {
+        data.push({
+            x: time + i * 1000,
+            y: Math.random()
+        });
+    }
+    return data;
+}());
+
+// Plugin to add a pulsating marker on add point
+Highcharts.addEvent(Highcharts.Series, 'addPoint', e => {
+    const point = e.point,
+        series = e.target;
+
+    if (!series.pulse) {
+        series.pulse = series.chart.renderer.circle()
+            .add(series.markerGroup);
+    }
+
+    setTimeout(() => {
+        series.pulse
+            .attr({
+                x: series.xAxis.toPixels(point.x, true),
+                y: series.yAxis.toPixels(point.y, true),
+                r: series.options.marker.radius,
+                opacity: 1,
+                fill: series.color
+            })
+            .animate({
+                r: 20,
+                opacity: 0
+            }, {
+                duration: 1000
+            });
+    }, 1);
+});
+
+Highcharts.chart('container', {
+    chart: {
+        type: 'spline',
+        events: {
+            load: onChartLoad
+        }
+    },
+
+    time: {
+        useUTC: false
+    },
+
+    title: {
+        text: 'Live random data'
+    },
+
+    accessibility: {
+        announceNewData: {
+            enabled: true,
+            minAnnounceInterval: 15000,
+            announcementFormatter: function (allSeries, newSeries, newPoint) {
+                if (newPoint) {
+                    return 'New point added. Value: ' + newPoint.y;
+                }
+                return false;
+            }
+        }
+    },
+
+    xAxis: {
+        type: 'datetime',
+        tickPixelInterval: 150,
+        maxPadding: 0.1
+    },
+
+    yAxis: {
+        title: {
+            text: 'Value'
+        },
+        plotLines: [
+            {
+                value: 0,
+                width: 1,
+                color: '#808080'
+            }
+        ]
+    },
+
+    tooltip: {
+        headerFormat: '<b>{series.name}</b><br/>',
+        pointFormat: '{point.x:%Y-%m-%d %H:%M:%S}<br/>{point.y:.2f}'
+    },
+
+    legend: {
+        enabled: false
+    },
+
+    exporting: {
+        enabled: false
+    },
+
+    series: [
+        {
+            name: 'Random data',
+            lineWidth: 2,
+            color: Highcharts.getOptions().colors[2],
+            data
+        }
+    ]
+});
+```
+
+<Note>
+This example demonstrates:
+- Adding points dynamically with `series.addPoint()`
+- Creating a pulsating animation effect when new points are added
+- Using chart events to trigger updates on load
+- Accessibility announcements for new data points
+</Note>
+
+## Click to Add Points
+
+An interactive scatter chart where users can add and remove points by clicking.
+
+```javascript
+// Plugin to add a pulsating marker on add point
+Highcharts.addEvent(Highcharts.Series, 'addPoint', e => {
+    const point = e.point,
+        series = e.target;
+
+    if (!series.pulse) {
+        series.pulse = series.chart.renderer.circle()
+            .add(series.markerGroup);
+    }
+    setTimeout(() => {
+        series.pulse
+            .attr({
+                x: series.xAxis.toPixels(point.x, true),
+                y: series.yAxis.toPixels(point.y, true),
+                r: series.options.marker.radius,
+                opacity: 1,
+                fill: series.color
+            })
+            .animate({
+                r: 20,
+                opacity: 0
+            }, {
+                duration: 1000
+            });
+    }, 1);
+});
+
+Highcharts.chart('container', {
+    chart: {
+        type: 'scatter',
+        margin: [70, 50, 60, 80],
+        events: {
+            click: function (e) {
+                // Find the clicked values and the series
+                const x = Math.round(e.xAxis[0].value),
+                    y = Math.round(e.yAxis[0].value),
+                    series = this.series[0];
+
+                // Add it
+                series.addPoint([x, y]);
+            }
+        }
+    },
+    title: {
+        text: 'User supplied data',
+        align: 'left'
+    },
+    subtitle: {
+        text: 'Click the plot area to add a point. Click a point to remove it.',
+        align: 'left'
+    },
+    accessibility: {
+        announceNewData: {
+            enabled: true
+        }
+    },
+    xAxis: {
+        gridLineWidth: 1,
+        minPadding: 0.2,
+        maxPadding: 0.2,
+        maxZoom: 60
+    },
+    yAxis: {
+        title: {
+            text: 'Value'
+        },
+        minPadding: 0.2,
+        maxPadding: 0.2,
+        maxZoom: 60,
+        plotLines: [{
+            value: 0,
+            width: 1,
+            color: '#808080'
+        }]
+    },
+    legend: {
+        enabled: false
+    },
+    exporting: {
+        enabled: false
+    },
+    plotOptions: {
+        series: {
+            stickyTracking: false,
+            lineWidth: 3,
+            point: {
+                events: {
+                    click: function () {
+                        if (this.series.data.length > 1) {
+                            this.remove();
+                        }
+                    }
+                }
+            }
+        }
+    },
+    series: [{
+        data: [[20, 20], [80, 80]],
+        color: Highcharts.getOptions().colors[3],
+        marker: {
+            lineWidth: 2,
+            radius: 6
+        }
+    }]
+});
+```
+
+<Tip>
+Click anywhere on the chart to add a point. Click on an existing point to remove it. The pulsating animation provides visual feedback when points are added.
+</Tip>
+
+## Dynamic Chart Updates
+
+Update chart configuration on-the-fly with button controls.
+
+```javascript
+const chart = Highcharts.chart('container', {
+    title: {
+        text: 'Unemployment rates in engineering and ICT subjects, 2023'
+    },
+    subtitle: {
+        text: 'Chart option: Plain | Source: ' +
+            '<a href="https://www.nav.no/no/nav-og-samfunn/statistikk/arbeidssokere-og-stillinger-statistikk/helt-ledige"' +
+            'target="_blank">NAV</a>'
+    },
+    colors: [
+        '#4caefe', '#3fbdf3', '#35c3e8', '#2bc9dc',
+        '#20cfe1', '#16d4e6', '#0dd9db', '#03dfd0',
+        '#00e4c5', '#00e9ba', '#00eeaf', '#23e274'
+    ],
+    xAxis: {
+        categories: [
+            'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+        ]
+    },
+    series: [{
+        type: 'column',
+        name: 'Unemployed',
+        borderRadius: 5,
+        colorByPoint: true,
+        data: [
+            2396, 2434, 2491, 2602, 2536, 2618, 2928, 2899,
+            2780, 2853, 2923, 2999
+        ],
+        showInLegend: false
+    }]
+});
+
+// Update to plain view
+document.getElementById('plain').addEventListener('click', () => {
+    chart.update({
+        chart: {
+            inverted: false,
+            polar: false
+        },
+        subtitle: {
+            text: 'Chart option: Plain | Source: ' +
+                '<a href="https://www.nav.no/no/nav-og-samfunn/statistikk/arbeidssokere-og-stillinger-statistikk/helt-ledige"' +
+                'target="_blank">NAV</a>'
+        }
+    });
+});
+
+// Update to inverted view
+document.getElementById('inverted').addEventListener('click', () => {
+    chart.update({
+        chart: {
+            inverted: true,
+            polar: false
+        },
+        subtitle: {
+            text: 'Chart option: Inverted | Source: ' +
+                '<a href="https://www.nav.no/no/nav-og-samfunn/statistikk/arbeidssokere-og-stillinger-statistikk/helt-ledige"' +
+                'target="_blank">NAV</a>'
+        }
+    });
+});
+
+// Update to polar view
+document.getElementById('polar').addEventListener('click', () => {
+    chart.update({
+        chart: {
+            inverted: false,
+            polar: true
+        },
+        subtitle: {
+            text: 'Chart option: Polar | Source: ' +
+                '<a href="https://www.nav.no/no/nav-og-samfunn/statistikk/arbeidssokere-og-stillinger-statistikk/helt-ledige"' +
+                'target="_blank">NAV</a>'
+        }
+    });
+});
+```
+
+<Accordion title="HTML for the buttons">
+
+```html
+<div id="controls">
+    <button id="plain">Plain</button>
+    <button id="inverted">Inverted</button>
+    <button id="polar">Polar</button>
+</div>
+<div id="container"></div>
+```
+
+</Accordion>
+
+## Common Update Methods
+
+<AccordionGroup>
+
+<Accordion title="chart.update()">
+Updates the entire chart configuration. Accepts an options object and optional redraw parameters.
+
+```javascript
+chart.update({
+    chart: {
+        type: 'bar'
+    },
+    title: {
+        text: 'New Title'
+    }
+});
+```
+</Accordion>
+
+<Accordion title="series.addPoint()">
+Adds a new point to a series. Accepts data, redraw, shift, and animation parameters.
+
+```javascript
+series.addPoint([x, y], true, true);
+// Parameters: [data], redraw, shift oldest point, animation
+```
+</Accordion>
+
+<Accordion title="series.setData()">
+Replaces all data in a series at once.
+
+```javascript
+series.setData([
+    [1, 2],
+    [2, 3],
+    [3, 5],
+    [4, 8]
+]);
+```
+</Accordion>
+
+<Accordion title="point.update()">
+Updates a single point's properties.
+
+```javascript
+point.update({
+    y: 100,
+    color: 'red',
+    name: 'Updated Point'
+});
+```
+</Accordion>
+
+<Accordion title="point.remove()">
+Removes a point from the series.
+
+```javascript
+point.remove();
+```
+</Accordion>
+
+</AccordionGroup>
+
+## Performance Tips
+
+<Warning>
+When updating charts with large datasets or frequent updates:
+- Set `redraw: false` when adding multiple points, then call `chart.redraw()` once
+- Use the `boost` module for datasets with thousands of points
+- Disable animations for better performance: `animation: false`
+</Warning>
+
+## Best Practices
+
+<CardGroup cols={2}>
+
+<Card title="Batch Updates" icon="layer-group">
+When making multiple changes, batch them into a single update call to minimize redraws.
+</Card>
+
+<Card title="Memory Management" icon="memory">
+Use the `shift` parameter in `addPoint()` to prevent unlimited memory growth in live charts.
+</Card>
+
+<Card title="User Feedback" icon="bell">
+Provide visual or audio feedback when data updates, especially for accessibility.
+</Card>
+
+<Card title="Error Handling" icon="shield">
+Validate data before updating charts to prevent rendering errors.
+</Card>
+
+</CardGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+
+<Card title="Advanced Features" href="/examples/advanced-features" icon="wand-magic-sparkles">
+Explore annotations, drilldown, and custom plugins
+</Card>
+
+<Card title="Framework Integrations" href="/examples/integrations" icon="code">
+Integrate Highcharts with React, Vue, and Angular
+</Card>
+
+</CardGroup>

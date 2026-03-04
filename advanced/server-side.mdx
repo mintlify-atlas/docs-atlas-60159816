@@ -1,0 +1,583 @@
+---
+title: Server-Side Rendering
+description: Learn how to render Highcharts on the server for email reports, PDFs, and automated chart generation
+---
+
+Server-side rendering allows you to generate chart images without a browser, perfect for automated reports, email notifications, and PDF generation.
+
+## Use Cases
+
+- **Email Reports** - Embed chart images in emails
+- **PDF Generation** - Include charts in PDF documents
+- **Automated Dashboards** - Generate charts on schedule
+- **Static Site Generation** - Pre-render charts at build time
+- **API Endpoints** - Serve chart images via REST API
+
+## Node Export Server
+
+The official Highcharts Node Export Server is a powerful tool for server-side rendering.
+
+### Installation
+
+<CodeGroup>
+
+```bash npm
+npm install highcharts-export-server -g
+```
+
+```bash yarn
+yarn global add highcharts-export-server
+```
+
+```bash Docker
+docker pull highcharts/highcharts-export-server
+```
+
+</CodeGroup>
+
+### Command Line Usage
+
+```bash
+# Simple chart from config file
+highcharts-export-server -infile chart-config.json -outfile chart.png
+
+# Specify format
+highcharts-export-server -infile config.json -outfile chart.pdf
+
+# Set dimensions
+highcharts-export-server -infile config.json -outfile chart.png -width 800 -height 600
+
+# Batch processing
+highcharts-export-server -batch "config1.json=chart1.png;config2.json=chart2.png"
+```
+
+### Server Mode
+
+Run as an HTTP server:
+
+```bash
+highcharts-export-server --enableServer 1 --port 7801
+```
+
+Then POST requests to `http://localhost:7801`:
+
+```javascript
+const response = await fetch('http://localhost:7801', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+        infile: {
+            title: { text: 'My Chart' },
+            series: [{ data: [1, 2, 3, 4, 5] }]
+        },
+        width: 800,
+        scale: 2,
+        type: 'png'
+    })
+});
+
+const buffer = await response.buffer();
+```
+
+## Node.js Integration
+
+### Using as a Module
+
+```javascript
+const exporter = require('highcharts-export-server');
+
+// Initialize pool
+exporter.initPool();
+
+// Export chart
+exporter.export({
+    type: 'png',
+    options: {
+        title: {
+            text: 'Server-Side Chart'
+        },
+        series: [{
+            data: [1, 3, 2, 4, 5]
+        }]
+    },
+    width: 800,
+    scale: 2
+}, (err, res) => {
+    if (err) {
+        console.error(err);
+        return;
+    }
+    
+    // res.data contains the image buffer
+    require('fs').writeFileSync('chart.png', res.data);
+    
+    // Clean up
+    exporter.killPool();
+});
+```
+
+### Async/Await Pattern
+
+```javascript
+const exporter = require('highcharts-export-server');
+const fs = require('fs').promises;
+
+async function generateChart() {
+    try {
+        exporter.initPool();
+        
+        const result = await new Promise((resolve, reject) => {
+            exporter.export({
+                type: 'png',
+                options: {
+                    chart: { type: 'column' },
+                    title: { text: 'Sales by Region' },
+                    xAxis: {
+                        categories: ['North', 'South', 'East', 'West']
+                    },
+                    series: [{
+                        name: 'Q1',
+                        data: [120, 95, 110, 87]
+                    }, {
+                        name: 'Q2',
+                        data: [135, 102, 125, 93]
+                    }]
+                },
+                width: 1000,
+                scale: 2
+            }, (err, res) => {
+                if (err) reject(err);
+                else resolve(res);
+            });
+        });
+        
+        await fs.writeFile('sales-chart.png', result.data);
+        console.log('Chart generated successfully');
+        
+    } catch (error) {
+        console.error('Chart generation failed:', error);
+    } finally {
+        exporter.killPool();
+    }
+}
+
+generatChart();
+```
+
+## Express.js Integration
+
+```javascript
+const express = require('express');
+const exporter = require('highcharts-export-server');
+
+const app = express();
+app.use(express.json());
+
+// Initialize export server
+exporter.initPool();
+
+app.post('/generate-chart', async (req, res) => {
+    try {
+        const result = await new Promise((resolve, reject) => {
+            exporter.export({
+                type: req.body.format || 'png',
+                options: req.body.chartOptions,
+                width: req.body.width || 800,
+                scale: req.body.scale || 2
+            }, (err, result) => {
+                if (err) reject(err);
+                else resolve(result);
+            });
+        });
+        
+        res.set('Content-Type', `image/${req.body.format || 'png'}`);
+        res.send(result.data);
+        
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.listen(3000, () => {
+    console.log('Chart server running on port 3000');
+});
+
+// Clean up on exit
+process.on('exit', () => {
+    exporter.killPool();
+});
+```
+
+## Configuration Options
+
+```javascript
+const exportOptions = {
+    // Output format: 'png', 'jpeg', 'pdf', 'svg'
+    type: 'png',
+    
+    // Chart configuration
+    options: {
+        chart: { type: 'line' },
+        title: { text: 'Chart Title' },
+        series: [{ data: [1, 2, 3] }]
+    },
+    
+    // Image dimensions
+    width: 800,
+    height: 600,
+    
+    // Scale factor (for retina displays)
+    scale: 2,
+    
+    // Additional resources
+    resources: {
+        files: ['custom-theme.js'],
+        js: 'console.log("Custom JS");',
+        css: '.custom { color: red; }'
+    },
+    
+    // Custom constructor
+    constr: 'chart',  // or 'stockChart', 'mapChart'
+    
+    // Global options
+    globalOptions: {
+        lang: {
+            decimalPoint: ',',
+            thousandsSep: '.'
+        }
+    },
+    
+    // Theme
+    themeOptions: {
+        colors: ['#058DC7', '#50B432', '#ED561B']
+    },
+    
+    // Callback JavaScript
+    callback: 'function(chart) { chart.renderer.text("Custom", 10, 10).add(); }'
+};
+```
+
+## Docker Deployment
+
+### Using Official Image
+
+```dockerfile
+FROM highcharts/highcharts-export-server:latest
+
+EXPOSE 7801
+
+CMD ["--enableServer", "1", "--port", "7801"]
+```
+
+```bash
+docker run -d -p 7801:7801 highcharts/highcharts-export-server
+```
+
+### Custom Dockerfile
+
+```dockerfile
+FROM node:18-alpine
+
+WORKDIR /app
+
+RUN npm install -g highcharts-export-server
+
+EXPOSE 7801
+
+CMD ["highcharts-export-server", "--enableServer", "1", "--port", "7801"]
+```
+
+## Email Integration
+
+### Using Nodemailer
+
+```javascript
+const nodemailer = require('nodemailer');
+const exporter = require('highcharts-export-server');
+
+exporter.initPool();
+
+async function sendChartEmail(to, chartOptions) {
+    // Generate chart
+    const chart = await new Promise((resolve, reject) => {
+        exporter.export({
+            type: 'png',
+            options: chartOptions,
+            width: 800,
+            scale: 2
+        }, (err, res) => {
+            if (err) reject(err);
+            else resolve(res);
+        });
+    });
+    
+    // Send email
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS
+        }
+    });
+    
+    await transporter.sendMail({
+        from: 'reports@example.com',
+        to: to,
+        subject: 'Your Weekly Report',
+        html: `
+            <h1>Weekly Sales Report</h1>
+            <p>Please find your sales chart below:</p>
+            <img src="cid:chart" alt="Sales Chart" />
+        `,
+        attachments: [{
+            filename: 'chart.png',
+            content: chart.data,
+            cid: 'chart'
+        }]
+    });
+    
+    console.log('Email sent successfully');
+}
+
+exporter.killPool();
+```
+
+## PDF Generation
+
+### Using PDFKit
+
+```javascript
+const PDFDocument = require('pdfkit');
+const exporter = require('highcharts-export-server');
+const fs = require('fs');
+
+exporter.initPool();
+
+async function createPDFReport() {
+    // Generate chart
+    const chart = await new Promise((resolve, reject) => {
+        exporter.export({
+            type: 'png',
+            options: {
+                title: { text: 'Monthly Revenue' },
+                series: [{ data: [10, 20, 30, 40, 50] }]
+            },
+            width: 600,
+            scale: 2
+        }, (err, res) => {
+            if (err) reject(err);
+            else resolve(res);
+        });
+    });
+    
+    // Create PDF
+    const doc = new PDFDocument();
+    doc.pipe(fs.createWriteStream('report.pdf'));
+    
+    doc.fontSize(20).text('Monthly Report', 100, 50);
+    doc.fontSize(12).text('Generated on ' + new Date().toLocaleDateString(), 100, 80);
+    
+    doc.image(chart.data, 100, 120, {
+        width: 400
+    });
+    
+    doc.end();
+    
+    exporter.killPool();
+}
+
+createPDFReport();
+```
+
+## Next.js Integration
+
+### API Route
+
+```typescript
+// pages/api/chart.ts
+import type { NextApiRequest, NextApiResponse } from 'next';
+const exporter = require('highcharts-export-server');
+
+exporter.initPool();
+
+export default async function handler(
+    req: NextApiRequest,
+    res: NextApiResponse
+) {
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: 'Method not allowed' });
+    }
+    
+    try {
+        const result = await new Promise((resolve, reject) => {
+            exporter.export({
+                type: 'png',
+                options: req.body.chartOptions,
+                width: req.body.width || 800,
+                scale: 2
+            }, (err: any, res: any) => {
+                if (err) reject(err);
+                else resolve(res);
+            });
+        });
+        
+        res.setHeader('Content-Type', 'image/png');
+        res.send(result.data);
+        
+    } catch (error) {
+        res.status(500).json({ error: 'Chart generation failed' });
+    }
+}
+```
+
+### Static Generation
+
+```typescript
+// lib/generateChart.ts
+import fs from 'fs/promises';
+const exporter = require('highcharts-export-server');
+
+export async function generateStaticChart(options: any, filename: string) {
+    exporter.initPool();
+    
+    const result = await new Promise((resolve, reject) => {
+        exporter.export({
+            type: 'png',
+            options,
+            width: 1000,
+            scale: 2
+        }, (err: any, res: any) => {
+            if (err) reject(err);
+            else resolve(res);
+        });
+    });
+    
+    await fs.writeFile(`public/charts/${filename}`, result.data);
+    
+    exporter.killPool();
+    
+    return `/charts/${filename}`;
+}
+
+// pages/report.tsx
+import { GetStaticProps } from 'next';
+import { generateStaticChart } from '@/lib/generateChart';
+
+export const getStaticProps: GetStaticProps = async () => {
+    const chartUrl = await generateStaticChart({
+        title: { text: 'Sales Data' },
+        series: [{ data: [1, 2, 3, 4, 5] }]
+    }, 'sales-chart.png');
+    
+    return {
+        props: { chartUrl }
+    };
+};
+
+export default function Report({ chartUrl }: { chartUrl: string }) {
+    return <img src={chartUrl} alt="Sales Chart" />;
+}
+```
+
+## Performance Tips
+
+<Steps>
+
+<Step title="Pool Management">
+
+Initialize the pool once and reuse it:
+
+```javascript
+// At application startup
+exporter.initPool({
+    maxWorkers: 4,
+    initialWorkers: 2
+});
+
+// At application shutdown
+process.on('SIGTERM', () => {
+    exporter.killPool();
+});
+```
+
+</Step>
+
+<Step title="Use Caching">
+
+```javascript
+const cache = new Map();
+
+function getCachedChart(key, options) {
+    if (cache.has(key)) {
+        return cache.get(key);
+    }
+    
+    const chart = generateChart(options);
+    cache.set(key, chart);
+    return chart;
+}
+```
+
+</Step>
+
+<Step title="Optimize Chart Config">
+
+```javascript
+// Disable unnecessary features
+const options = {
+    chart: {
+        animation: false
+    },
+    plotOptions: {
+        series: {
+            animation: false,
+            shadow: false
+        }
+    }
+};
+```
+
+</Step>
+
+</Steps>
+
+## Error Handling
+
+```javascript
+function safeExport(options) {
+    return new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => {
+            reject(new Error('Export timeout'));
+        }, 30000);
+        
+        exporter.export(options, (err, res) => {
+            clearTimeout(timeout);
+            
+            if (err) {
+                reject(err);
+            } else {
+                resolve(res);
+            }
+        });
+    });
+}
+
+try {
+    const result = await safeExport(chartOptions);
+    // Handle success
+} catch (error) {
+    console.error('Export failed:', error);
+    // Handle error
+}
+```
+
+<Warning>
+Server-side rendering requires sufficient memory and CPU resources. Monitor your server performance and adjust worker pool size accordingly.
+</Warning>
+
+## Resources
+
+- [Node Export Server Documentation](https://github.com/highcharts/node-export-server)
+- [Export Server API Reference](https://github.com/highcharts/node-export-server/blob/master/README.md)

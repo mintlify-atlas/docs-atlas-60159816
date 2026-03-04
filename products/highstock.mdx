@@ -1,0 +1,430 @@
+---
+title: Highcharts Stock
+description: Create advanced financial charts with time series data, technical indicators, and interactive range selectors
+---
+
+Highcharts Stock is a specialized charting library built on top of Highcharts Core, designed for visualizing time series data and financial charts. It includes all the features of Highcharts, plus advanced functionality for stock market analysis, technical indicators, and time-based data exploration.
+
+## Overview
+
+Highcharts Stock extends Highcharts with powerful features for financial and time series data visualization, including:
+
+- **Navigator**: Fine-tune the visible range and scroll through large datasets
+- **Range Selector**: Quickly select predefined time ranges or specify exact intervals
+- **Technical Indicators**: 50+ built-in indicators for financial analysis
+- **Financial Chart Types**: Candlestick, OHLC, HLC, Heikin Ashi, and more
+- **Data Grouping**: Automatic point aggregation for improved performance
+- **Advanced Crosshairs**: Track data points across multiple series
+
+## Installation
+
+<CodeGroup>
+```bash npm
+npm install highcharts
+```
+
+```bash yarn
+yarn add highcharts
+```
+
+```html CDN
+<script src="https://code.highcharts.com/stock/highstock.js"></script>
+```
+</CodeGroup>
+
+### ES6 Module Import
+
+```javascript
+import Highcharts from 'highcharts/highstock';
+
+// Optional: Load additional modules
+import indicators from 'highcharts/indicators/indicators';
+import indicatorSMA from 'highcharts/indicators/sma';
+
+indicators(Highcharts);
+indicatorSMA(Highcharts);
+```
+
+## Getting Started
+
+Create your first stock chart with the `Highcharts.stockChart()` constructor:
+
+```javascript
+Highcharts.stockChart('container', {
+  rangeSelector: {
+    selected: 1
+  },
+  title: {
+    text: 'AAPL Stock Price'
+  },
+  series: [{
+    name: 'AAPL',
+    data: [
+      [1147651200000, 67.79],
+      [1147737600000, 64.98],
+      [1147824000000, 65.26],
+      // ... more data points
+    ],
+    tooltip: {
+      valueDecimals: 2
+    }
+  }]
+});
+```
+
+## Key Features
+
+### Navigator and Scrollbar
+
+The navigator provides a small overview chart that allows users to select and scroll through different time ranges.
+
+<Card title="Navigator" icon="compass">
+  The navigator appears below the main chart and shows a condensed view of the entire dataset, with handles to adjust the visible range.
+</Card>
+
+```javascript
+Highcharts.stockChart('container', {
+  navigator: {
+    enabled: true,
+    height: 40,
+    series: {
+      type: 'areaspline',
+      fillOpacity: 0.05
+    }
+  },
+  scrollbar: {
+    enabled: true,
+    barBackgroundColor: '#808083',
+    barBorderRadius: 7,
+    barBorderWidth: 0,
+    buttonBackgroundColor: '#808083',
+    buttonBorderWidth: 0,
+    buttonBorderRadius: 7
+  },
+  series: [{
+    data: yourData
+  }]
+});
+```
+
+### Range Selector
+
+Quickly select common time ranges or specify custom date intervals.
+
+```javascript
+rangeSelector: {
+  buttons: [{
+    type: 'day',
+    count: 1,
+    text: '1d'
+  }, {
+    type: 'week',
+    count: 1,
+    text: '1w'
+  }, {
+    type: 'month',
+    count: 1,
+    text: '1m'
+  }, {
+    type: 'month',
+    count: 3,
+    text: '3m'
+  }, {
+    type: 'year',
+    count: 1,
+    text: '1y'
+  }, {
+    type: 'all',
+    text: 'All'
+  }],
+  selected: 4
+}
+```
+
+### Financial Chart Types
+
+<CardGroup cols={2}>
+  <Card title="Candlestick" icon="chart-candlestick">
+    Display open, high, low, and close prices with colored bodies showing price direction
+  </Card>
+  <Card title="OHLC" icon="chart-line">
+    Show open, high, low, and close as vertical lines with horizontal ticks
+  </Card>
+  <Card title="HLC" icon="chart-simple">
+    Display high, low, and close prices without open values
+  </Card>
+  <Card title="Heikin Ashi" icon="chart-area">
+    Modified candlestick chart that smooths price data to identify trends
+  </Card>
+</CardGroup>
+
+```javascript
+series: [{
+  type: 'candlestick',
+  name: 'AAPL Stock Price',
+  data: [
+    [timestamp, open, high, low, close],
+    [1147651200000, 67.79, 68.15, 67.35, 67.93],
+    // ... more data
+  ]
+}]
+```
+
+### Technical Indicators
+
+Highcharts Stock includes 50+ technical indicators for financial analysis. Indicators are implemented as series linked to the main data.
+
+<Steps>
+  <Step title="Load the indicators module">
+    ```html
+    <script src="https://code.highcharts.com/stock/indicators/indicators.js"></script>
+    ```
+  </Step>
+  
+  <Step title="Load specific indicator modules">
+    ```html
+    <script src="https://code.highcharts.com/stock/indicators/ema.js"></script>
+    <script src="https://code.highcharts.com/stock/indicators/rsi.js"></script>
+    ```
+  </Step>
+  
+  <Step title="Add indicators to your chart">
+    ```javascript
+    series: [{
+      id: 'aapl',
+      name: 'AAPL Stock Price',
+      data: priceData
+    }, {
+      type: 'sma',
+      linkedTo: 'aapl',
+      params: {
+        period: 14
+      }
+    }, {
+      type: 'ema',
+      linkedTo: 'aapl',
+      params: {
+        period: 7
+      }
+    }]
+    ```
+  </Step>
+</Steps>
+
+#### Available Indicators
+
+**Overlays** (same scale as price chart):
+- SMA (Simple Moving Average)
+- EMA (Exponential Moving Average)
+- Bollinger Bands
+- Pivot Points
+- VWAP (Volume Weighted Average Price)
+- And many more...
+
+**Oscillators** (separate axis):
+- RSI (Relative Strength Index)
+- MACD (Moving Average Convergence Divergence)
+- Stochastic
+- CCI (Commodity Channel Index)
+- ATR (Average True Range)
+- And many more...
+
+### Data Grouping
+
+Automatically aggregate data points based on zoom level for improved performance with large datasets.
+
+```javascript
+plotOptions: {
+  series: {
+    dataGrouping: {
+      enabled: true,
+      approximation: 'average',
+      groupPixelWidth: 10,
+      units: [[
+        'day',
+        [1]
+      ], [
+        'week',
+        [1]
+      ], [
+        'month',
+        [1, 3, 6]
+      ]]
+    }
+  }
+}
+```
+
+## Advanced Examples
+
+### Candlestick with Volume
+
+```javascript
+Highcharts.stockChart('container', {
+  yAxis: [{
+    labels: {
+      align: 'right',
+      x: -3
+    },
+    title: {
+      text: 'OHLC'
+    },
+    height: '60%',
+    lineWidth: 2
+  }, {
+    labels: {
+      align: 'right',
+      x: -3
+    },
+    title: {
+      text: 'Volume'
+    },
+    top: '65%',
+    height: '35%',
+    offset: 0,
+    lineWidth: 2
+  }],
+  series: [{
+    type: 'candlestick',
+    name: 'AAPL',
+    data: ohlcData,
+    dataGrouping: {
+      units: [['week', [1]], ['month', [1, 2, 3, 4, 6]]]
+    }
+  }, {
+    type: 'column',
+    name: 'Volume',
+    data: volumeData,
+    yAxis: 1,
+    dataGrouping: {
+      units: [['week', [1]], ['month', [1, 2, 3, 4, 6]]]
+    }
+  }]
+});
+```
+
+### MACD with Pivot Points
+
+```javascript
+series: [{
+  id: 'aapl',
+  name: 'AAPL Stock Price',
+  data: priceData
+}, {
+  type: 'pivotpoints',
+  linkedTo: 'aapl',
+  zIndex: 0,
+  lineWidth: 1,
+  dataLabels: {
+    overflow: 'none',
+    crop: false,
+    y: 4,
+    style: {
+      fontSize: '9px'
+    }
+  }
+}, {
+  type: 'macd',
+  yAxis: 1,
+  linkedTo: 'aapl'
+}]
+```
+
+### Comparing Multiple Stocks
+
+```javascript
+Highcharts.stockChart('container', {
+  rangeSelector: {
+    selected: 4
+  },
+  yAxis: {
+    labels: {
+      formatter: function () {
+        return (this.value > 0 ? ' + ' : '') + this.value + '%';
+      }
+    },
+    plotLines: [{
+      value: 0,
+      width: 2,
+      color: 'silver'
+    }]
+  },
+  plotOptions: {
+    series: {
+      compare: 'percent',
+      showInNavigator: true
+    }
+  },
+  series: [{
+    name: 'AAPL',
+    data: aaplData
+  }, {
+    name: 'MSFT',
+    data: msftData
+  }, {
+    name: 'GOOG',
+    data: googData
+  }]
+});
+```
+
+## Stock Tools
+
+Stock Tools provide an advanced GUI for drawing annotations and managing indicators.
+
+```html
+<script src="https://code.highcharts.com/stock/modules/stock-tools.js"></script>
+```
+
+```javascript
+stockTools: {
+  gui: {
+    enabled: true,
+    buttons: ['indicators', 'separator', 'simpleShapes', 'lines', 'crookedLines', 'measure', 'advanced', 'toggleAnnotations', 'separator', 'verticalLabels', 'flags', 'separator', 'zoomChange', 'fullScreen', 'typeChange', 'separator', 'currentPriceIndicator', 'saveChart']
+  }
+}
+```
+
+## Performance Tips
+
+<Card title="Optimize Large Datasets" icon="gauge-high">
+  - Enable data grouping for datasets with thousands of points
+  - Use `turboThreshold` to control when optimization kicks in
+  - Consider lazy loading data as users zoom and pan
+  - Use appropriate approximation functions for your data type
+</Card>
+
+```javascript
+plotOptions: {
+  series: {
+    turboThreshold: 5000,
+    dataGrouping: {
+      enabled: true
+    }
+  }
+}
+```
+
+## Related Resources
+
+<CardGroup cols={2}>
+  <Card title="API Reference" icon="code" href="https://api.highcharts.com/highstock/">
+    Complete Highcharts Stock API documentation
+  </Card>
+  <Card title="Live Demos" icon="flask" href="https://www.highcharts.com/demo/stock">
+    Interactive examples and demos
+  </Card>
+  <Card title="Technical Indicators" icon="chart-line">
+    Full list of 50+ available technical indicators
+  </Card>
+  <Card title="Chart Types" icon="shapes">
+    Explore all financial chart types available
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+- Explore [Technical Indicators](/products/highstock#technical-indicators) for advanced analysis
+- Learn about [Data Grouping](/products/highstock#data-grouping) for performance optimization
+- Check out [Financial Chart Types](/products/highstock#financial-chart-types) for different visualization options
+- Try the [Stock Tools](/products/highstock#stock-tools) for interactive chart annotation

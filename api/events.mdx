@@ -1,0 +1,649 @@
+---
+title: 'Event Handling'
+description: 'Complete reference for Highcharts event system'
+---
+
+# Event Handling
+
+Highcharts provides a comprehensive event system for handling user interactions and chart lifecycle events.
+
+## Event Configuration
+
+Events are configured in the `events` option of chart elements:
+
+```javascript
+Highcharts.chart('container', {
+  chart: {
+    events: {
+      load: function() { /* ... */ }
+    }
+  },
+  xAxis: {
+    events: {
+      afterSetExtremes: function(e) { /* ... */ }
+    }
+  },
+  plotOptions: {
+    series: {
+      events: {
+        click: function(e) { /* ... */ }
+      },
+      point: {
+        events: {
+          click: function() { /* ... */ }
+        }
+      }
+    }
+  }
+});
+```
+
+## Chart Events
+
+**Source**: `ts/Core/Chart/ChartOptions.ts:83`
+
+### load
+
+Fires when the chart has finished loading.
+
+```javascript
+chart: {
+  events: {
+    load: function() {
+      console.log('Chart loaded');
+      console.log('Chart object:', this);
+    }
+  }
+}
+```
+
+**Context**: `this` = Chart instance
+
+### render
+
+Fires after the chart has rendered.
+
+```javascript
+chart: {
+  events: {
+    render: function() {
+      console.log('Chart rendered at', new Date());
+    }
+  }
+}
+```
+
+### redraw
+
+Fires when the chart is redrawn.
+
+```javascript
+chart: {
+  events: {
+    redraw: function() {
+      console.log('Chart redrawn');
+    }
+  }
+}
+```
+
+### click
+
+Fires when the plot background is clicked.
+
+```javascript
+chart: {
+  events: {
+    click: function(event) {
+      const x = event.xAxis[0].value;
+      const y = event.yAxis[0].value;
+      console.log('Clicked at:', x, y);
+      
+      // Add point at click location
+      this.series[0].addPoint([x, y]);
+    }
+  }
+}
+```
+
+**Event Object**:
+- `xAxis` - Array of axis objects with click coordinates
+- `yAxis` - Array of axis objects with click coordinates
+- Native DOM event properties
+
+### selection
+
+Fires when area is selected (zooming).
+
+```javascript
+chart: {
+  zooming: { type: 'x' },
+  events: {
+    selection: function(event) {
+      const min = event.xAxis[0].min;
+      const max = event.xAxis[0].max;
+      console.log('Selected range:', min, max);
+      
+      // Prevent default zoom
+      return false;
+    }
+  }
+}
+```
+
+**Event Object**:
+- `xAxis[0].min` - Selection start
+- `xAxis[0].max` - Selection end
+- `yAxis[0].min/max` - Y-axis selection
+- `resetSelection` - True if reset zoom button was clicked
+
+**Return**: `false` to prevent default zoom behavior
+
+### addSeries
+
+Fires when a series is added.
+
+```javascript
+chart: {
+  events: {
+    addSeries: function(event) {
+      console.log('Series added:', event.options);
+      
+      // Prevent series addition
+      if (this.series.length >= 5) {
+        alert('Maximum 5 series allowed');
+        return false;
+      }
+    }
+  }
+}
+```
+
+**Event Object**:
+- `options` - Series options being added
+
+**Return**: `false` to prevent adding
+
+### beforePrint / afterPrint
+
+Fires before and after the chart is printed.
+
+```javascript
+chart: {
+  events: {
+    beforePrint: function() {
+      this.update({
+        chart: { width: 1000 }
+      });
+    },
+    afterPrint: function() {
+      this.reflow();
+    }
+  }
+}
+```
+
+## Axis Events
+
+### afterSetExtremes
+
+Fires after axis extremes are set.
+
+```javascript
+xAxis: {
+  events: {
+    afterSetExtremes: function(e) {
+      console.log('New range:', e.min, e.max);
+      
+      // Load data for new range
+      if (e.trigger === 'zoom') {
+        loadDataForRange(e.min, e.max);
+      }
+    }
+  }
+}
+```
+
+**Event Object**:
+- `min` - New minimum
+- `max` - New maximum
+- `dataMin` - Data minimum
+- `dataMax` - Data maximum
+- `trigger` - Event trigger: 'zoom', 'navigator', etc.
+
+### setExtremes
+
+Fires when extremes are being set (before actual change).
+
+```javascript
+xAxis: {
+  events: {
+    setExtremes: function(e) {
+      console.log('Setting extremes:', e.min, e.max);
+      
+      // Prevent negative range
+      if (e.min < 0) {
+        alert('Minimum cannot be negative');
+        return false;
+      }
+    }
+  }
+}
+```
+
+**Return**: `false` to prevent the change
+
+### afterBreaks
+
+Fires after axis breaks are recalculated.
+
+```javascript
+xAxis: {
+  events: {
+    afterBreaks: function() {
+      console.log('Breaks updated');
+    }
+  }
+}
+```
+
+### pointBreak
+
+Fires when a point is broken by axis breaks.
+
+```javascript
+xAxis: {
+  events: {
+    pointBreak: function(e) {
+      console.log('Point broken:', e.point.name);
+    }
+  }
+}
+```
+
+## Series Events
+
+**Source**: `ts/Core/Series/SeriesOptions.ts:111`
+
+### click
+
+Fires when the series is clicked.
+
+```javascript
+plotOptions: {
+  series: {
+    events: {
+      click: function(event) {
+        console.log('Series clicked:', this.name);
+        console.log('Nearest point:', event.point);
+      }
+    }
+  }
+}
+```
+
+**Event Object**:
+- `point` - Nearest point to click
+
+### show / hide
+
+Fires when series is shown or hidden.
+
+```javascript
+plotOptions: {
+  series: {
+    events: {
+      show: function() {
+        console.log('Series shown:', this.name);
+      },
+      hide: function() {
+        console.log('Series hidden:', this.name);
+      }
+    }
+  }
+}
+```
+
+### legendItemClick
+
+Fires when legend item is clicked.
+
+```javascript
+plotOptions: {
+  series: {
+    events: {
+      legendItemClick: function() {
+        if (!confirm('Toggle ' + this.name + '?')) {
+          return false;  // Prevent toggle
+        }
+      }
+    }
+  }
+}
+```
+
+**Return**: `false` to prevent default hide/show
+
+### mouseOver / mouseOut
+
+Fires when mouse enters or leaves series.
+
+```javascript
+plotOptions: {
+  series: {
+    events: {
+      mouseOver: function() {
+        this.update({ opacity: 1 });
+      },
+      mouseOut: function() {
+        this.update({ opacity: 0.7 });
+      }
+    }
+  }
+}
+```
+
+### afterAnimate
+
+Fires after series animation completes.
+
+```javascript
+plotOptions: {
+  series: {
+    events: {
+      afterAnimate: function() {
+        console.log('Animation complete for:', this.name);
+      }
+    }
+  }
+}
+```
+
+## Point Events
+
+### click
+
+Fires when a point is clicked.
+
+```javascript
+plotOptions: {
+  series: {
+    point: {
+      events: {
+        click: function() {
+          alert('Point clicked: ' + this.category + ', ' + this.y);
+          
+          // Highlight point
+          this.update({ color: 'red' });
+        }
+      }
+    }
+  }
+}
+```
+
+**Context**: `this` = Point instance
+
+### mouseOver / mouseOut
+
+Fires when mouse enters or leaves a point.
+
+```javascript
+plotOptions: {
+  series: {
+    point: {
+      events: {
+        mouseOver: function() {
+          console.log('Hovering:', this.name, this.y);
+          this.update({ 
+            marker: { radius: 10 }
+          });
+        },
+        mouseOut: function() {
+          this.update({ 
+            marker: { radius: 4 }
+          });
+        }
+      }
+    }
+  }
+}
+```
+
+### select / unselect
+
+Fires when point is selected or unselected.
+
+```javascript
+plotOptions: {
+  series: {
+    allowPointSelect: true,
+    point: {
+      events: {
+        select: function() {
+          console.log('Selected:', this.y);
+        },
+        unselect: function() {
+          console.log('Unselected:', this.y);
+        }
+      }
+    }
+  }
+}
+```
+
+### update
+
+Fires when point is updated.
+
+```javascript
+plotOptions: {
+  series: {
+    point: {
+      events: {
+        update: function() {
+          console.log('Point updated to:', this.y);
+        }
+      }
+    }
+  }
+}
+```
+
+### remove
+
+Fires when point is removed.
+
+```javascript
+plotOptions: {
+  series: {
+    point: {
+      events: {
+        remove: function() {
+          console.log('Point removed:', this.y);
+        }
+      }
+    }
+  }
+}
+```
+
+### drag / drop
+
+Fires when point is dragged (requires draggable-points module).
+
+```javascript
+plotOptions: {
+  series: {
+    point: {
+      events: {
+        drag: function(e) {
+          console.log('Dragging to:', e.newY);
+        },
+        drop: function(e) {
+          console.log('Dropped at:', e.newY);
+        }
+      }
+    }
+  }
+}
+```
+
+## Event Utilities
+
+### addEvent()
+
+Add event listener to chart element.
+
+```javascript
+const chart = Highcharts.chart('container', { /* ... */ });
+
+// Add custom event listener
+Highcharts.addEvent(chart, 'render', function() {
+  console.log('Custom render handler');
+});
+
+// Add to series
+Highcharts.addEvent(chart.series[0], 'hide', function() {
+  console.log('Series hidden');
+});
+```
+
+### removeEvent()
+
+Remove event listener.
+
+```javascript
+const unbind = Highcharts.addEvent(chart, 'render', handler);
+
+// Later remove
+Highcharts.removeEvent(chart, 'render', handler);
+
+// Or call unbind function
+unbind();
+```
+
+### fireEvent()
+
+Manually fire an event.
+
+```javascript
+// Fire custom event
+Highcharts.fireEvent(chart, 'customEvent', {
+  customData: 'value'
+});
+
+// Fire with default function
+Highcharts.fireEvent(
+  chart,
+  'selection',
+  { xAxis: [{ min: 0, max: 100 }] },
+  function(e) {
+    console.log('Default selection handler');
+  }
+);
+```
+
+## Complete Example
+
+```javascript
+const chart = Highcharts.chart('container', {
+  chart: {
+    zooming: { type: 'x' },
+    events: {
+      load: function() {
+        console.log('Chart loaded with', this.series.length, 'series');
+      },
+      selection: function(event) {
+        if (!event.resetSelection) {
+          const min = event.xAxis[0].min;
+          const max = event.xAxis[0].max;
+          console.log('Zoomed to:', min, max);
+          
+          // Load additional data
+          fetch(`/api/data?min=${min}&max=${max}`)
+            .then(res => res.json())
+            .then(data => {
+              this.series[0].setData(data);
+            });
+        }
+      },
+      click: function(event) {
+        const x = event.xAxis[0].value;
+        const y = event.yAxis[0].value;
+        
+        this.series[0].addPoint([x, y]);
+      }
+    }
+  },
+  
+  xAxis: {
+    events: {
+      afterSetExtremes: function(e) {
+        console.log('X-axis range:', e.min, e.max);
+        
+        if (e.trigger === 'navigator') {
+          console.log('Changed via navigator');
+        }
+      }
+    }
+  },
+  
+  plotOptions: {
+    series: {
+      allowPointSelect: true,
+      cursor: 'pointer',
+      events: {
+        click: function(event) {
+          console.log('Series:', this.name);
+          console.log('Point:', event.point.y);
+        },
+        hide: function() {
+          console.log('Hidden:', this.name);
+        },
+        show: function() {
+          console.log('Shown:', this.name);
+        },
+        legendItemClick: function() {
+          return confirm('Toggle ' + this.name + '?');
+        },
+        afterAnimate: function() {
+          console.log('Animation done:', this.name);
+        }
+      },
+      point: {
+        events: {
+          click: function() {
+            alert('Value: ' + this.y);
+          },
+          mouseOver: function() {
+            this.series.chart.setTitle({
+              text: this.category + ': ' + this.y
+            });
+          },
+          select: function() {
+            console.log('Selected point:', this.y);
+          }
+        }
+      }
+    }
+  },
+  
+  series: [{
+    data: [29.9, 71.5, 106.4, 129.2, 144.0]
+  }]
+});
+
+// Add custom event handler
+Highcharts.addEvent(chart, 'render', function() {
+  console.log('Custom render handler');
+});
+```
+
+## See Also
+
+- [Chart Class](/api/chart) - Chart methods
+- [Series Class](/api/series) - Series methods
+- [Axis Class](/api/axis) - Axis methods
+- [Point Class](/api/point) - Point methods
+- [Methods API](/api/methods) - API methods

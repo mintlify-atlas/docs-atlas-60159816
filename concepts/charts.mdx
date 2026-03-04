@@ -1,0 +1,303 @@
+---
+title: Chart Configuration and Structure
+description: Learn about Highcharts chart configuration, structure, and core chart options for creating interactive visualizations.
+---
+
+# Chart Configuration and Structure
+
+Highcharts charts are created by passing a configuration object to the chart constructor. Understanding the chart structure and configuration options is fundamental to creating effective visualizations.
+
+## Creating a Chart
+
+The basic pattern for creating a Highcharts chart involves initializing it with a configuration object:
+
+```javascript
+Highcharts.chart('container', {
+    chart: {
+        type: 'column'
+    },
+    title: {
+        text: 'Chart Title'
+    },
+    xAxis: {
+        categories: ['Category 1', 'Category 2', 'Category 3']
+    },
+    yAxis: {
+        title: {
+            text: 'Values'
+        }
+    },
+    series: [{
+        name: 'Series 1',
+        data: [1, 2, 3]
+    }]
+});
+```
+
+## Chart Structure
+
+Every Highcharts chart consists of several key components:
+
+<Tabs>
+  <Tab title="Chart Container">
+    The `chart` object defines the chart type, dimensions, and rendering options.
+
+    ```typescript
+    interface ChartOptions {
+        type?: string;           // Chart type: 'line', 'column', 'bar', etc.
+        width?: number;          // Chart width in pixels
+        height?: number;         // Chart height in pixels
+        backgroundColor?: ColorType;
+        borderWidth?: number;
+        borderRadius?: number;
+        events?: ChartEventsOptions;
+        animation?: AnimationOptions;
+        renderTo?: string | HTMLDOMElement;
+        polar?: boolean;         // Enable polar chart
+        zoomType?: 'x' | 'y' | 'xy';  // Enable zooming
+    }
+    ```
+
+    **Key Properties:**
+    - `type` - Default series type for the chart
+    - `renderTo` - DOM element ID where chart renders
+    - `zoomType` - Enable mouse zooming on x, y, or both axes
+    - `polar` - Convert the chart to polar coordinates
+  </Tab>
+
+  <Tab title="Title & Subtitle">
+    Chart titles provide context for your visualization.
+
+    ```javascript
+    title: {
+        text: 'Monthly Revenue Report',
+        align: 'left',
+        style: {
+            fontSize: '18px',
+            fontWeight: 'bold'
+        }
+    },
+    subtitle: {
+        text: 'Source: Company Analytics',
+        align: 'left'
+    }
+    ```
+  </Tab>
+
+  <Tab title="Chart Events">
+    Charts support various events for interactivity.
+
+    ```typescript
+    interface ChartEventsOptions {
+        load?: Function;         // Fires when chart is loaded
+        render?: Function;       // Fires after chart is rendered
+        addSeries?: Function;    // Fires when series is added
+        click?: Function;        // Fires on chart click
+        selection?: Function;    // Fires on zoom/selection
+    }
+    ```
+
+    **Example:**
+    ```javascript
+    chart: {
+        events: {
+            load: function() {
+                console.log('Chart loaded');
+            },
+            click: function(event) {
+                console.log('Clicked at:', event.xAxis[0].value);
+            }
+        }
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Chart Methods
+
+Once created, chart instances expose methods for dynamic updates:
+
+<CodeGroup>
+```javascript Chart Updates
+// Get chart instance
+const chart = Highcharts.chart('container', options);
+
+// Add a series
+chart.addSeries({
+    name: 'New Series',
+    data: [5, 3, 4, 7, 2]
+});
+
+// Update chart options
+chart.update({
+    title: {
+        text: 'Updated Title'
+    }
+});
+
+// Redraw the chart
+chart.redraw();
+```
+
+```javascript Chart Sizing
+// Set specific size
+chart.setSize(800, 400);
+
+// Reflow to container size
+chart.reflow();
+
+// Set title
+chart.setTitle({
+    text: 'New Title'
+}, {
+    text: 'New Subtitle'
+});
+```
+
+```javascript Chart Export
+// Export chart to PNG
+chart.exportChart({
+    type: 'image/png',
+    filename: 'my-chart'
+});
+
+// Get SVG representation
+const svg = chart.getSVG();
+```
+</CodeGroup>
+
+## Chart Types
+
+Highcharts supports numerous chart types through the `chart.type` option:
+
+| Type | Description | Use Case |
+|------|-------------|----------|
+| `line` | Line chart | Trends over time |
+| `column` | Vertical bars | Comparing categories |
+| `bar` | Horizontal bars | Ranking data |
+| `area` | Area chart | Cumulative values |
+| `pie` | Pie chart | Part-to-whole relationships |
+| `scatter` | Scatter plot | Correlation analysis |
+| `bubble` | Bubble chart | Three-dimensional data |
+| `heatmap` | Heat map | Matrix data visualization |
+
+<Note>
+  The chart type can be set globally with `chart.type` or overridden per series with `series.type`.
+</Note>
+
+## Real-World Example
+
+Here's a complete chart configuration with multiple features:
+
+```javascript
+Highcharts.chart('container', {
+    chart: {
+        type: 'column',
+        backgroundColor: '#f9f9f9',
+        borderRadius: 8,
+        events: {
+            load: function() {
+                this.renderer.text(
+                    'Custom watermark',
+                    100,
+                    100
+                ).add();
+            }
+        }
+    },
+    title: {
+        text: 'Corn vs Wheat Production for 2023',
+        align: 'left'
+    },
+    subtitle: {
+        text: 'Source: Agriculture Statistics',
+        align: 'left'
+    },
+    xAxis: {
+        categories: ['USA', 'China', 'Brazil', 'EU', 'Argentina', 'India'],
+        crosshair: true
+    },
+    yAxis: {
+        min: 0,
+        title: {
+            text: '1000 metric tons (MT)'
+        }
+    },
+    tooltip: {
+        valueSuffix: ' (1000 MT)'
+    },
+    plotOptions: {
+        column: {
+            pointPadding: 0.2,
+            borderWidth: 0
+        }
+    },
+    series: [{
+        name: 'Corn',
+        data: [387749, 280000, 129000, 64300, 54000, 34300]
+    }, {
+        name: 'Wheat',
+        data: [45321, 140000, 10000, 140500, 19500, 113500]
+    }]
+});
+```
+
+## Chart Options Interface
+
+The complete TypeScript interface from `ChartOptions.ts`:
+
+<ParamField path="chart.type" type="string" default="line">
+  The default series type for the chart. Can be any of the chart type options.
+</ParamField>
+
+<ParamField path="chart.width" type="number">
+  An explicit width for the chart. By default, the chart adapts to the container element's width.
+</ParamField>
+
+<ParamField path="chart.height" type="number">
+  An explicit height for the chart. If not set, the height is calculated from the offset height of the containing element.
+</ParamField>
+
+<ParamField path="chart.backgroundColor" type="ColorType" default="#FFFFFF">
+  The background color for the chart area.
+</ParamField>
+
+<ParamField path="chart.zoomType" type="'x' | 'y' | 'xy'">
+  Decides in what dimensions the user can zoom by dragging the mouse.
+</ParamField>
+
+<ParamField path="chart.polar" type="boolean" default={false}>
+  When true, cartesian charts like line, spline, area, and column are transformed into the polar coordinate system.
+</ParamField>
+
+<ParamField path="chart.events" type="ChartEventsOptions">
+  Event listeners for the chart. Events include: `load`, `render`, `addSeries`, `click`, `selection`.
+</ParamField>
+
+## Best Practices
+
+<Warning>
+  Always specify a container element that exists in the DOM before initializing the chart. The chart will fail to render if the container doesn't exist.
+</Warning>
+
+1. **Container Setup** - Ensure your container element has defined dimensions
+2. **Performance** - Use `chart.reflow()` instead of recreating charts on resize
+3. **Accessibility** - Include descriptive titles and axis labels
+4. **Responsive Design** - Use the responsive options for mobile-friendly charts
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Series Configuration" icon="chart-line" href="/concepts/series">
+    Learn about configuring data series
+  </Card>
+  <Card title="Axes" icon="ruler" href="/concepts/axes">
+    Configure chart axes and scales
+  </Card>
+  <Card title="Responsive Charts" icon="mobile" href="/concepts/responsive">
+    Make charts responsive to screen size
+  </Card>
+  <Card title="Options" icon="sliders" href="/concepts/options">
+    Explore all configuration options
+  </Card>
+</CardGroup>

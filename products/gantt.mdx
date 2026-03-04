@@ -1,0 +1,561 @@
+---
+title: Highcharts Gantt
+description: Create interactive Gantt charts for project management with task dependencies, resource management, and progress tracking
+---
+
+Highcharts Gantt is a specialized charting library for creating interactive Gantt charts that visualize project schedules, task dependencies, and resource allocation. Built on Highcharts Core, it provides powerful features for project management visualization.
+
+## Overview
+
+Highcharts Gantt provides comprehensive project visualization features:
+
+- **Task Dependencies**: Visual connectors showing relationships between tasks
+- **Progress Tracking**: Display completion percentage for each task
+- **Resource Management**: Allocate and track resources across tasks
+- **Drag and Drop**: Interactive task editing and rescheduling
+- **Tree Grid**: Hierarchical task organization with collapsible groups
+- **Milestones**: Mark important project events
+- **Custom Connectors**: Flexible pathfinding algorithms for dependencies
+
+## Installation
+
+<CodeGroup>
+```bash npm
+npm install highcharts
+```
+
+```bash yarn
+yarn add highcharts
+```
+
+```html CDN - Standalone
+<script src="https://code.highcharts.com/gantt/highcharts-gantt.js"></script>
+```
+
+```html CDN - As Module
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/gantt/modules/gantt.js"></script>
+```
+</CodeGroup>
+
+### ES6 Module Import
+
+```javascript
+import Highcharts from 'highcharts/highcharts-gantt';
+
+// Or as a module with Highcharts Core
+import Highcharts from 'highcharts';
+import ganttModule from 'highcharts/modules/gantt';
+
+ganttModule(Highcharts);
+```
+
+## Getting Started
+
+Create your first Gantt chart with the `Highcharts.ganttChart()` constructor:
+
+<Steps>
+  <Step title="Create a container element">
+    ```html
+    <div id="container"></div>
+    ```
+  </Step>
+  
+  <Step title="Define your tasks">
+    ```javascript
+    const tasks = [{
+      name: 'Project Planning',
+      id: 'planning',
+      start: Date.UTC(2024, 0, 1),
+      end: Date.UTC(2024, 0, 14)
+    }, {
+      name: 'Development',
+      id: 'dev',
+      start: Date.UTC(2024, 0, 15),
+      end: Date.UTC(2024, 1, 28),
+      dependency: 'planning'
+    }, {
+      name: 'Testing',
+      id: 'test',
+      start: Date.UTC(2024, 2, 1),
+      end: Date.UTC(2024, 2, 14),
+      dependency: 'dev'
+    }];
+    ```
+  </Step>
+  
+  <Step title="Create the Gantt chart">
+    ```javascript
+    Highcharts.ganttChart('container', {
+      title: {
+        text: 'Project Timeline'
+      },
+      xAxis: {
+        currentDateIndicator: true
+      },
+      series: [{
+        name: 'Project Tasks',
+        data: tasks
+      }]
+    });
+    ```
+  </Step>
+</Steps>
+
+## Task Configuration
+
+Each task in a Gantt chart can have multiple properties:
+
+```javascript
+{
+  id: 'task-1',              // Unique identifier
+  name: 'Task Name',          // Display name
+  start: Date.UTC(2024, 0, 1), // Start date
+  end: Date.UTC(2024, 0, 14),  // End date
+  completed: 0.5,             // Progress (0-1)
+  dependency: 'task-0',       // Dependent task ID
+  parent: 'phase-1',          // Parent task for grouping
+  milestone: false,           // Is this a milestone?
+  color: '#FF0000'            // Custom color
+}
+```
+
+## Key Features
+
+### Task Dependencies
+
+Visualize relationships between tasks with connector lines.
+
+<Card title="Dependency Types" icon="link">
+  Dependencies show which tasks must be completed before others can start, helping identify the critical path in your project.
+</Card>
+
+```javascript
+data: [{
+  id: 'design',
+  name: 'Design Phase',
+  start: Date.UTC(2024, 0, 1),
+  end: Date.UTC(2024, 0, 14)
+}, {
+  id: 'development',
+  name: 'Development',
+  start: Date.UTC(2024, 0, 15),
+  end: Date.UTC(2024, 1, 28),
+  dependency: 'design'  // Single dependency
+}, {
+  id: 'testing',
+  name: 'Testing',
+  start: Date.UTC(2024, 2, 1),
+  end: Date.UTC(2024, 2, 14),
+  dependency: ['development', 'design']  // Multiple dependencies
+}]
+```
+
+### Custom Dependency Connectors
+
+Customize the appearance and routing of dependency connectors:
+
+```javascript
+pathfinder: {
+  type: 'simpleConnect', // or 'straight', 'fastAvoid'
+  lineWidth: 2,
+  lineColor: '#0066cc',
+  dashStyle: 'Solid',
+  marker: {
+    enabled: true,
+    symbol: 'arrow',
+    width: 8,
+    height: 8,
+    color: '#0066cc'
+  }
+}
+```
+
+#### Pathfinding Algorithms
+
+<CardGroup cols={3}>
+  <Card title="simpleConnect" icon="route">
+    Default algorithm using right angles only
+  </Card>
+  <Card title="straight" icon="arrow-right">
+    Direct straight line between tasks
+  </Card>
+  <Card title="fastAvoid" icon="diagram-project">
+    Avoids overlapping other tasks
+  </Card>
+</CardGroup>
+
+### Progress Tracking
+
+Display task completion percentage:
+
+```javascript
+data: [{
+  id: 'task-1',
+  name: 'Development',
+  start: Date.UTC(2024, 0, 1),
+  end: Date.UTC(2024, 1, 1),
+  completed: {
+    amount: 0.75  // 75% complete
+  }
+}]
+
+// Customize completed appearance
+plotOptions: {
+  gantt: {
+    dataLabels: {
+      enabled: true,
+      format: '{point.completed.amount:.0%}'
+    }
+  }
+}
+```
+
+### Tree Grid and Grouping
+
+Organize tasks hierarchically:
+
+```javascript
+data: [{
+  id: 'phase-1',
+  name: 'Phase 1: Planning'
+}, {
+  id: 'task-1',
+  name: 'Research',
+  parent: 'phase-1',
+  start: Date.UTC(2024, 0, 1),
+  end: Date.UTC(2024, 0, 7)
+}, {
+  id: 'task-2',
+  name: 'Requirements',
+  parent: 'phase-1',
+  start: Date.UTC(2024, 0, 8),
+  end: Date.UTC(2024, 0, 14)
+}, {
+  id: 'phase-2',
+  name: 'Phase 2: Development'
+}, {
+  id: 'task-3',
+  name: 'Coding',
+  parent: 'phase-2',
+  start: Date.UTC(2024, 0, 15),
+  end: Date.UTC(2024, 1, 28)
+}]
+```
+
+### Milestones
+
+Mark important project events:
+
+```javascript
+data: [{
+  id: 'milestone-1',
+  name: 'Project Kickoff',
+  start: Date.UTC(2024, 0, 1),
+  milestone: true,
+  color: '#ff0000'
+}, {
+  id: 'task-1',
+  name: 'Development',
+  start: Date.UTC(2024, 0, 2),
+  end: Date.UTC(2024, 1, 1),
+  dependency: 'milestone-1'
+}, {
+  id: 'milestone-2',
+  name: 'Release',
+  start: Date.UTC(2024, 1, 1),
+  milestone: true,
+  dependency: 'task-1',
+  color: '#00ff00'
+}]
+```
+
+### Resource Management
+
+Allocate resources to tasks:
+
+```javascript
+yAxis: [{
+  title: {
+    text: 'Tasks'
+  },
+  categories: ['Planning', 'Development', 'Testing'],
+  grid: {
+    columns: [{
+      title: {
+        text: 'Task'
+      },
+      labels: {
+        format: '{point.name}'
+      }
+    }, {
+      title: {
+        text: 'Assignee'
+      },
+      labels: {
+        format: '{point.assignee}'
+      }
+    }, {
+      title: {
+        text: 'Duration'
+      },
+      labels: {
+        format: '{(divide (subtract point.end point.start) 86400000):.0f} days'
+      }
+    }]
+  }
+}],
+
+data: [{
+  name: 'Development',
+  start: Date.UTC(2024, 0, 1),
+  end: Date.UTC(2024, 1, 1),
+  assignee: 'John Doe'
+}]
+```
+
+## Advanced Features
+
+### Current Date Indicator
+
+Show a line marking today's date:
+
+```javascript
+xAxis: {
+  currentDateIndicator: {
+    color: '#ff0000',
+    width: 2,
+    label: {
+      format: '%a, %b %d %Y, %H:%M'
+    }
+  }
+}
+```
+
+### Custom Time Units
+
+Configure the time scale:
+
+```javascript
+xAxis: {
+  min: Date.UTC(2024, 0, 1),
+  max: Date.UTC(2024, 11, 31),
+  units: [
+    ['day', [1]],
+    ['week', [1]],
+    ['month', [1]]
+  ],
+  labels: {
+    format: '{value:%e. %b}'
+  }
+}
+```
+
+### Drag and Drop
+
+Enable interactive task editing:
+
+```html
+<script src="https://code.highcharts.com/gantt/modules/draggable-points.js"></script>
+```
+
+```javascript
+plotOptions: {
+  gantt: {
+    dragDrop: {
+      draggableX: true,
+      draggableY: false,
+      dragPrecisionX: 1000 * 60 * 60 * 24 // 1 day
+    }
+  }
+},
+
+series: [{
+  data: tasks,
+  point: {
+    events: {
+      drop: function(e) {
+        console.log('Task moved:', this.name, 'New start:', new Date(e.newPoint.start));
+      }
+    }
+  }
+}]
+```
+
+## Complete Example
+
+Here's a comprehensive Gantt chart example:
+
+```javascript
+Highcharts.ganttChart('container', {
+  title: {
+    text: 'Software Development Project'
+  },
+  
+  xAxis: {
+    min: Date.UTC(2024, 0, 1),
+    max: Date.UTC(2024, 5, 30),
+    currentDateIndicator: {
+      color: '#ff0000',
+      width: 2,
+      label: {
+        format: '%a, %b %d'
+      }
+    }
+  },
+  
+  yAxis: {
+    uniqueNames: true,
+    grid: {
+      columns: [{
+        title: { text: 'Task' },
+        labels: { format: '{point.name}' }
+      }, {
+        title: { text: 'Assignee' },
+        labels: { format: '{point.assignee}' }
+      }, {
+        title: { text: 'Progress' },
+        labels: { format: '{point.completed.amount:.0%}' }
+      }]
+    }
+  },
+  
+  tooltip: {
+    pointFormat: '<b>{point.name}</b><br/>' +
+                 'Start: {point.start:%e %b}<br/>' +
+                 'End: {point.end:%e %b}<br/>' +
+                 'Progress: {point.completed.amount:.0%}'
+  },
+  
+  plotOptions: {
+    gantt: {
+      dataLabels: {
+        enabled: true,
+        format: '{point.name}'
+      }
+    }
+  },
+  
+  series: [{
+    name: 'Project',
+    data: [{
+      id: 'planning',
+      name: 'Planning Phase',
+      assignee: 'Project Manager'
+    }, {
+      id: 'req',
+      name: 'Requirements',
+      parent: 'planning',
+      start: Date.UTC(2024, 0, 1),
+      end: Date.UTC(2024, 0, 14),
+      completed: 1,
+      assignee: 'Business Analyst'
+    }, {
+      id: 'design',
+      name: 'Design',
+      parent: 'planning',
+      start: Date.UTC(2024, 0, 15),
+      end: Date.UTC(2024, 0, 28),
+      completed: 0.8,
+      assignee: 'Designer',
+      dependency: 'req'
+    }, {
+      id: 'dev',
+      name: 'Development Phase',
+      assignee: 'Tech Lead'
+    }, {
+      id: 'backend',
+      name: 'Backend Development',
+      parent: 'dev',
+      start: Date.UTC(2024, 1, 1),
+      end: Date.UTC(2024, 2, 15),
+      completed: 0.6,
+      assignee: 'Backend Developer',
+      dependency: 'design'
+    }, {
+      id: 'frontend',
+      name: 'Frontend Development',
+      parent: 'dev',
+      start: Date.UTC(2024, 1, 1),
+      end: Date.UTC(2024, 2, 15),
+      completed: 0.5,
+      assignee: 'Frontend Developer',
+      dependency: 'design'
+    }, {
+      id: 'testing',
+      name: 'Testing',
+      start: Date.UTC(2024, 2, 16),
+      end: Date.UTC(2024, 3, 15),
+      completed: 0.2,
+      assignee: 'QA Engineer',
+      dependency: ['backend', 'frontend']
+    }, {
+      id: 'release',
+      name: 'Product Release',
+      start: Date.UTC(2024, 3, 16),
+      milestone: true,
+      dependency: 'testing',
+      assignee: 'DevOps'
+    }]
+  }]
+});
+```
+
+## Styling and Theming
+
+Customize the appearance of your Gantt chart:
+
+```javascript
+plotOptions: {
+  gantt: {
+    borderColor: '#cccccc',
+    borderWidth: 1,
+    colorByPoint: false,
+    dataLabels: {
+      enabled: true,
+      style: {
+        fontSize: '12px',
+        fontWeight: 'bold'
+      }
+    },
+    // Completed portion styling
+    completed: {
+      fill: '#90ed7d',
+      fillOpacity: 0.8
+    }
+  }
+}
+```
+
+## Performance Tips
+
+<Card title="Optimize Large Projects" icon="gauge-high">
+  - Use `boostThreshold` for projects with hundreds of tasks
+  - Collapse task groups by default
+  - Consider pagination or filtering for very large projects
+  - Minimize the number of visible columns in the tree grid
+</Card>
+
+## Related Resources
+
+<CardGroup cols={2}>
+  <Card title="API Reference" icon="code" href="https://api.highcharts.com/gantt/">
+    Complete Highcharts Gantt API documentation
+  </Card>
+  <Card title="Live Demos" icon="flask" href="https://www.highcharts.com/demo/gantt">
+    Interactive examples and demos
+  </Card>
+  <Card title="Task Dependencies">
+    Learn about visualizing task relationships
+  </Card>
+  <Card title="Resource Management">
+    Track and allocate project resources
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+- Learn about [Task Dependencies](/products/gantt#task-dependencies) for complex project relationships
+- Explore [Progress Tracking](/products/gantt#progress-tracking) to monitor task completion
+- Try [Drag and Drop](/products/gantt#drag-and-drop) for interactive project planning
+- Implement [Resource Management](/products/gantt#resource-management) to track team allocation

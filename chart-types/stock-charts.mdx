@@ -1,0 +1,466 @@
+---
+title: Stock Charts
+description: Create financial charts with advanced features like range selectors, technical indicators, and candlestick patterns
+---
+
+Highstock is a specialized charting library built on top of Highcharts, designed specifically for financial and time-series data visualization.
+
+## Overview
+
+Stock charts are optimized for displaying large datasets with time-based data, featuring:
+
+- Navigator for browsing large datasets
+- Range selector for quick time period selection
+- Advanced data grouping
+- Technical indicators
+- OHLC and candlestick series
+- Gap handling
+
+## Basic Stock Chart
+
+<CodeGroup>
+```javascript Simple Line Stock Chart
+Highcharts.stockChart('container', {
+  title: {
+    text: 'AAPL Stock Price'
+  },
+  rangeSelector: {
+    selected: 1
+  },
+  series: [{
+    name: 'AAPL',
+    data: [
+      [Date.UTC(2024, 0, 1), 185.64],
+      [Date.UTC(2024, 0, 2), 185.92],
+      [Date.UTC(2024, 0, 3), 184.25],
+      [Date.UTC(2024, 0, 4), 181.91],
+      [Date.UTC(2024, 0, 5), 181.18]
+    ],
+    tooltip: {
+      valueDecimals: 2
+    }
+  }]
+});
+```
+
+```javascript With Navigator
+Highcharts.stockChart('container', {
+  rangeSelector: {
+    buttons: [{
+      type: 'month',
+      count: 1,
+      text: '1m'
+    }, {
+      type: 'month',
+      count: 3,
+      text: '3m'
+    }, {
+      type: 'month',
+      count: 6,
+      text: '6m'
+    }, {
+      type: 'year',
+      count: 1,
+      text: '1y'
+    }, {
+      type: 'all',
+      text: 'All'
+    }],
+    selected: 1
+  },
+  navigator: {
+    enabled: true
+  },
+  series: [{
+    name: 'Stock Price',
+    data: stockData // Your time series data
+  }]
+});
+```
+</CodeGroup>
+
+## OHLC Charts
+
+OHLC (Open-High-Low-Close) charts display four values for each time period:
+
+```javascript
+Highcharts.stockChart('container', {
+  rangeSelector: {
+    selected: 1
+  },
+  title: {
+    text: 'AAPL Stock Price'
+  },
+  series: [{
+    type: 'ohlc',
+    name: 'AAPL Stock Price',
+    data: [
+      [Date.UTC(2024, 0, 1), 180.00, 186.00, 179.50, 185.64], // date, open, high, low, close
+      [Date.UTC(2024, 0, 2), 185.64, 187.00, 184.00, 185.92],
+      [Date.UTC(2024, 0, 3), 185.92, 186.50, 183.00, 184.25],
+      [Date.UTC(2024, 0, 4), 184.25, 184.50, 181.00, 181.91],
+      [Date.UTC(2024, 0, 5), 181.91, 182.50, 180.00, 181.18]
+    ],
+    dataGrouping: {
+      units: [[
+        'week',
+        [1]
+      ], [
+        'month',
+        [1, 2, 3, 4, 6]
+      ]]
+    }
+  }]
+});
+```
+
+## Candlestick Charts
+
+Candlestick charts are similar to OHLC but use filled and hollow bodies:
+
+<CodeGroup>
+```javascript Basic Candlestick
+Highcharts.stockChart('container', {
+  rangeSelector: {
+    selected: 1
+  },
+  title: {
+    text: 'Stock Price - Candlestick'
+  },
+  series: [{
+    type: 'candlestick',
+    name: 'Stock Price',
+    data: [
+      [Date.UTC(2024, 0, 1), 180.00, 186.00, 179.50, 185.64],
+      [Date.UTC(2024, 0, 2), 185.64, 187.00, 184.00, 185.92],
+      [Date.UTC(2024, 0, 3), 185.92, 186.50, 183.00, 184.25]
+    ]
+  }]
+});
+```
+
+```javascript With Volume
+Highcharts.stockChart('container', {
+  yAxis: [{
+    labels: {
+      align: 'right',
+      x: -3
+    },
+    title: {
+      text: 'Price'
+    },
+    height: '60%',
+    lineWidth: 2
+  }, {
+    labels: {
+      align: 'right',
+      x: -3
+    },
+    title: {
+      text: 'Volume'
+    },
+    top: '65%',
+    height: '35%',
+    offset: 0,
+    lineWidth: 2
+  }],
+  series: [{
+    type: 'candlestick',
+    name: 'Stock Price',
+    data: ohlcData
+  }, {
+    type: 'column',
+    name: 'Volume',
+    data: volumeData,
+    yAxis: 1
+  }]
+});
+```
+</CodeGroup>
+
+## Technical Indicators
+
+Add popular technical indicators to your charts:
+
+<Tabs>
+  <Tab title="SMA (Simple Moving Average)">
+    ```javascript
+    Highcharts.stockChart('container', {
+      series: [{
+        type: 'candlestick',
+        id: 'aapl',
+        name: 'AAPL Stock Price',
+        data: data
+      }, {
+        type: 'sma',
+        linkedTo: 'aapl',
+        params: {
+          period: 14
+        },
+        marker: {
+          enabled: false
+        }
+      }]
+    });
+    ```
+  </Tab>
+  <Tab title="EMA (Exponential Moving Average)">
+    ```javascript
+    series: [{
+      type: 'candlestick',
+      id: 'aapl',
+      data: data
+    }, {
+      type: 'ema',
+      linkedTo: 'aapl',
+      params: {
+        period: 20
+      }
+    }]
+    ```
+  </Tab>
+  <Tab title="Bollinger Bands">
+    ```javascript
+    series: [{
+      type: 'candlestick',
+      id: 'aapl',
+      data: data
+    }, {
+      type: 'bb',
+      linkedTo: 'aapl',
+      params: {
+        period: 20,
+        standardDeviation: 2
+      }
+    }]
+    ```
+  </Tab>
+  <Tab title="MACD">
+    ```javascript
+    yAxis: [{
+      height: '60%'
+    }, {
+      top: '65%',
+      height: '35%'
+    }],
+    series: [{
+      type: 'candlestick',
+      id: 'aapl',
+      data: data
+    }, {
+      type: 'macd',
+      linkedTo: 'aapl',
+      yAxis: 1
+    }]
+    ```
+  </Tab>
+</Tabs>
+
+## Range Selector Configuration
+
+Customize the range selector buttons:
+
+```javascript
+Highcharts.stockChart('container', {
+  rangeSelector: {
+    buttons: [{
+      type: 'day',
+      count: 1,
+      text: '1d',
+      title: 'View 1 day'
+    }, {
+      type: 'week',
+      count: 1,
+      text: '1w',
+      title: 'View 1 week'
+    }, {
+      type: 'month',
+      count: 1,
+      text: '1m',
+      title: 'View 1 month'
+    }, {
+      type: 'month',
+      count: 3,
+      text: '3m',
+      title: 'View 3 months'
+    }, {
+      type: 'month',
+      count: 6,
+      text: '6m',
+      title: 'View 6 months'
+    }, {
+      type: 'ytd',
+      text: 'YTD',
+      title: 'View year to date'
+    }, {
+      type: 'year',
+      count: 1,
+      text: '1y',
+      title: 'View 1 year'
+    }, {
+      type: 'all',
+      text: 'All',
+      title: 'View all'
+    }],
+    selected: 3,
+    inputEnabled: true,
+    buttonTheme: {
+      width: 60
+    }
+  },
+  series: [{
+    data: data
+  }]
+});
+```
+
+## Data Grouping
+
+Automatically group data for better performance:
+
+```javascript
+Highcharts.stockChart('container', {
+  plotOptions: {
+    series: {
+      dataGrouping: {
+        enabled: true,
+        forced: true,
+        units: [[
+          'day',
+          [1]
+        ], [
+          'week',
+          [1]
+        ], [
+          'month',
+          [1, 3, 6]
+        ], [
+          'year',
+          [1]
+        ]]
+      }
+    }
+  },
+  series: [{
+    data: largeDataset
+  }]
+});
+```
+
+## Flags and Events
+
+Mark important events on the chart:
+
+```javascript
+Highcharts.stockChart('container', {
+  series: [{
+    id: 'dataseries',
+    data: data
+  }, {
+    type: 'flags',
+    data: [{
+      x: Date.UTC(2024, 0, 15),
+      title: 'Earnings',
+      text: 'Q4 Earnings Report'
+    }, {
+      x: Date.UTC(2024, 1, 1),
+      title: 'Split',
+      text: '2:1 Stock Split'
+    }],
+    onSeries: 'dataseries',
+    shape: 'squarepin',
+    width: 16
+  }]
+});
+```
+
+## Compare Multiple Stocks
+
+```javascript
+Highcharts.stockChart('container', {
+  rangeSelector: {
+    selected: 4
+  },
+  yAxis: {
+    labels: {
+      formatter: function () {
+        return (this.value > 0 ? ' + ' : '') + this.value + '%';
+      }
+    },
+    plotLines: [{
+      value: 0,
+      width: 2,
+      color: 'silver'
+    }]
+  },
+  plotOptions: {
+    series: {
+      compare: 'percent',
+      showInNavigator: true
+    }
+  },
+  tooltip: {
+    pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b> ({point.change}%)<br/>',
+    valueDecimals: 2,
+    split: true
+  },
+  series: [{
+    name: 'AAPL',
+    data: aaplData
+  }, {
+    name: 'MSFT',
+    data: msftData
+  }, {
+    name: 'GOOG',
+    data: googData
+  }]
+});
+```
+
+## Use Cases
+
+<CardGroup cols={2}>
+  <Card title="Financial Analysis" icon="chart-line">
+    - Stock price tracking
+    - Portfolio monitoring
+    - Technical analysis
+    - Forex trading
+  </Card>
+  <Card title="Time Series Data" icon="clock">
+    - Sensor data
+    - Performance metrics
+    - Resource monitoring
+    - Long-term trends
+  </Card>
+</CardGroup>
+
+## Data Format
+
+Stock charts use timestamp-based data:
+
+<Tabs>
+  <Tab title="Line/Area">
+    ```javascript
+    data: [
+      [Date.UTC(2024, 0, 1), 185.64],
+      [Date.UTC(2024, 0, 2), 185.92]
+    ]
+    ```
+  </Tab>
+  <Tab title="OHLC/Candlestick">
+    ```javascript
+    data: [
+      [Date.UTC(2024, 0, 1), 180.00, 186.00, 179.50, 185.64],
+      // [timestamp, open, high, low, close]
+    ]
+    ```
+  </Tab>
+</Tabs>
+
+<Note>
+  Stock charts require the Highstock library (`highstock.js`) instead of the standard Highcharts library.
+</Note>
+
+<Warning>
+  For optimal performance with large datasets, enable data grouping and use the boost module.
+</Warning>

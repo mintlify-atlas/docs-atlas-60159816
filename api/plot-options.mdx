@@ -1,0 +1,585 @@
+---
+title: 'Plot Options'
+description: 'Global series defaults and type-specific plot options'
+---
+
+# Plot Options
+
+Plot options define default configurations for all series of a specific type. They provide a central place to set common properties without repeating them for each series.
+
+## Overview
+
+Plot options are organized hierarchically:
+
+1. **plotOptions.series** - Applies to all series types
+2. **plotOptions.{type}** - Applies to specific types (line, column, pie, etc.)
+3. **series[].options** - Individual series overrides
+
+```javascript
+Highcharts.chart('container', {
+  plotOptions: {
+    series: {
+      // Applies to ALL series
+      animation: true,
+      showInLegend: true
+    },
+    line: {
+      // Applies to line series only
+      lineWidth: 2,
+      marker: { enabled: false }
+    },
+    column: {
+      // Applies to column series only
+      borderWidth: 0,
+      pointPadding: 0.2
+    }
+  },
+  series: [{
+    type: 'line',
+    // Inherits from plotOptions.series and plotOptions.line
+    data: [1, 2, 3]
+  }]
+});
+```
+
+## Common Plot Options (All Series)
+
+### plotOptions.series
+
+Options that apply to all series types:
+
+```javascript
+plotOptions: {
+  series: {
+    // Animation
+    animation: {
+      duration: 1000,
+      easing: 'easeInOut'
+    },
+    
+    // Data labels
+    dataLabels: {
+      enabled: false,
+      format: '{point.y}'
+    },
+    
+    // Events
+    events: {
+      click: function(event) {
+        console.log('Series clicked:', this.name);
+      },
+      mouseOver: function() {
+        this.update({ opacity: 1 });
+      },
+      mouseOut: function() {
+        this.update({ opacity: 0.8 });
+      },
+      legendItemClick: function() {
+        // Return false to prevent hide/show
+        return confirm('Toggle ' + this.name + '?');
+      }
+    },
+    
+    // Point events
+    point: {
+      events: {
+        click: function() {
+          console.log('Point clicked:', this.y);
+        },
+        mouseOver: function() {
+          this.update({ color: 'red' });
+        }
+      }
+    },
+    
+    // States
+    states: {
+      hover: {
+        enabled: true,
+        lineWidthPlus: 1,
+        brightness: 0.1
+      },
+      select: {
+        color: '#ff0000'
+      },
+      inactive: {
+        opacity: 0.2
+      }
+    },
+    
+    // Behavior
+    allowPointSelect: true,
+    cursor: 'pointer',
+    showInLegend: true,
+    visible: true,
+    enableMouseTracking: true,
+    
+    // Tooltip
+    tooltip: {
+      followPointer: true,
+      headerFormat: '<span style="font-size:10px">{point.key}</span><br/>',
+      pointFormat: '<span style="color:{point.color}">●</span> {series.name}: <b>{point.y}</b><br/>'
+    }
+  }
+}
+```
+
+## Line Series Options
+
+### plotOptions.line
+
+```javascript
+plotOptions: {
+  line: {
+    // Line appearance
+    lineWidth: 2,
+    color: null,  // Auto from color palette
+    dashStyle: 'Solid',  // 'Solid', 'Dash', 'Dot', etc.
+    
+    // Markers
+    marker: {
+      enabled: false,  // Auto-enable on low point count
+      symbol: 'circle',
+      radius: 4,
+      lineColor: '#ffffff',
+      lineWidth: 0,
+      fillColor: null,  // Inherits from series.color
+      states: {
+        hover: {
+          enabled: true,
+          radiusPlus: 2,
+          lineWidthPlus: 1
+        }
+      }
+    },
+    
+    // Area fill
+    fillColor: null,
+    fillOpacity: 0.75,
+    threshold: 0,
+    
+    // Step line
+    step: false,  // false, 'left', 'center', 'right'
+    
+    // Smoothing
+    softThreshold: true,
+    
+    // Data grouping (Highstock)
+    dataGrouping: {
+      enabled: true
+    }
+  }
+}
+```
+
+## Column/Bar Series Options
+
+### plotOptions.column
+
+```javascript
+plotOptions: {
+  column: {
+    // Column sizing
+    pointWidth: null,  // Auto-calculate
+    pointPadding: 0.1,  // 10% padding between columns
+    groupPadding: 0.2,  // 20% padding between groups
+    minPointLength: 0,  // Minimum column height
+    maxPointWidth: null,  // Max width constraint
+    
+    // Appearance
+    borderWidth: 1,
+    borderColor: '#ffffff',
+    borderRadius: 0,
+    
+    // Colors
+    color: null,
+    colorByPoint: false,  // Each point gets unique color
+    colors: null,  // Array of colors for colorByPoint
+    
+    // Stacking
+    stacking: null,  // null, 'normal', 'percent'
+    
+    // Depth (3D)
+    depth: 25,
+    edgeColor: null,
+    edgeWidth: 1,
+    
+    // Grouping
+    grouping: true,
+    groupZPadding: 1,
+    
+    // Data labels
+    dataLabels: {
+      align: 'center',
+      verticalAlign: 'top',
+      inside: false,
+      crop: true,
+      overflow: 'justify'
+    }
+  }
+}
+```
+
+### plotOptions.bar
+
+Same as column options but for horizontal bars:
+
+```javascript
+plotOptions: {
+  bar: {
+    // Same options as column
+    pointPadding: 0.1,
+    groupPadding: 0.2,
+    borderWidth: 1
+  }
+}
+```
+
+## Area Series Options
+
+### plotOptions.area
+
+```javascript
+plotOptions: {
+  area: {
+    // Inherits line options plus:
+    
+    // Fill
+    fillColor: {
+      linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+      stops: [
+        [0, 'rgba(124, 181, 236, 0.5)'],
+        [1, 'rgba(124, 181, 236, 0)']
+      ]
+    },
+    fillOpacity: 0.75,
+    
+    // Line
+    lineWidth: 2,
+    
+    // Threshold
+    threshold: 0,
+    trackByArea: false,
+    
+    // Stacking
+    stacking: null  // 'normal', 'percent'
+  }
+}
+```
+
+## Pie Series Options
+
+### plotOptions.pie
+
+```javascript
+plotOptions: {
+  pie: {
+    // Size
+    size: null,  // Auto or '75%' or 300
+    innerSize: 0,  // 0 for pie, >0 for donut
+    
+    // Start angle
+    startAngle: 0,
+    endAngle: null,  // For semi-circle: startAngle + 180
+    
+    // Appearance
+    borderWidth: 1,
+    borderColor: '#ffffff',
+    
+    // Center
+    center: ['50%', '50%'],
+    
+    // Slicing
+    slicedOffset: 10,
+    
+    // Colors
+    colors: null,
+    colorByPoint: true,
+    
+    // Data labels
+    dataLabels: {
+      enabled: true,
+      format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+      distance: 30,  // Distance from pie
+      connectorWidth: 1,
+      connectorColor: null,
+      connectorPadding: 5,
+      softConnector: true
+    },
+    
+    // Ignore hidden point
+    ignoreHiddenPoint: true,
+    
+    // 3D
+    depth: 0
+  }
+}
+```
+
+## Scatter Series Options
+
+### plotOptions.scatter
+
+```javascript
+plotOptions: {
+  scatter: {
+    // Markers always visible
+    marker: {
+      enabled: true,
+      radius: 4,
+      symbol: 'circle'
+    },
+    
+    // Line connection
+    lineWidth: 0,
+    
+    // Jitter for overlapping points
+    jitter: {
+      x: 0,
+      y: 0
+    },
+    
+    // Data labels
+    dataLabels: {
+      enabled: false
+    },
+    
+    // Tooltip
+    tooltip: {
+      headerFormat: '<b>{series.name}</b><br>',
+      pointFormat: 'x: {point.x}<br/>y: {point.y}'
+    },
+    
+    // Clustering
+    cluster: {
+      enabled: false,
+      allowOverlap: false,
+      minimumClusterSize: 2
+    }
+  }
+}
+```
+
+## Bubble Series Options
+
+### plotOptions.bubble
+
+```javascript
+plotOptions: {
+  bubble: {
+    // Inherits scatter options plus:
+    
+    // Size
+    minSize: 8,
+    maxSize: '20%',
+    sizeBy: 'area',  // 'area' or 'width'
+    zMin: null,
+    zMax: null,
+    zThreshold: 0,
+    
+    // Appearance
+    marker: {
+      fillOpacity: 0.5,
+      lineWidth: 1
+    },
+    
+    // Data labels
+    dataLabels: {
+      inside: true,
+      verticalAlign: 'middle'
+    }
+  }
+}
+```
+
+## Heatmap Series Options
+
+### plotOptions.heatmap
+
+```javascript
+plotOptions: {
+  heatmap: {
+    // Color axis
+    colsize: 1,  // Cell width in axis units
+    rowsize: 1,  // Cell height in axis units
+    
+    // Appearance
+    borderWidth: 0,
+    borderColor: '#ffffff',
+    
+    // Null color
+    nullColor: '#f7f7f7',
+    
+    // Data labels
+    dataLabels: {
+      enabled: true,
+      color: '#000000',
+      inside: true,
+      verticalAlign: 'middle'
+    },
+    
+    // Tooltip
+    tooltip: {
+      headerFormat: '',
+      pointFormat: 'x: {point.x}, y: {point.y}, value: <b>{point.value}</b>'
+    }
+  }
+}
+```
+
+## Advanced: States Configuration
+
+### Hover State
+
+```javascript
+plotOptions: {
+  series: {
+    states: {
+      hover: {
+        enabled: true,
+        lineWidthPlus: 1,
+        brightness: 0.1,
+        halo: {
+          size: 10,
+          opacity: 0.25,
+          attributes: {
+            fill: '#000000',
+            'stroke-width': 2,
+            stroke: '#ffffff'
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+### Select State
+
+```javascript
+plotOptions: {
+  series: {
+    allowPointSelect: true,
+    states: {
+      select: {
+        enabled: true,
+        color: '#ff0000',
+        borderColor: '#000000',
+        borderWidth: 2
+      }
+    }
+  }
+}
+```
+
+### Inactive State
+
+```javascript
+plotOptions: {
+  series: {
+    states: {
+      inactive: {
+        enabled: true,
+        opacity: 0.2
+      }
+    }
+  }
+}
+```
+
+## Complete Example
+
+```javascript
+Highcharts.chart('container', {
+  chart: {
+    type: 'line'
+  },
+  
+  plotOptions: {
+    // All series defaults
+    series: {
+      animation: {
+        duration: 1000
+      },
+      states: {
+        hover: {
+          enabled: true,
+          lineWidthPlus: 2
+        },
+        inactive: {
+          opacity: 0.3
+        }
+      },
+      events: {
+        legendItemClick: function() {
+          console.log('Legend clicked:', this.name);
+        }
+      },
+      point: {
+        events: {
+          click: function() {
+            alert('Point value: ' + this.y);
+          }
+        }
+      }
+    },
+    
+    // Line-specific defaults
+    line: {
+      lineWidth: 3,
+      marker: {
+        enabled: false,
+        states: {
+          hover: {
+            enabled: true,
+            radius: 6
+          }
+        }
+      },
+      dataLabels: {
+        enabled: false
+      }
+    },
+    
+    // Column-specific defaults
+    column: {
+      borderWidth: 0,
+      pointPadding: 0.1,
+      groupPadding: 0.2,
+      dataLabels: {
+        enabled: true,
+        format: '{point.y:.1f}'
+      }
+    }
+  },
+  
+  series: [
+    {
+      type: 'line',
+      name: 'Line Series',
+      data: [1, 3, 2, 4, 5]
+      // Inherits from plotOptions.series + plotOptions.line
+    },
+    {
+      type: 'column',
+      name: 'Column Series',
+      data: [2, 4, 3, 5, 6]
+      // Inherits from plotOptions.series + plotOptions.column
+    },
+    {
+      type: 'line',
+      name: 'Custom Line',
+      lineWidth: 5,  // Override plotOptions.line.lineWidth
+      color: '#ff0000',
+      data: [3, 5, 4, 6, 7]
+    }
+  ]
+});
+```
+
+## See Also
+
+- [Series Options](/api/series-options) - Individual series configuration
+- [Series Class](/api/series) - Series API methods
+- [Chart Options](/api/chart-options) - Chart configuration
+- [Events API](/api/events) - Event handling

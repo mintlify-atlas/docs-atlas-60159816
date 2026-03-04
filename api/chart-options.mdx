@@ -1,0 +1,522 @@
+---
+title: 'Chart Configuration Options'
+description: 'Complete reference for Highcharts chart configuration options'
+---
+
+# Chart Configuration Options
+
+The `chart` option controls the rendering container, dimensions, appearance, and behavior of the chart itself.
+
+**Source**: `ts/Core/Chart/ChartOptions.ts`
+
+## Basic Configuration
+
+```javascript
+Highcharts.chart('container', {
+  chart: {
+    type: 'line',
+    width: 800,
+    height: 400,
+    backgroundColor: '#f0f0f0'
+  }
+});
+```
+
+## Rendering Options
+
+### chart.type
+
+<ParamField path="chart.type" type="string" default="line">
+  Default series type for the chart
+</ParamField>
+
+```javascript
+chart: {
+  type: 'column'  // 'line', 'bar', 'pie', 'scatter', etc.
+}
+```
+
+### chart.renderTo
+
+<ParamField path="chart.renderTo" type="string | HTMLElement">
+  The HTML element where the chart will be rendered
+</ParamField>
+
+```javascript
+chart: {
+  renderTo: 'container'  // Element ID or DOM element
+}
+```
+
+### chart.width
+
+<ParamField path="chart.width" type="number | null">
+  Explicit pixel width of the chart. If null, uses container width.
+</ParamField>
+
+```javascript
+chart: {
+  width: 800  // Fixed width
+}
+```
+
+### chart.height
+
+<ParamField path="chart.height" type="number | null">
+  Explicit pixel height of the chart. If null, uses container height or defaults to 400px.
+</ParamField>
+
+```javascript
+chart: {
+  height: 600  // Fixed height
+}
+```
+
+## Appearance Options
+
+### chart.backgroundColor
+
+<ParamField path="chart.backgroundColor" type="ColorType" default="#ffffff">
+  Background color or gradient for the outer chart area
+</ParamField>
+
+```javascript
+chart: {
+  backgroundColor: '#f8f8f8',
+  // Or gradient
+  backgroundColor: {
+    linearGradient: { x1: 0, y1: 0, x2: 1, y2: 1 },
+    stops: [
+      [0, '#ffffff'],
+      [1, '#e0e0e0']
+    ]
+  }
+}
+```
+
+### chart.borderWidth
+
+<ParamField path="chart.borderWidth" type="number" default="0">
+  Width of the outer chart border in pixels
+</ParamField>
+
+```javascript
+chart: {
+  borderWidth: 2,
+  borderColor: '#cccccc'
+}
+```
+
+### chart.borderColor
+
+<ParamField path="chart.borderColor" type="ColorType" default="#335cad">
+  Color of the outer chart border
+</ParamField>
+
+### chart.borderRadius
+
+<ParamField path="chart.borderRadius" type="number" default="0">
+  Corner radius of the outer chart border
+</ParamField>
+
+```javascript
+chart: {
+  borderWidth: 1,
+  borderRadius: 10
+}
+```
+
+### chart.plotBackgroundColor
+
+<ParamField path="chart.plotBackgroundColor" type="ColorType">
+  Background color for the plot area (where the data is rendered)
+</ParamField>
+
+```javascript
+chart: {
+  plotBackgroundColor: '#fffef0'
+}
+```
+
+### chart.plotBorderWidth
+
+<ParamField path="chart.plotBorderWidth" type="number" default="0">
+  Width of the plot area border
+</ParamField>
+
+```javascript
+chart: {
+  plotBorderWidth: 1,
+  plotBorderColor: '#cccccc'
+}
+```
+
+### chart.plotBorderColor
+
+<ParamField path="chart.plotBorderColor" type="ColorType" default="#cccccc">
+  Color of the plot area border
+</ParamField>
+
+### chart.className
+
+<ParamField path="chart.className" type="string">
+  CSS class name to apply to the chart container
+</ParamField>
+
+```javascript
+chart: {
+  className: 'my-custom-chart'
+}
+```
+
+## Spacing & Margins
+
+### chart.margin
+
+<ParamField path="chart.margin" type="number | [number, number, number, number]">
+  Margin around the chart. Can be a single number or array [top, right, bottom, left]
+</ParamField>
+
+```javascript
+chart: {
+  margin: [50, 50, 100, 50]  // [top, right, bottom, left]
+}
+```
+
+### chart.marginTop
+
+<ParamField path="chart.marginTop" type="number">
+  Top margin in pixels
+</ParamField>
+
+### chart.marginRight
+
+<ParamField path="chart.marginRight" type="number">
+  Right margin in pixels
+</ParamField>
+
+### chart.marginBottom
+
+<ParamField path="chart.marginBottom" type="number">
+  Bottom margin in pixels
+</ParamField>
+
+### chart.marginLeft
+
+<ParamField path="chart.marginLeft" type="number">
+  Left margin in pixels
+</ParamField>
+
+### chart.spacing
+
+<ParamField path="chart.spacing" type="[number, number, number, number]" default="[10, 10, 15, 10]">
+  Space between the chart border and the plot area [top, right, bottom, left]
+</ParamField>
+
+```javascript
+chart: {
+  spacing: [20, 20, 20, 20]
+}
+```
+
+## Interaction Options
+
+### chart.animation
+
+<ParamField path="chart.animation" type="boolean | AnimationOptions" default="true">
+  Enable or configure chart animations
+</ParamField>
+
+```javascript
+chart: {
+  animation: false,  // Disable
+  // Or configure
+  animation: {
+    duration: 1000,
+    easing: 'easeOutBounce'
+  }
+}
+```
+
+### chart.reflow
+
+<ParamField path="chart.reflow" type="boolean" default="true">
+  Whether to reflow the chart when the window is resized
+</ParamField>
+
+```javascript
+chart: {
+  reflow: true
+}
+```
+
+### chart.panning
+
+<ParamField path="chart.panning" type="boolean | object" default="false">
+  Enable panning in the chart
+</ParamField>
+
+```javascript
+chart: {
+  panning: {
+    enabled: true,
+    type: 'x'  // 'x', 'y', or 'xy'
+  }
+}
+```
+
+### chart.zooming
+
+<ParamField path="chart.zooming" type="object">
+  Zooming configuration
+</ParamField>
+
+```javascript
+chart: {
+  zooming: {
+    type: 'x',  // 'x', 'y', or 'xy'
+    mouseWheel: {
+      enabled: true,
+      sensitivity: 1.1
+    },
+    resetButton: {
+      theme: {
+        fill: '#white',
+        stroke: '#cccccc'
+      },
+      position: {
+        align: 'right',
+        x: -10,
+        y: 10
+      }
+    }
+  }
+}
+```
+
+### chart.events
+
+<ParamField path="chart.events" type="object">
+  Event handlers for chart-level events
+</ParamField>
+
+```javascript
+chart: {
+  events: {
+    load: function() {
+      console.log('Chart loaded');
+    },
+    redraw: function() {
+      console.log('Chart redrawn');
+    },
+    render: function() {
+      console.log('Chart rendered');
+    },
+    click: function(event) {
+      console.log('Chart clicked at', event.xAxis[0].value);
+    },
+    selection: function(event) {
+      console.log('Selected range:', event.xAxis[0].min, event.xAxis[0].max);
+      return false; // Prevent default zoom
+    },
+    addSeries: function(event) {
+      console.log('Series added:', event.options);
+    }
+  }
+}
+```
+
+**Source**: `ts/Core/Chart/ChartOptions.ts:83`
+
+## 3D Options
+
+### chart.options3d
+
+<ParamField path="chart.options3d" type="object">
+  3D chart configuration
+</ParamField>
+
+```javascript
+chart: {
+  options3d: {
+    enabled: true,
+    alpha: 15,
+    beta: 30,
+    depth: 300,
+    viewDistance: 25
+  }
+}
+```
+
+## Advanced Options
+
+### chart.inverted
+
+<ParamField path="chart.inverted" type="boolean" default="false">
+  Whether to invert the axes so X is vertical and Y is horizontal
+</ParamField>
+
+```javascript
+chart: {
+  inverted: true  // Creates horizontal bar chart from column
+}
+```
+
+### chart.polar
+
+<ParamField path="chart.polar" type="boolean" default="false">
+  Whether the chart is a polar chart
+</ParamField>
+
+```javascript
+chart: {
+  polar: true
+}
+```
+
+### chart.alignTicks
+
+<ParamField path="chart.alignTicks" type="boolean" default="true">
+  Whether to align tick marks on multiple axes
+</ParamField>
+
+### chart.ignoreHiddenSeries
+
+<ParamField path="chart.ignoreHiddenSeries" type="boolean" default="true">
+  Whether hidden series should affect axis extremes
+</ParamField>
+
+```javascript
+chart: {
+  ignoreHiddenSeries: false  // Hidden series still affect scale
+}
+```
+
+### chart.parallel Coordinates
+
+<ParamField path="chart.parallelCoordinates" type="boolean" default="false">
+  Enable parallel coordinates chart type
+</ParamField>
+
+```javascript
+chart: {
+  parallelCoordinates: true,
+  parallelAxes: {
+    lineWidth: 2
+  }
+}
+```
+
+### chart.scrollablePlotArea
+
+<ParamField path="chart.scrollablePlotArea" type="object">
+  Make the plot area scrollable for large datasets
+</ParamField>
+
+```javascript
+chart: {
+  scrollablePlotArea: {
+    minWidth: 700,
+    scrollPositionX: 1,
+    opacity: 0.85
+  }
+}
+```
+
+## Export & Print Options
+
+### chart.printMaxWidth
+
+<ParamField path="chart.printMaxWidth" type="number" default="780">
+  Maximum width for the chart when printing
+</ParamField>
+
+```javascript
+chart: {
+  printMaxWidth: 600
+}
+```
+
+## Complete Example
+
+```javascript
+Highcharts.chart('container', {
+  chart: {
+    type: 'line',
+    width: 800,
+    height: 400,
+    
+    // Appearance
+    backgroundColor: {
+      linearGradient: { x1: 0, y1: 0, x2: 1, y2: 1 },
+      stops: [
+        [0, '#ffffff'],
+        [1, '#f0f0f0']
+      ]
+    },
+    borderWidth: 2,
+    borderColor: '#cccccc',
+    borderRadius: 10,
+    
+    plotBackgroundColor: '#fffef0',
+    plotBorderWidth: 1,
+    plotBorderColor: '#cccccc',
+    
+    // Spacing
+    margin: [70, 50, 100, 80],
+    spacing: [10, 10, 15, 10],
+    
+    // Interaction
+    animation: {
+      duration: 1000
+    },
+    
+    zooming: {
+      type: 'x',
+      mouseWheel: {
+        enabled: true
+      }
+    },
+    
+    panning: {
+      enabled: true,
+      type: 'x'
+    },
+    
+    // Events
+    events: {
+      load: function() {
+        console.log('Chart loaded at', new Date());
+      },
+      selection: function(event) {
+        const min = event.xAxis[0].min;
+        const max = event.xAxis[0].max;
+        console.log('Selected range:', min, max);
+      },
+      click: function(event) {
+        console.log('Clicked at:', event.xAxis[0].value);
+      }
+    },
+    
+    // Behavior
+    reflow: true,
+    ignoreHiddenSeries: true,
+    alignTicks: true
+  },
+  
+  title: {
+    text: 'Fully Configured Chart'
+  },
+  
+  series: [{
+    data: [1, 3, 2, 4, 5, 4, 6, 7, 6, 5]
+  }]
+});
+```
+
+## See Also
+
+- [Chart Class API](/api/chart) - Chart methods and properties
+- [Responsive Options](/api/responsive-options) - Responsive configuration
+- [Events API](/api/events) - Chart events
+- [Series Options](/api/series-options) - Series configuration

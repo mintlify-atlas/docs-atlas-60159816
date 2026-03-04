@@ -1,0 +1,447 @@
+---
+title: Creating Custom Builds
+description: Learn how to create optimized custom builds of Highcharts tailored to your specific needs
+---
+
+Highcharts provides a flexible build system that allows you to create custom, optimized bundles containing only the features you need. This reduces file size and improves performance.
+
+## Build System Overview
+
+Highcharts uses a modular build system powered by:
+
+- **TypeScript** - Source code in `ts/` directory
+- **Gulp** - Build orchestration and task automation
+- **@highcharts/highcharts-assembler** - Module bundling and assembly
+- **SWC** - Fast JavaScript/TypeScript compilation and minification
+- **Webpack** - Module bundling for ES modules
+
+## Understanding the Module System
+
+Highcharts is structured as ES6 modules that can be assembled in different ways:
+
+```typescript
+// Core modules
+import Highcharts from 'highcharts/es-modules/masters/highcharts.src.js';
+
+// Add specific features
+import 'highcharts/es-modules/masters/modules/exporting.src.js';
+import 'highcharts/es-modules/masters/modules/boost.src.js';
+```
+
+## Build Commands
+
+<CodeGroup>
+
+```bash npm
+# Full build
+npm run build
+
+# Build only code (faster)
+npm run gulp scripts
+
+# Compile TypeScript
+npm run gulp scripts-ts
+
+# Compile and minify
+npm run gulp scripts-compile
+
+# Watch mode for development
+npm run gulp scripts-watch
+```
+
+```bash gulp
+# Full distribution build
+gulp dist
+
+# TypeScript compilation
+gulp scripts-ts
+
+# Webpack bundling
+gulp scripts-webpack
+
+# CSS compilation
+gulp scripts-css
+
+# Minification
+gulp scripts-compile
+```
+
+</CodeGroup>
+
+## Creating a Custom Build
+
+<Steps>
+
+<Step title="Identify Required Modules">
+
+Determine which Highcharts features you need:
+
+```javascript
+// Minimal chart
+const modules = [
+  'highcharts',
+  'modules/exporting'
+];
+
+// Stock chart with indicators
+const modules = [
+  'highstock',
+  'modules/boost',
+  'indicators/ema',
+  'indicators/macd'
+];
+```
+
+</Step>
+
+<Step title="Use ES Modules">
+
+Import only what you need:
+
+```typescript
+// Custom build with specific features
+import Highcharts from 'highcharts/es-modules/masters/highcharts.src.js';
+import 'highcharts/es-modules/masters/modules/exporting.src.js';
+import 'highcharts/es-modules/masters/modules/accessibility.src.js';
+
+export default Highcharts;
+```
+
+</Step>
+
+<Step title="Bundle with Your Tool">
+
+Use your preferred bundler:
+
+<CodeGroup>
+
+```javascript webpack
+// webpack.config.js
+module.exports = {
+  entry: './src/custom-highcharts.js',
+  output: {
+    filename: 'highcharts-custom.js',
+    library: 'Highcharts',
+    libraryTarget: 'umd'
+  },
+  optimization: {
+    minimize: true
+  }
+};
+```
+
+```javascript vite
+// vite.config.js
+import { defineConfig } from 'vite';
+
+export default defineConfig({
+  build: {
+    lib: {
+      entry: './src/custom-highcharts.js',
+      name: 'Highcharts',
+      formats: ['es', 'umd']
+    },
+    rollupOptions: {
+      external: [],
+      output: {
+        globals: {}
+      }
+    }
+  }
+});
+```
+
+</CodeGroup>
+
+</Step>
+
+</Steps>
+
+## Build Configuration
+
+### TypeScript Configuration
+
+The main TypeScript configuration is in `ts/tsconfig.json`:
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ES6",
+    "moduleResolution": "node",
+    "declaration": true,
+    "outDir": "../code/es-modules/",
+    "strict": true,
+    "esModuleInterop": true,
+    "stripInternal": true,
+    "noEmitOnError": true
+  }
+}
+```
+
+### Compilation Process
+
+Highcharts uses SWC for fast compilation and minification:
+
+```javascript
+// SWC minification options
+const options = {
+  compress: {},
+  format: {
+    comments: 'some'
+  },
+  mangle: true,
+  module: true,
+  sourceMap: true
+};
+```
+
+## Using Highcharts Assembler
+
+The `@highcharts/highcharts-assembler` package builds distributable modules:
+
+```javascript
+const { buildModules } = require('@highcharts/highcharts-assembler/src/build.js');
+
+buildModules({
+  base: './js/',
+  output: './code/',
+  type: 'classic'
+});
+```
+
+## Tree Shaking with Modern Bundlers
+
+<Note>
+Modern bundlers like Webpack 5, Rollup, and Vite support tree shaking with Highcharts ES modules, automatically removing unused code.
+</Note>
+
+```javascript
+// Only the used parts will be included
+import Highcharts from 'highcharts/es-modules/masters/highcharts.src.js';
+import 'highcharts/es-modules/masters/modules/exporting.src.js';
+
+// This creates a smaller bundle automatically
+```
+
+## Optimizing Build Size
+
+<Steps>
+
+<Step title="Use ES Modules">
+
+Always prefer ES modules for better tree shaking:
+
+```typescript
+import Highcharts from 'highcharts/es-modules/masters/highcharts.src.js';
+```
+
+</Step>
+
+<Step title="Import Only Needed Modules">
+
+```typescript
+// Bad - imports everything
+import Highcharts from 'highcharts';
+
+// Good - imports only what you need
+import Highcharts from 'highcharts/es-modules/masters/highcharts.src.js';
+import 'highcharts/es-modules/masters/modules/exporting.src.js';
+```
+
+</Step>
+
+<Step title="Enable Compression">
+
+Configure your bundler for optimal compression:
+
+```javascript
+// webpack.config.js
+module.exports = {
+  optimization: {
+    minimize: true,
+    usedExports: true,
+    sideEffects: false
+  }
+};
+```
+
+</Step>
+
+</Steps>
+
+## Build Products
+
+Highcharts supports building different products:
+
+<CodeGroup>
+
+```bash Highcharts
+npm run gulp scripts
+```
+
+```bash Highstock
+npm run gulp scripts --product Stock
+```
+
+```bash Highmaps
+npm run gulp scripts --product Maps
+```
+
+```bash Dashboards
+npm run dbuild
+```
+
+</CodeGroup>
+
+## Custom Build Examples
+
+### Minimal Chart Build
+
+```typescript
+// minimal-chart.ts
+import Highcharts from 'highcharts/es-modules/masters/highcharts.src.js';
+
+// Size: ~120KB minified
+export default Highcharts;
+```
+
+### Stock Chart with Indicators
+
+```typescript
+// stock-with-indicators.ts
+import Highcharts from 'highcharts/es-modules/masters/highstock.src.js';
+import 'highcharts/es-modules/masters/modules/boost.src.js';
+import 'highcharts/es-modules/Stock/Indicators/EMA/EMAIndicator.js';
+import 'highcharts/es-modules/Stock/Indicators/MACD/MACDIndicator.js';
+
+// Size: ~250KB minified
+export default Highcharts;
+```
+
+### Chart with Exporting
+
+```typescript
+// chart-with-export.ts
+import Highcharts from 'highcharts/es-modules/masters/highcharts.src.js';
+import 'highcharts/es-modules/masters/modules/exporting.src.js';
+import 'highcharts/es-modules/masters/modules/export-data.src.js';
+
+// Size: ~150KB minified
+export default Highcharts;
+```
+
+## Development Workflow
+
+<Steps>
+
+<Step title="Start Watch Mode">
+
+```bash
+npm run gulp scripts-watch
+```
+
+This watches TypeScript files and rebuilds on changes.
+
+</Step>
+
+<Step title="Make Changes">
+
+Edit files in the `ts/` directory:
+
+```typescript
+// ts/Core/Chart/Chart.ts
+export class Chart {
+  // Your modifications
+}
+```
+
+</Step>
+
+<Step title="Test Changes">
+
+The build system automatically compiles to `code/es-modules/`:
+
+```bash
+npm test
+```
+
+</Step>
+
+</Steps>
+
+## CI/CD Integration
+
+```yaml
+# .github/workflows/build.yml
+name: Build
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - run: npm install
+      - run: npm run build
+      - run: npm test
+```
+
+<Warning>
+Custom builds may not receive automatic updates. When upgrading Highcharts, rebuild your custom bundle to get the latest features and fixes.
+</Warning>
+
+## Performance Tips
+
+1. **Use specific imports** - Avoid importing the entire library
+2. **Enable minification** - Always minify production builds
+3. **Enable gzip/brotli** - Configure your server for compression
+4. **Use CDN for common builds** - Let browsers cache standard builds
+5. **Lazy load modules** - Load optional features on demand
+
+## Troubleshooting
+
+### Build Fails with TypeScript Errors
+
+```bash
+# Clean build cache
+npm run gulp clean
+
+# Rebuild
+npm run build
+```
+
+### Module Not Found
+
+Ensure the module path is correct:
+
+```typescript
+// Correct
+import 'highcharts/es-modules/masters/modules/exporting.src.js';
+
+// Incorrect
+import 'highcharts/modules/exporting';
+```
+
+### Large Bundle Size
+
+Analyze your bundle:
+
+```bash
+npm install -D webpack-bundle-analyzer
+```
+
+```javascript
+// webpack.config.js
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+
+module.exports = {
+  plugins: [
+    new BundleAnalyzerPlugin()
+  ]
+};
+```

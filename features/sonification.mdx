@@ -1,0 +1,597 @@
+---
+title: Audio Representation (Sonification)
+description: Convert chart data into audio to make data accessible through sound
+---
+
+# Audio Representation (Sonification)
+
+Sonification transforms chart data into audio, making data accessible to users with visual impairments and providing an alternative way to explore data patterns through sound.
+
+## Overview
+
+The Sonification module (from `ts/Extensions/Sonification/Sonification.ts:94-109`) enables you to:
+- Convert data points to musical notes
+- Map data values to audio parameters (pitch, volume, duration)
+- Create audio earcons (notification sounds)
+- Navigate charts using audio cues
+- Make data accessible through sound
+
+## Setup
+
+The sonification module is included in the accessibility module:
+
+```javascript
+import Highcharts from 'highcharts';
+import Accessibility from 'highcharts/modules/accessibility';
+
+Accessibility(Highcharts);
+
+Highcharts.chart('container', {
+  accessibility: {
+    enabled: true
+  },
+  sonification: {
+    enabled: true
+  },
+  // Chart configuration
+});
+```
+
+## Basic Sonification
+
+### Enable Sonification
+
+```javascript
+Highcharts.chart('container', {
+  sonification: {
+    enabled: true,
+    duration: 5000,  // Play for 5 seconds
+    defaultInstrumentOptions: {
+      instrument: 'piano',
+      minPitch: 'c3',
+      maxPitch: 'c6'
+    }
+  },
+  series: [{
+    data: [1, 2, 4, 5, 7, 9, 11, 13]
+  }]
+});
+```
+
+### Play Chart as Audio
+
+From the Sonification API (`ts/Extensions/Sonification/Sonification.ts:63-90`):
+
+```javascript
+// Get chart instance
+const chart = Highcharts.chart('container', { /* config */ });
+
+// Play the entire chart
+chart.sonify();
+
+// Play with callback when finished
+chart.sonify(function () {
+  console.log('Sonification complete');
+});
+
+// Toggle play/pause
+chart.toggleSonify();
+
+// Cancel playback
+chart.sonification.cancel();
+```
+
+### Play Individual Series
+
+```javascript
+// Sonify a specific series
+chart.series[0].sonify();
+
+// With callback
+chart.series[0].sonify(function () {
+  console.log('Series sonification complete');
+});
+```
+
+## Audio Mapping
+
+### Pitch Mapping
+
+Map data values to musical pitches:
+
+```javascript
+{
+  sonification: {
+    defaultInstrumentOptions: {
+      mapping: {
+        pitch: {
+          min: 'c3',    // Lowest note
+          max: 'c6',    // Highest note
+          // Map to y-value by default
+          mapTo: 'y',
+          // Or use custom mapping function
+          mapFunction: 'linear'  // or 'logarithmic'
+        }
+      }
+    }
+  }
+}
+```
+
+### Volume Mapping
+
+```javascript
+{
+  sonification: {
+    defaultInstrumentOptions: {
+      mapping: {
+        volume: {
+          min: 0.2,   // Quietest
+          max: 1.0,   // Loudest
+          mapTo: 'y'
+        }
+      }
+    }
+  }
+}
+```
+
+### Duration and Timing
+
+```javascript
+{
+  sonification: {
+    duration: 8000,  // Total duration in milliseconds
+    pointGrouping: {
+      enabled: true,
+      groupTimespan: 100,  // Group points within 100ms
+      algorithm: 'minmax'  // or 'first', 'last', 'average'
+    },
+    defaultInstrumentOptions: {
+      mapping: {
+        noteDuration: 200,  // Each note plays for 200ms
+        gapBetweenNotes: 50  // 50ms gap between notes
+      }
+    }
+  }
+}
+```
+
+## Instruments and Sounds
+
+### Available Instruments
+
+Highcharts includes several preset instruments:
+
+<CodeGroup>
+```javascript Piano
+{
+  sonification: {
+    defaultInstrumentOptions: {
+      instrument: 'piano'
+    }
+  }
+}
+```
+
+```javascript Flute
+{
+  sonification: {
+    defaultInstrumentOptions: {
+      instrument: 'flute'
+    }
+  }
+}
+```
+
+```javascript Vibraphone
+{
+  sonification: {
+    defaultInstrumentOptions: {
+      instrument: 'vibraphone'
+    }
+  }
+}
+```
+
+```javascript Saxophone
+{
+  sonification: {
+    defaultInstrumentOptions: {
+      instrument: 'saxophone'
+    }
+  }
+}
+```
+</CodeGroup>
+
+### Custom Instruments
+
+Define custom synthesizer patches:
+
+```javascript
+{
+  sonification: {
+    defaultInstrumentOptions: {
+      instrument: {
+        oscillators: [{
+          type: 'sine',
+          frequency: 1
+        }],
+        envelope: {
+          attack: 0.01,
+          decay: 0.1,
+          sustain: 0.3,
+          release: 0.3
+        }
+      }
+    }
+  }
+}
+```
+
+## Advanced Features
+
+### Earcons (Audio Notifications)
+
+From the earcon demo (`samples/highcharts/sonification/chart-earcon/demo.js:11-42`):
+
+```javascript
+Highcharts.chart('container', {
+  sonification: {
+    duration: 11000,
+    afterSeriesWait: 1100,
+    events: {
+      onEnd: function () {
+        console.log('Sonification ended');
+      }
+    },
+    // Global track that plays for specific conditions
+    globalTracks: [{
+      type: 'instrument',
+      instrument: 'vibraphone',
+      showPlayMarker: false,
+      mapping: {
+        pitch: ['g6', 'g6'],
+        playDelay: 60,
+        gapBetweenNotes: 100
+      },
+      // Only play when this condition is true
+      activeWhen: function (context) {
+        const point = context.point;
+        const series = point.series;
+        // Play earcon when point is the max in series
+        return point.y === Math.max.apply(Math, 
+          series.points.map(p => p.y)
+        );
+      }
+    }]
+  },
+  series: [{
+    data: [1, 2, 4, 5, 7, 9, 11, 13]
+  }, {
+    data: [4, 5, 9, 5, 2, 1, 4, 6]
+  }]
+});
+```
+
+### Multiple Tracks
+
+Create multiple simultaneous audio tracks:
+
+```javascript
+{
+  sonification: {
+    globalTracks: [
+      {
+        // Melody track
+        type: 'instrument',
+        instrument: 'piano',
+        mapping: {
+          pitch: {
+            mapTo: 'y',
+            min: 'c4',
+            max: 'c6'
+          },
+          volume: 0.8
+        }
+      },
+      {
+        // Bass track
+        type: 'instrument',
+        instrument: 'bass',
+        mapping: {
+          pitch: {
+            mapTo: 'y',
+            min: 'c2',
+            max: 'c4'
+          },
+          volume: 0.6
+        }
+      },
+      {
+        // Speech track
+        type: 'speech',
+        mapping: {
+          text: '{point.name}: {point.y}',
+          rate: 1.2,
+          volume: 0.7
+        }
+      }
+    ]
+  }
+}
+```
+
+### Context Track Mapping
+
+Map audio parameters based on context:
+
+```javascript
+{
+  sonification: {
+    defaultInstrumentOptions: {
+      mapping: {
+        pitch: function (context) {
+          // Access point data
+          const value = context.point.y;
+          const min = context.point.series.yAxis.min;
+          const max = context.point.series.yAxis.max;
+          
+          // Custom pitch calculation
+          const range = max - min;
+          const normalized = (value - min) / range;
+          const semitones = normalized * 24;  // 2 octave range
+          
+          return 'c4+' + semitones;
+        },
+        volume: function (context) {
+          // Vary volume based on x-position
+          const xPercent = context.point.plotX / context.chart.plotWidth;
+          return 0.4 + (xPercent * 0.6);
+        }
+      }
+    }
+  }
+}
+```
+
+## Sonification Events (from `ts/Extensions/Sonification/Sonification.ts:14-21`)
+
+```javascript
+{
+  sonification: {
+    events: {
+      onSeriesStart: function (e) {
+        console.log('Starting series:', e.series.name);
+      },
+      onSeriesEnd: function (e) {
+        console.log('Finished series:', e.series.name);
+      },
+      onPointStart: function (e) {
+        console.log('Playing point:', e.point.category, e.point.y);
+      },
+      onPointEnd: function (e) {
+        console.log('Finished point:', e.point.category);
+      },
+      onEnd: function () {
+        console.log('Sonification complete');
+        // Re-enable play button
+        document.getElementById('play-btn').disabled = false;
+      }
+    }
+  }
+}
+```
+
+## Interactive Controls
+
+Create playback controls for users:
+
+```html
+<button id="play">Play</button>
+<button id="pause">Pause</button>
+<button id="stop">Stop</button>
+<input type="range" id="speed" min="0.5" max="2" step="0.1" value="1">
+```
+
+```javascript
+const chart = Highcharts.chart('container', { /* config */ });
+
+// Play button
+document.getElementById('play').onclick = function () {
+  chart.sonify();
+};
+
+// Pause/Resume button
+document.getElementById('pause').onclick = function () {
+  chart.toggleSonify();
+};
+
+// Stop button  
+document.getElementById('stop').onclick = function () {
+  chart.sonification.cancel();
+};
+
+// Speed control
+document.getElementById('speed').oninput = function (e) {
+  const speed = parseFloat(e.target.value);
+  chart.update({
+    sonification: {
+      duration: 5000 / speed
+    }
+  });
+};
+```
+
+## Scrubbing Navigation
+
+Allow users to scrub through the chart (from `ts/Extensions/Sonification/Sonification.ts:183-200`):
+
+```javascript
+// Play a specific segment (0-100)
+chart.sonification.playSegment(50);  // Play middle segment
+
+// Scrubbing with slider
+document.getElementById('scrubber').oninput = function (e) {
+  const segment = parseInt(e.target.value);
+  chart.sonification.playSegment(segment);
+};
+```
+
+## Accessibility Integration
+
+Combine sonification with accessibility features:
+
+```javascript
+{
+  accessibility: {
+    enabled: true,
+    keyboardNavigation: {
+      enabled: true
+    },
+    screenReaderSection: {
+      beforeChartFormat: '<div>Use arrow keys to navigate. ' +
+        'Press P to play sonification.</div>'
+    }
+  },
+  sonification: {
+    enabled: true,
+    showCrosshair: true,  // Show position during playback
+    showTooltip: true     // Show tooltip during playback
+  }
+}
+
+// Add keyboard shortcut
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'p' || e.key === 'P') {
+    chart.toggleSonify();
+  }
+});
+```
+
+## Best Practices
+
+<Note>
+**Sonification Design Tips**
+- Use appropriate pitch ranges (avoid extremes)
+- Keep duration reasonable (5-15 seconds for most charts)
+- Provide play/pause controls
+- Show visual feedback during playback
+- Use earcons sparingly for important events
+- Test with headphones and speakers
+- Consider users with hearing impairments
+- Provide alternative text descriptions
+- Use familiar instruments for better understanding
+</Note>
+
+<Warning>
+**Important Considerations**
+- Browser audio support varies (test across browsers)
+- Audio may not autoplay due to browser policies
+- Requires user interaction to start in most browsers
+- Can be CPU intensive for large datasets
+- May not work properly in all screen readers
+- Consider providing mute option
+- Loud or jarring sounds can be startling
+</Warning>
+
+## Complete Example
+
+```javascript
+const chart = Highcharts.chart('container', {
+  chart: {
+    type: 'spline'
+  },
+  title: {
+    text: 'Temperature Trends with Sonification'
+  },
+  subtitle: {
+    text: 'Click Play to hear the data'
+  },
+  accessibility: {
+    enabled: true,
+    landmarkVerbosity: 'one',
+    description: 'Temperature chart with audio representation'
+  },
+  sonification: {
+    enabled: true,
+    duration: 8000,
+    afterSeriesWait: 500,
+    
+    // Show visual feedback
+    showCrosshair: true,
+    showTooltip: true,
+    
+    // Events
+    events: {
+      onPointStart: function (e) {
+        console.log('Temperature:', e.point.y + '°C');
+      },
+      onEnd: function () {
+        document.getElementById('play-btn').textContent = 'Play Again';
+      }
+    },
+    
+    // Default instrument settings
+    defaultInstrumentOptions: {
+      instrument: 'piano',
+      mapping: {
+        pitch: {
+          mapTo: 'y',
+          min: 'c3',
+          max: 'c6'
+        },
+        volume: {
+          mapTo: 'y',
+          min: 0.4,
+          max: 0.9
+        },
+        noteDuration: 200,
+        gapBetweenNotes: 50
+      }
+    },
+    
+    // Earcon for maximum temperature
+    globalTracks: [{
+      type: 'instrument',
+      instrument: 'vibraphone',
+      showPlayMarker: false,
+      mapping: {
+        pitch: ['g6', 'g6'],
+        playDelay: 80,
+        gapBetweenNotes: 100
+      },
+      activeWhen: function (context) {
+        const point = context.point;
+        const series = point.series;
+        return point.y === Math.max.apply(Math, 
+          series.points.map(p => p.y)
+        );
+      }
+    }]
+  },
+  series: [{
+    name: 'Temperature',
+    data: [15, 18, 22, 25, 28, 32, 30, 27, 23, 19, 16, 14]
+  }]
+});
+
+// Control buttons
+document.getElementById('play-btn').onclick = function () {
+  chart.sonify();
+  this.textContent = 'Playing...';
+};
+
+document.getElementById('stop-btn').onclick = function () {
+  chart.sonification.cancel();
+  document.getElementById('play-btn').textContent = 'Play';
+};
+```
+
+## Related Resources
+
+- [Accessibility Features](/features/accessibility)
+- [Keyboard Navigation](https://www.highcharts.com/docs/accessibility/accessibility-module)
+- [Web Audio API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API)
+- [Tooltips and Data Labels](/features/tooltips-labels)

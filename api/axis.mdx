@@ -1,0 +1,627 @@
+---
+title: 'Axis Class API'
+description: 'Complete reference for the Highcharts Axis class'
+---
+
+# Axis Class
+
+The Axis class controls the x-axis, y-axis, and other dimensional axes in a chart. Axes handle scaling, labeling, gridlines, and positioning.
+
+**Source**: `ts/Core/Axis/Axis.ts:190`
+
+## Overview
+
+Axes can be accessed through the chart object:
+
+```javascript
+// Access specific axes
+const xAxis = chart.xAxis[0];
+const yAxis = chart.yAxis[0];
+
+// All axes in the chart
+chart.axes.forEach(axis => {
+  console.log(axis.isXAxis ? 'X' : 'Y', axis.min, axis.max);
+});
+
+// By ID
+const customAxis = chart.get('my-axis-id');
+```
+
+## Constructor
+
+Axes are typically created via chart configuration or `chart.addAxis()`, not directly instantiated.
+
+```javascript
+// Via chart options
+Highcharts.chart('container', {
+  xAxis: {
+    categories: ['Jan', 'Feb', 'Mar'],
+    title: { text: 'Month' }
+  },
+  yAxis: {
+    title: { text: 'Value' },
+    min: 0
+  }
+});
+
+// Multiple axes
+Highcharts.chart('container', {
+  yAxis: [{
+    // Primary y-axis
+    title: { text: 'Temperature' }
+  }, {
+    // Secondary y-axis
+    title: { text: 'Rainfall' },
+    opposite: true
+  }]
+});
+```
+
+## Properties
+
+### axis.chart
+
+<ResponseField name="chart" type="Highcharts.Chart" required>
+  The chart instance this axis belongs to
+</ResponseField>
+
+```javascript
+const chart = axis.chart;
+```
+
+### axis.series
+
+<ResponseField name="series" type="Array<Highcharts.Series>">
+  All series associated with this axis
+</ResponseField>
+
+```javascript
+axis.series.forEach(series => {
+  console.log(series.name);
+});
+```
+
+### axis.min
+
+<ResponseField name="min" type="number">
+  Current minimum value of the axis
+</ResponseField>
+
+```javascript
+console.log('Min:', axis.min); // 0
+```
+
+### axis.max
+
+<ResponseField name="max" type="number">
+  Current maximum value of the axis
+</ResponseField>
+
+```javascript
+console.log('Max:', axis.max); // 100
+```
+
+### axis.dataMin
+
+<ResponseField name="dataMin" type="number">
+  Minimum value from all series data on this axis
+</ResponseField>
+
+```javascript
+console.log('Data range:', axis.dataMin, '-', axis.dataMax);
+```
+
+### axis.dataMax
+
+<ResponseField name="dataMax" type="number">
+  Maximum value from all series data on this axis
+</ResponseField>
+
+### axis.isXAxis
+
+<ResponseField name="isXAxis" type="boolean">
+  Whether this is an X axis (true) or Y axis (false)
+</ResponseField>
+
+```javascript
+if (axis.isXAxis) {
+  console.log('This is an X axis');
+}
+```
+
+### axis.categories
+
+<ResponseField name="categories" type="Array<string>">
+  Category names for categorical axes
+</ResponseField>
+
+```javascript
+console.log(axis.categories); // ['Jan', 'Feb', 'Mar']
+```
+
+### axis.options
+
+<ResponseField name="options" type="AxisOptions" required>
+  The axis configuration options
+</ResponseField>
+
+```javascript
+console.log(axis.options.title.text);
+```
+
+### axis.len
+
+<ResponseField name="len" type="number">
+  Length of the axis in pixels
+</ResponseField>
+
+```javascript
+console.log('Axis length:', axis.len, 'px');
+```
+
+### axis.opposite
+
+<ResponseField name="opposite" type="boolean">
+  Whether the axis is on the opposite side
+</ResponseField>
+
+## Methods
+
+### axis.setExtremes()
+
+Set the minimum and maximum values of the axis.
+
+<ParamField path="min" type="number | null" required>
+  New minimum value (null to auto-calculate)
+</ParamField>
+
+<ParamField path="max" type="number | null" required>
+  New maximum value (null to auto-calculate)
+</ParamField>
+
+<ParamField path="redraw" type="boolean" default="true">
+  Whether to redraw the chart
+</ParamField>
+
+<ParamField path="animation" type="boolean | AnimationOptions">
+  Animation options
+</ParamField>
+
+<ParamField path="eventArguments" type="object">
+  Custom event arguments
+</ParamField>
+
+```javascript
+// Set explicit range
+axis.setExtremes(0, 100);
+
+// Auto-calculate max
+axis.setExtremes(0, null);
+
+// With animation
+axis.setExtremes(0, 100, true, {
+  duration: 1000,
+  easing: 'easeOutBounce'
+});
+
+// Without redraw (for multiple changes)
+chart.xAxis[0].setExtremes(0, 50, false);
+chart.yAxis[0].setExtremes(0, 100, false);
+chart.redraw();
+```
+
+**Fires**: `setExtremes` event
+
+**Source**: Referenced in `ts/Core/Axis/AxisOptions.ts:29`
+
+### axis.update()
+
+Update the axis with new options.
+
+<ParamField path="options" type="AxisOptions" required>
+  New axis options to merge
+</ParamField>
+
+<ParamField path="redraw" type="boolean" default="true">
+  Whether to redraw the chart
+</ParamField>
+
+```javascript
+// Update axis title
+axis.update({
+  title: { text: 'New Title' }
+});
+
+// Update multiple properties
+axis.update({
+  title: { text: 'Updated Axis' },
+  min: 0,
+  max: 200,
+  gridLineWidth: 2,
+  gridLineColor: '#e0e0e0'
+});
+
+// Update categories
+axis.update({
+  categories: ['Q1', 'Q2', 'Q3', 'Q4']
+});
+```
+
+### axis.setTitle()
+
+Set the axis title.
+
+<ParamField path="title" type="AxisTitleOptions" required>
+  New title options
+</ParamField>
+
+<ParamField path="redraw" type="boolean" default="true">
+  Whether to redraw
+</ParamField>
+
+```javascript
+// Simple text update
+axis.setTitle({ text: 'New Title' });
+
+// With styling
+axis.setTitle({
+  text: 'Temperature (°C)',
+  style: {
+    color: '#ff0000',
+    fontWeight: 'bold'
+  },
+  rotation: 0
+});
+```
+
+**Source**: Referenced in `ts/Core/Axis/AxisOptions.ts:30`
+
+### axis.setCategories()
+
+Set the categories for a categorical axis.
+
+<ParamField path="categories" type="Array<string>" required>
+  New category names
+</ParamField>
+
+<ParamField path="redraw" type="boolean" default="true">
+  Whether to redraw
+</ParamField>
+
+```javascript
+// Update categories
+axis.setCategories(['January', 'February', 'March']);
+
+// Quarterly categories
+axis.setCategories(['Q1', 'Q2', 'Q3', 'Q4']);
+```
+
+### axis.remove()
+
+Remove the axis from the chart.
+
+<ParamField path="redraw" type="boolean" default="true">
+  Whether to redraw the chart
+</ParamField>
+
+```javascript
+// Remove secondary axis
+const secondaryAxis = chart.yAxis[1];
+secondaryAxis.remove();
+```
+
+### axis.addPlotLine()
+
+Add a plot line to the axis.
+
+<ParamField path="options" type="PlotLineOptions" required>
+  Plot line configuration
+</ParamField>
+
+```javascript
+// Add threshold line
+axis.addPlotLine({
+  value: 50,
+  color: 'red',
+  width: 2,
+  id: 'threshold',
+  label: {
+    text: 'Threshold',
+    align: 'right'
+  }
+});
+
+// Add multiple plot lines
+axis.addPlotLine({
+  value: 75,
+  color: 'orange',
+  dashStyle: 'Dash',
+  width: 1,
+  label: { text: 'Warning' }
+});
+```
+
+**Returns**: `Highcharts.PlotLineOrBand`
+
+### axis.addPlotBand()
+
+Add a plot band to the axis.
+
+<ParamField path="options" type="PlotBandOptions" required>
+  Plot band configuration
+</ParamField>
+
+```javascript
+// Add shaded region
+axis.addPlotBand({
+  from: 20,
+  to: 80,
+  color: 'rgba(255, 0, 0, 0.1)',
+  id: 'normal-range',
+  label: {
+    text: 'Normal Range',
+    align: 'center'
+  }
+});
+
+// Weekend highlighting
+axis.addPlotBand({
+  from: 5.5,
+  to: 7.5,
+  color: '#f0f0f0',
+  label: { text: 'Weekend' }
+});
+```
+
+**Returns**: `Highcharts.PlotLineOrBand`
+
+### axis.removePlotLine()
+
+Remove a plot line by ID.
+
+<ParamField path="id" type="string" required>
+  ID of the plot line to remove
+</ParamField>
+
+```javascript
+// Remove plot line
+axis.removePlotLine('threshold');
+```
+
+### axis.removePlotBand()
+
+Remove a plot band by ID.
+
+<ParamField path="id" type="string" required>
+  ID of the plot band to remove
+</ParamField>
+
+```javascript
+// Remove plot band
+axis.removePlotBand('normal-range');
+```
+
+### axis.toValue()
+
+Translate a pixel position to an axis value.
+
+<ParamField path="pixel" type="number" required>
+  Pixel position relative to the axis
+</ParamField>
+
+<ParamField path="paneCoordinates" type="boolean">
+  Whether coordinates are pane-relative
+</ParamField>
+
+```javascript
+// Get value at pixel position
+const value = axis.toValue(200);
+console.log('Value at 200px:', value);
+
+// Use in click handler
+chart.container.addEventListener('click', (e) => {
+  const value = xAxis.toValue(e.offsetX);
+  console.log('Clicked at x-value:', value);
+});
+```
+
+**Returns**: `number`
+
+### axis.toPixels()
+
+Translate an axis value to a pixel position.
+
+<ParamField path="value" type="number" required>
+  The axis value to convert
+</ParamField>
+
+<ParamField path="paneCoordinates" type="boolean">
+  Whether to return pane-relative coordinates
+</ParamField>
+
+```javascript
+// Get pixel position of value
+const pixel = axis.toPixels(50);
+console.log('50 is at pixel:', pixel);
+
+// Draw custom marker
+const x = xAxis.toPixels(10);
+const y = yAxis.toPixels(25);
+chart.renderer.circle(x, y, 5)
+  .attr({ fill: 'red' })
+  .add();
+```
+
+**Returns**: `number`
+
+### axis.getExtremes()
+
+Get the current extremes of the axis.
+
+```javascript
+const extremes = axis.getExtremes();
+console.log('Min:', extremes.min);
+console.log('Max:', extremes.max);
+console.log('Data Min:', extremes.dataMin);
+console.log('Data Max:', extremes.dataMax);
+console.log('User Min:', extremes.userMin);
+console.log('User Max:', extremes.userMax);
+```
+
+**Returns**: Object with `min`, `max`, `dataMin`, `dataMax`, `userMin`, `userMax`
+
+## Events
+
+Axis events are configured in the axis options:
+
+```javascript
+Highcharts.chart('container', {
+  xAxis: {
+    events: {
+      afterSetExtremes: function(e) {
+        console.log('Extremes set:', e.min, e.max);
+      },
+      setExtremes: function(e) {
+        console.log('Setting extremes:', e.min, e.max);
+        // Return false to prevent
+        if (e.min < 0) {
+          return false;
+        }
+      },
+      afterBreaks: function() {
+        console.log('Breaks recalculated');
+      }
+    }
+  }
+});
+```
+
+Common axis events:
+- `afterSetExtremes` - After extremes are set
+- `setExtremes` - When extremes are being set (preventable)
+- `afterBreaks` - After axis breaks are recalculated
+- `pointBreak` - When a point is broken by axis breaks
+
+## Example: Dynamic Axis Control
+
+```javascript
+const chart = Highcharts.chart('container', {
+  chart: { type: 'line' },
+  title: { text: 'Dynamic Axis Example' },
+  xAxis: {
+    title: { text: 'Time' },
+    type: 'datetime',
+    events: {
+      afterSetExtremes: function(e) {
+        console.log('Zoomed to:', new Date(e.min), new Date(e.max));
+      }
+    }
+  },
+  yAxis: {
+    title: { text: 'Value' },
+    plotLines: [{
+      value: 50,
+      color: 'red',
+      width: 2,
+      id: 'threshold'
+    }]
+  },
+  series: [{
+    name: 'Data',
+    data: Array.from({ length: 100 }, (_, i) => [
+      Date.now() + i * 3600000,
+      Math.random() * 100
+    ])
+  }]
+});
+
+const xAxis = chart.xAxis[0];
+const yAxis = chart.yAxis[0];
+
+// Zoom to last 24 hours
+function zoomToLast24Hours() {
+  const now = Date.now();
+  const dayAgo = now - 24 * 3600000;
+  xAxis.setExtremes(dayAgo, now);
+}
+
+// Update Y axis range based on data
+function updateYRange() {
+  const data = chart.series[0].yData;
+  const min = Math.min(...data);
+  const max = Math.max(...data);
+  yAxis.setExtremes(min * 0.9, max * 1.1);
+}
+
+// Add dynamic plot band
+function addWarningZone(from, to) {
+  yAxis.addPlotBand({
+    from: from,
+    to: to,
+    color: 'rgba(255, 165, 0, 0.2)',
+    id: 'warning-zone',
+    label: { text: 'Warning' }
+  });
+}
+
+// Update threshold dynamically
+function updateThreshold(value) {
+  yAxis.removePlotLine('threshold');
+  yAxis.addPlotLine({
+    value: value,
+    color: 'red',
+    width: 2,
+    id: 'threshold',
+    label: { text: `Threshold: ${value}` }
+  });
+}
+```
+
+## Example: Multiple Axes
+
+```javascript
+const chart = Highcharts.chart('container', {
+  title: { text: 'Temperature and Rainfall' },
+  xAxis: {
+    categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May']
+  },
+  yAxis: [{
+    // Primary Y axis
+    title: { text: 'Temperature (°C)' },
+    labels: {
+      format: '{value}°C'
+    }
+  }, {
+    // Secondary Y axis
+    title: { text: 'Rainfall (mm)' },
+    labels: {
+      format: '{value} mm'
+    },
+    opposite: true
+  }],
+  series: [{
+    name: 'Temperature',
+    type: 'line',
+    yAxis: 0,
+    data: [7, 9, 12, 15, 18],
+    tooltip: { valueSuffix: '°C' }
+  }, {
+    name: 'Rainfall',
+    type: 'column',
+    yAxis: 1,
+    data: [50, 45, 40, 35, 30],
+    tooltip: { valueSuffix: ' mm' }
+  }]
+});
+
+// Update both axes
+chart.yAxis[0].update({ min: 0, max: 25 });
+chart.yAxis[1].update({ min: 0, max: 100 });
+```
+
+## See Also
+
+- [Axis Options](/api/axis-options) - Configuration reference
+- [Chart Class](/api/chart) - Chart management
+- [Series Class](/api/series) - Data series
+- [Plot Options](/api/plot-options) - Plot lines and bands

@@ -1,0 +1,380 @@
+---
+title: Basic Chart Examples
+description: Learn how to create basic charts including line, column, pie, and bar charts with Highcharts
+---
+
+## Overview
+
+This guide demonstrates how to create fundamental chart types with Highcharts. Each example uses real data and is production-ready.
+
+## Line Chart
+
+A basic line chart showing trends over time with series labels for enhanced readability.
+
+<CodeGroup>
+
+```javascript JavaScript
+Highcharts.chart('container', {
+    title: {
+        text: 'U.S Solar Employment Growth',
+        align: 'left'
+    },
+
+    subtitle: {
+        text: 'By Job Category. Source: <a href="https://irecusa.org/programs/solar-jobs-census/" target="_blank">IREC</a>.',
+        align: 'left'
+    },
+
+    yAxis: {
+        title: {
+            text: 'Number of Employees'
+        }
+    },
+
+    xAxis: {
+        accessibility: {
+            rangeDescription: 'Range: 2010 to 2022'
+        }
+    },
+
+    legend: {
+        layout: 'vertical',
+        align: 'right',
+        verticalAlign: 'middle'
+    },
+
+    plotOptions: {
+        series: {
+            label: {
+                connectorAllowed: false
+            },
+            pointStart: 2010
+        }
+    },
+
+    series: [{
+        name: 'Installation & Developers',
+        data: [
+            43934, 48656, 65165, 81827, 112143, 142383,
+            171533, 165174, 155157, 161454, 154610, 168960, 171558
+        ]
+    }, {
+        name: 'Manufacturing',
+        data: [
+            24916, 37941, 29742, 29851, 32490, 30282,
+            38121, 36885, 33726, 34243, 31050, 33099, 33473
+        ]
+    }, {
+        name: 'Sales & Distribution',
+        data: [
+            11744, 30000, 16005, 19771, 20185, 24377,
+            32147, 30912, 29243, 29213, 25663, 28978, 30618
+        ]
+    }, {
+        name: 'Operations & Maintenance',
+        data: [
+            null, null, null, null, null, null, null,
+            null, 11164, 11218, 10077, 12530, 16585
+        ]
+    }, {
+        name: 'Other',
+        data: [
+            21908, 5548, 8105, 11248, 8989, 11816, 18274,
+            17300, 13053, 11906, 10073, 11471, 11648
+        ]
+    }],
+
+    responsive: {
+        rules: [{
+            condition: {
+                maxWidth: 500
+            },
+            chartOptions: {
+                legend: {
+                    layout: 'horizontal',
+                    align: 'center',
+                    verticalAlign: 'bottom'
+                }
+            }
+        }]
+    }
+});
+```
+
+```html HTML
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/series-label.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+
+<div id="container"></div>
+```
+
+</CodeGroup>
+
+<Note>
+This chart uses the `series-label` module to automatically add labels to each line for enhanced readability.
+</Note>
+
+## Column Chart
+
+A basic column chart comparing data across categories with crosshair functionality.
+
+```javascript
+Highcharts.chart('container', {
+    chart: {
+        type: 'column'
+    },
+    title: {
+        text: 'Corn vs wheat estimated production for 2023'
+    },
+    subtitle: {
+        text:
+            'Source: <a target="_blank" ' +
+            'href="https://www.indexmundi.com/agriculture/?commodity=corn">indexmundi</a>'
+    },
+    xAxis: {
+        categories: ['USA', 'China', 'Brazil', 'EU', 'Argentina', 'India'],
+        crosshair: true,
+        accessibility: {
+            description: 'Countries'
+        }
+    },
+    yAxis: {
+        min: 0,
+        title: {
+            text: '1000 metric tons (MT)'
+        }
+    },
+    tooltip: {
+        valueSuffix: ' (1000 MT)'
+    },
+    plotOptions: {
+        column: {
+            pointPadding: 0.2,
+            borderWidth: 0
+        }
+    },
+    series: [
+        {
+            name: 'Corn',
+            data: [387749, 280000, 129000, 64300, 54000, 34300]
+        },
+        {
+            name: 'Wheat',
+            data: [45321, 140000, 10000, 140500, 19500, 113500]
+        }
+    ]
+});
+```
+
+<Tip>
+The `crosshair` feature highlights the hovered category, making it easier to compare values across series.
+</Tip>
+
+## Pie Chart
+
+An interactive pie chart with zooming and panning capabilities.
+
+```javascript
+Highcharts.chart('container', {
+    chart: {
+        type: 'pie',
+        zooming: {
+            type: 'xy'
+        },
+        panning: {
+            enabled: true,
+            type: 'xy'
+        },
+        panKey: 'shift'
+    },
+    title: {
+        text: 'Egg Yolk Composition'
+    },
+    tooltip: {
+        valueSuffix: '%'
+    },
+    subtitle: {
+        text:
+        'Source:<a href="https://www.mdpi.com/2072-6643/11/3/684/htm" target="_default">MDPI</a>'
+    },
+    plotOptions: {
+        pie: {
+            allowPointSelect: true,
+            cursor: 'pointer',
+            dataLabels: [{
+                enabled: true,
+                distance: 20
+            }, {
+                enabled: true,
+                distance: -40,
+                format: '{point.percentage:.1f}%',
+                style: {
+                    fontSize: '1.2em',
+                    textOutline: 'none',
+                    opacity: 0.7
+                },
+                filter: {
+                    operator: '>',
+                    property: 'percentage',
+                    value: 10
+                }
+            }]
+        }
+    },
+    series: [
+        {
+            name: 'Percentage',
+            colorByPoint: true,
+            data: [
+                {
+                    name: 'Water',
+                    y: 55.02
+                },
+                {
+                    name: 'Fat',
+                    sliced: true,
+                    selected: true,
+                    y: 26.71
+                },
+                {
+                    name: 'Carbohydrates',
+                    y: 1.09
+                },
+                {
+                    name: 'Protein',
+                    y: 15.5
+                },
+                {
+                    name: 'Ash',
+                    y: 1.68
+                }
+            ]
+        }
+    ]
+});
+```
+
+## 3D Column Chart
+
+An interactive 3D column chart with adjustable viewing angles.
+
+```javascript
+const chart = new Highcharts.Chart({
+    chart: {
+        renderTo: 'container',
+        type: 'column',
+        options3d: {
+            enabled: true,
+            alpha: 15,
+            beta: 15,
+            depth: 50,
+            viewDistance: 25
+        }
+    },
+    xAxis: {
+        type: 'category'
+    },
+    yAxis: {
+        title: {
+            enabled: false
+        }
+    },
+    tooltip: {
+        headerFormat: '<b>{point.key}</b><br>',
+        pointFormat: 'Cars sold: {point.y}'
+    },
+    title: {
+        text: 'Sold passenger cars in Norway by brand, May 2024'
+    },
+    subtitle: {
+        text: 'Source: ' +
+            '<a href="https://ofv.no/registreringsstatistikk"' +
+            'target="_blank">OFV</a>'
+    },
+    legend: {
+        enabled: false
+    },
+    plotOptions: {
+        column: {
+            depth: 25
+        }
+    },
+    series: [{
+        data: [
+            ['Toyota', 1795],
+            ['Volkswagen', 1242],
+            ['Volvo', 1074],
+            ['Tesla', 832],
+            ['Hyundai', 593],
+            ['MG', 509],
+            ['Skoda', 471],
+            ['BMW', 442],
+            ['Ford', 385],
+            ['Nissan', 371]
+        ],
+        colorByPoint: true
+    }]
+});
+```
+
+<Accordion title="Making the chart interactive">
+
+You can add controls to adjust the 3D viewing angles:
+
+```javascript
+function showValues() {
+    document.getElementById('alpha-value').innerHTML = chart.options.chart.options3d.alpha;
+    document.getElementById('beta-value').innerHTML = chart.options.chart.options3d.beta;
+    document.getElementById('depth-value').innerHTML = chart.options.chart.options3d.depth;
+}
+
+// Activate the sliders
+document.querySelectorAll('#sliders input').forEach(input => 
+    input.addEventListener('input', e => {
+        chart.options.chart.options3d[e.target.id] = parseFloat(e.target.value);
+        showValues();
+        chart.redraw(false);
+    })
+);
+```
+
+</Accordion>
+
+## Key Features
+
+<CardGroup cols={2}>
+
+<Card title="Responsive Design" icon="mobile">
+All charts automatically adapt to different screen sizes using responsive rules.
+</Card>
+
+<Card title="Accessibility" icon="universal-access">
+Built-in accessibility features ensure charts are usable by everyone.
+</Card>
+
+<Card title="Exporting" icon="download">
+Export charts as PNG, JPEG, PDF, or SVG with the exporting module.
+</Card>
+
+<Card title="Data Labels" icon="tag">
+Customizable data labels with multiple formatting options.
+</Card>
+
+</CardGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+
+<Card title="Dynamic Data" href="/examples/dynamic-data" icon="arrows-rotate">
+Learn how to update charts in real-time with dynamic data
+</Card>
+
+<Card title="Advanced Features" href="/examples/advanced-features" icon="wand-magic-sparkles">
+Explore advanced features like annotations and drilldown
+</Card>
+
+</CardGroup>

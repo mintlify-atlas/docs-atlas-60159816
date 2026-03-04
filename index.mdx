@@ -1,97 +1,284 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: Highcharts Documentation
+description: JavaScript charting framework for creating interactive charts, stock charts, maps, and Gantt diagrams
+mode: custom
 ---
 
-## Setting up
+<div className="relative overflow-hidden bg-gradient-to-br from-[#a6e9bc] to-[#6d819f] dark:from-[#0f1117] dark:to-[#1a1d27] py-20">
+  <div className="max-w-7xl mx-auto px-6 lg:px-8">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <div className="text-left">
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-6">
+          Build Beautiful Interactive Charts
+        </h1>
+        <p className="text-lg sm:text-xl text-gray-700 dark:text-gray-300 mb-8 max-w-2xl">
+          Highcharts is the world's leading JavaScript charting library. Create stunning visualizations with 70+ chart types, real-time updates, and extensive customization options.
+        </p>
+        <div className="flex flex-wrap gap-4">
+          <a
+            href="/quickstart"
+            className="inline-flex items-center px-6 py-3 rounded-lg bg-[#5c6ac4] hover:bg-[#4B5DCA] text-white font-semibold transition-colors"
+          >
+            Get Started
+            <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
+          </a>
+          <a
+            href="/api/overview"
+            className="inline-flex items-center px-6 py-3 rounded-lg border border-gray-300 dark:border-[#27272a] bg-white/10 dark:bg-white/5 hover:bg-white/20 dark:hover:bg-white/10 text-gray-900 dark:text-white font-semibold transition-colors"
+          >
+            API Reference
+          </a>
+        </div>
+      </div>
+      <div className="hidden lg:block">
+        <div className="relative">
+          <div className="absolute inset-0 bg-gradient-to-r from-[#a6e9bc] to-[#6d819f] rounded-2xl blur-3xl opacity-20"></div>
+          <div className="relative bg-white dark:bg-[#1a1d27] p-8 rounded-2xl border border-gray-200 dark:border-[#27272a] shadow-2xl">
+            <pre className="text-sm text-gray-800 dark:text-gray-200">
+              <code>{`import Highcharts from 'highcharts';
 
-Get your documentation site up and running in minutes.
+Highcharts.chart('container', {
+  chart: { type: 'line' },
+  title: { text: 'Monthly Sales' },
+  series: [{
+    name: 'Revenue',
+    data: [29.9, 71.5, 106.4, 129.2]
+  }]
+});`}</code>
+            </pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
+<div className="mt-16 mb-16 max-w-5xl mx-auto px-6">
+  <div className="text-center mb-12">
+    <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Get Started in Minutes</h2>
+    <p className="text-lg text-gray-600 dark:text-gray-400">Follow these simple steps to create your first chart</p>
+  </div>
 
-## Make it yours
+  <Steps>
+    <Step title="Install Highcharts">
+      Install Highcharts using your preferred package manager:
+      
+      <CodeGroup>
+      ```bash npm
+      npm install highcharts
+      ```
+      ```bash yarn
+      yarn add highcharts
+      ```
+      ```bash pnpm
+      pnpm add highcharts
+      ```
+      </CodeGroup>
+    </Step>
 
-Design a docs site that looks great and empowers your users.
+    <Step title="Import and Initialize">
+      Import Highcharts in your JavaScript or TypeScript file:
+      
+      ```javascript
+      import Highcharts from 'highcharts';
+      ```
+      
+      Or use the CDN for quick prototyping:
+      
+      ```html
+      <script src="https://code.highcharts.com/highcharts.js"></script>
+      ```
+    </Step>
 
-<Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
-  </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
-  </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
-  </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
-  </Card>
-</Columns>
+    <Step title="Create Your First Chart">
+      Add a container element and create a chart:
+      
+      ```html
+      <div id="container"></div>
+      ```
+      
+      ```javascript
+      Highcharts.chart('container', {
+        chart: {
+          type: 'line'
+        },
+        title: {
+          text: 'My First Chart'
+        },
+        xAxis: {
+          categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May']
+        },
+        yAxis: {
+          title: {
+            text: 'Values'
+          }
+        },
+        series: [{
+          name: 'Sales',
+          data: [29.9, 71.5, 106.4, 129.2, 144.0]
+        }]
+      });
+      ```
+      
+      <Note>
+        Highcharts automatically renders to the specified container. No additional setup required!
+      </Note>
+    </Step>
 
-## Create beautiful pages
+    <Step title="Customize and Explore">
+      Explore the extensive configuration options to customize your chart. Check out our [chart types](/chart-types/line-area), [styling options](/features/styling-themes), and [API reference](/api/overview) for more details.
+    </Step>
+  </Steps>
+</div>
 
-Everything you need to create world-class documentation.
+<div className="mt-16 mb-16 max-w-5xl mx-auto px-6">
+  <div className="text-center mb-12">
+    <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Explore Chart Types</h2>
+    <p className="text-lg text-gray-600 dark:text-gray-400">Choose from 70+ chart types for any data visualization need</p>
+  </div>
 
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
-  </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
-  </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
-  </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
-  </Card>
-</Columns>
+  <CardGroup cols={3}>
+    <Card title="Line & Area Charts" icon="chart-line" href="/chart-types/line-area">
+      Perfect for showing trends over time with smooth lines and filled areas
+    </Card>
+    <Card title="Column & Bar Charts" icon="chart-column" href="/chart-types/column-bar">
+      Compare values across categories with vertical or horizontal bars
+    </Card>
+    <Card title="Pie & Donut Charts" icon="chart-pie" href="/chart-types/pie-donut">
+      Display proportions and percentages with circular visualizations
+    </Card>
+    <Card title="Scatter & Bubble Charts" icon="chart-scatter" href="/chart-types/scatter-bubble">
+      Show relationships between variables with point-based charts
+    </Card>
+    <Card title="Heatmaps & Treemaps" icon="table-cells" href="/chart-types/heatmap-treemap">
+      Visualize complex data patterns with color-coded matrices
+    </Card>
+    <Card title="Stock Charts" icon="chart-candlestick" href="/chart-types/stock-charts">
+      Advanced financial charts with technical indicators and range selectors
+    </Card>
+  </CardGroup>
+</div>
 
-## Need inspiration?
+<div className="mt-16 mb-16 max-w-5xl mx-auto px-6">
+  <div className="text-center mb-12">
+    <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Powerful Features</h2>
+    <p className="text-lg text-gray-600 dark:text-gray-400">Everything you need to create professional, interactive charts</p>
+  </div>
 
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <a href="/features/styling-themes" className="group block rounded-2xl border border-gray-200 dark:border-[#27272a] hover:border-[#a6e9bc] dark:hover:border-[#a6e9bc] overflow-hidden no-underline transition-colors">
+      <div className="p-6 bg-white dark:bg-[#1a1d27]">
+        <div className="flex items-center mb-3">
+          <div className="w-10 h-10 rounded-lg bg-[#a6e9bc]/10 dark:bg-[#a6e9bc]/20 flex items-center justify-center mr-3">
+            <svg className="w-6 h-6 text-[#a6e9bc]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Styling & Themes</h3>
+        </div>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Customize every aspect of your charts with extensive styling options and pre-built themes</p>
+        <span className="text-sm font-medium text-[#a6e9bc] group-hover:text-[#6d819f]">
+          Learn more →
+        </span>
+      </div>
+    </a>
+
+    <a href="/features/accessibility" className="group block rounded-2xl border border-gray-200 dark:border-[#27272a] hover:border-[#a6e9bc] dark:hover:border-[#a6e9bc] overflow-hidden no-underline transition-colors">
+      <div className="p-6 bg-white dark:bg-[#1a1d27]">
+        <div className="flex items-center mb-3">
+          <div className="w-10 h-10 rounded-lg bg-[#a6e9bc]/10 dark:bg-[#a6e9bc]/20 flex items-center justify-center mr-3">
+            <svg className="w-6 h-6 text-[#a6e9bc]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Accessibility</h3>
+        </div>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Built-in keyboard navigation, screen reader support, and WCAG compliance for inclusive data visualization</p>
+        <span className="text-sm font-medium text-[#a6e9bc] group-hover:text-[#6d819f]">
+          Learn more →
+        </span>
+      </div>
+    </a>
+
+    <a href="/features/exporting" className="group block rounded-2xl border border-gray-200 dark:border-[#27272a] hover:border-[#a6e9bc] dark:hover:border-[#a6e9bc] overflow-hidden no-underline transition-colors">
+      <div className="p-6 bg-white dark:bg-[#1a1d27]">
+        <div className="flex items-center mb-3">
+          <div className="w-10 h-10 rounded-lg bg-[#a6e9bc]/10 dark:bg-[#a6e9bc]/20 flex items-center justify-center mr-3">
+            <svg className="w-6 h-6 text-[#a6e9bc]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Export & Print</h3>
+        </div>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Export charts to PNG, JPG, SVG, or PDF formats with a single click</p>
+        <span className="text-sm font-medium text-[#a6e9bc] group-hover:text-[#6d819f]">
+          Learn more →
+        </span>
+      </div>
+    </a>
+
+    <a href="/features/zooming-panning" className="group block rounded-2xl border border-gray-200 dark:border-[#27272a] hover:border-[#a6e9bc] dark:hover:border-[#a6e9bc] overflow-hidden no-underline transition-colors">
+      <div className="p-6 bg-white dark:bg-[#1a1d27]">
+        <div className="flex items-center mb-3">
+          <div className="w-10 h-10 rounded-lg bg-[#a6e9bc]/10 dark:bg-[#a6e9bc]/20 flex items-center justify-center mr-3">
+            <svg className="w-6 h-6 text-[#a6e9bc]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Interactive Features</h3>
+        </div>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Enable zooming, panning, and drilldown to let users explore data in detail</p>
+        <span className="text-sm font-medium text-[#a6e9bc] group-hover:text-[#6d819f]">
+          Learn more →
+        </span>
+      </div>
+    </a>
+  </div>
+</div>
+
+<div className="mt-16 mb-16 max-w-5xl mx-auto px-6">
+  <div className="text-center mb-12">
+    <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Highcharts Products</h2>
+    <p className="text-lg text-gray-600 dark:text-gray-400">Specialized solutions for different use cases</p>
+  </div>
+
+  <CardGroup cols={2}>
+    <Card title="Highcharts Stock" icon="chart-line-up" href="/products/highstock">
+      Advanced stock charts with timeline navigation, technical indicators, and range selectors
+    </Card>
+    <Card title="Highcharts Maps" icon="map" href="/products/highmaps">
+      Interactive maps with drill-down, heatmaps, and custom projections
+    </Card>
+    <Card title="Highcharts Gantt" icon="bars-progress" href="/products/gantt">
+      Project management charts with dependencies, milestones, and resource allocation
+    </Card>
+    <Card title="Highcharts Dashboards" icon="grid-2" href="/products/dashboards">
+      Build comprehensive dashboards with synchronized charts and interactive controls
+    </Card>
+  </CardGroup>
+</div>
+
+<div className="mt-16 mb-16 max-w-5xl mx-auto px-6">
+  <div className="rounded-2xl bg-gradient-to-br from-[#a6e9bc]/10 to-[#6d819f]/10 dark:from-[#1a1d27] dark:to-[#242838] border border-gray-200 dark:border-[#27272a] p-8 sm:p-12 text-center">
+    <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Ready to Start Building?</h2>
+    <p className="text-lg text-gray-600 dark:text-gray-400 mb-8 max-w-2xl mx-auto">
+      Join thousands of developers creating beautiful, interactive charts with Highcharts
+    </p>
+    <div className="flex flex-wrap justify-center gap-4">
+      <a
+        href="/quickstart"
+        className="inline-flex items-center px-6 py-3 rounded-lg bg-[#5c6ac4] hover:bg-[#4B5DCA] text-white font-semibold transition-colors"
+      >
+        Get Started
+      </a>
+      <a
+        href="/examples/basic-charts"
+        className="inline-flex items-center px-6 py-3 rounded-lg border border-gray-300 dark:border-[#27272a] bg-white dark:bg-[#1a1d27] hover:bg-gray-50 dark:hover:bg-[#242838] text-gray-900 dark:text-white font-semibold transition-colors"
+      >
+        View Examples
+      </a>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,310 @@
+---
+title: Styling and Themes
+description: Learn how to customize the visual appearance of Highcharts with custom styling and pre-built themes
+---
+
+# Styling and Themes
+
+Highcharts provides powerful styling capabilities through CSS, inline styles, and pre-built themes to customize the visual appearance of your charts.
+
+## Overview
+
+You can style Highcharts in two primary ways:
+- **Inline styles**: Using JavaScript configuration options
+- **Themes**: Applying pre-built or custom theme files
+
+## Using Pre-built Themes
+
+Highcharts includes several professionally designed themes that can be applied to your charts.
+
+### Available Themes
+
+- **DarkUnica**: Dark theme with gradient background
+- **Grid**: Clean grid-based design
+- **Avocado**: Fresh, modern color scheme
+- **Sunset**: Warm color palette
+- **High Contrast Dark/Light**: WCAG-compliant high contrast themes
+- **Brand Dark/Light**: Professional brand themes
+
+### Applying a Theme
+
+Themes are applied using the `Highcharts.setOptions()` method:
+
+```javascript
+import Highcharts from 'highcharts';
+import DarkUnica from 'highcharts/themes/dark-unica';
+
+// Apply the theme
+DarkUnica(Highcharts);
+
+// Create your chart
+Highcharts.chart('container', {
+  // Chart configuration
+});
+```
+
+<Note>
+Themes must be loaded before creating any charts to ensure all options are applied correctly.
+</Note>
+
+## Custom Styling
+
+### Chart Background and Colors
+
+Customize the chart's color scheme and background:
+
+```javascript
+Highcharts.chart('container', {
+  chart: {
+    backgroundColor: {
+      linearGradient: { x1: 0, y1: 0, x2: 1, y2: 1 },
+      stops: [
+        [0, '#2a2a2b'],
+        [1, '#3e3e40']
+      ]
+    },
+    style: {
+      fontFamily: '\'Unica One\', sans-serif'
+    },
+    plotBorderColor: '#606063'
+  },
+  colors: [
+    '#2b908f', '#90ee7e', '#f45b5b', '#7798BF', 
+    '#aaeeee', '#ff0066', '#eeaaee', '#55BF3B'
+  ]
+});
+```
+
+### Title and Subtitle Styling
+
+```javascript
+{
+  title: {
+    text: 'Chart Title',
+    style: {
+      color: '#E0E0E3',
+      textTransform: 'uppercase',
+      fontSize: '20px',
+      fontWeight: 'bold'
+    }
+  },
+  subtitle: {
+    text: 'Subtitle text',
+    style: {
+      color: '#E0E0E3',
+      textTransform: 'uppercase'
+    }
+  }
+}
+```
+
+### Axis Styling
+
+Customize axis lines, labels, and grid lines:
+
+```javascript
+{
+  xAxis: {
+    gridLineColor: '#707073',
+    labels: {
+      style: {
+        color: '#E0E0E3',
+        fontSize: '12px'
+      }
+    },
+    lineColor: '#707073',
+    minorGridLineColor: '#505053',
+    tickColor: '#707073',
+    title: {
+      style: {
+        color: '#A0A0A3'
+      }
+    }
+  },
+  yAxis: {
+    gridLineColor: '#707073',
+    labels: {
+      style: {
+        color: '#E0E0E3'
+      }
+    },
+    lineColor: '#707073',
+    tickWidth: 1,
+    tickColor: '#707073'
+  }
+}
+```
+
+### Series and Data Label Styling
+
+```javascript
+{
+  plotOptions: {
+    series: {
+      dataLabels: {
+        color: '#F0F0F3',
+        style: {
+          fontSize: '13px',
+          fontWeight: 'normal',
+          textOutline: 'none'
+        }
+      },
+      marker: {
+        lineColor: '#333'
+      }
+    }
+  }
+}
+```
+
+## Creating a Custom Theme
+
+Create your own theme by defining a comprehensive options object:
+
+```javascript
+const myCustomTheme = {
+  colors: [
+    '#058DC7', '#50B432', '#ED561B', '#DDDF00',
+    '#24CBE5', '#64E572', '#FF9655', '#FFF263'
+  ],
+  chart: {
+    backgroundColor: '#f4f4f4',
+    borderWidth: 1,
+    borderColor: '#cccccc',
+    borderRadius: 5,
+    plotBackgroundColor: '#ffffff',
+    plotBorderWidth: 1,
+    plotBorderColor: '#cccccc'
+  },
+  title: {
+    style: {
+      color: '#333333',
+      fontSize: '18px',
+      fontFamily: 'Arial, sans-serif'
+    }
+  },
+  legend: {
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#cccccc',
+    itemStyle: {
+      color: '#333333'
+    }
+  },
+  tooltip: {
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderWidth: 1,
+    borderColor: '#999999',
+    style: {
+      color: '#333333'
+    }
+  }
+};
+
+// Apply the custom theme
+Highcharts.setOptions(myCustomTheme);
+```
+
+## CSS Styling Mode
+
+Enable styled mode to use pure CSS for styling:
+
+<Steps>
+  <Step title="Enable Styled Mode">
+    Set `styledMode: true` in your chart configuration:
+    
+    ```javascript
+    Highcharts.chart('container', {
+      chart: {
+        styledMode: true
+      },
+      // Other options
+    });
+    ```
+  </Step>
+  
+  <Step title="Include CSS">
+    Include Highcharts CSS file:
+    
+    ```html
+    <link rel="stylesheet" href="https://code.highcharts.com/css/highcharts.css">
+    ```
+  </Step>
+  
+  <Step title="Customize with CSS">
+    Override styles in your own CSS:
+    
+    ```css
+    .highcharts-container {
+      font-family: 'Arial', sans-serif;
+    }
+    
+    .highcharts-background {
+      fill: #f4f4f4;
+    }
+    
+    .highcharts-series-0 {
+      stroke: #2b908f;
+      fill: #2b908f;
+    }
+    
+    .highcharts-tooltip-box {
+      fill: white;
+      stroke: #999;
+    }
+    ```
+  </Step>
+</Steps>
+
+## Theme Examples from Source
+
+The DarkUnica theme (from `ts/Extensions/Themes/DarkUnica.ts:44-239`) demonstrates a complete theme implementation:
+
+```javascript
+// Excerpt from DarkUnica theme
+const DarkUnicaTheme = {
+  colors: [
+    '#2b908f', '#90ee7e', '#f45b5b', '#7798BF', 
+    '#aaeeee', '#ff0066', '#eeaaee', '#55BF3B'
+  ],
+  chart: {
+    backgroundColor: {
+      linearGradient: { x1: 0, y1: 0, x2: 1, y2: 1 },
+      stops: [
+        [0, '#2a2a2b'],
+        [1, '#3e3e40']
+      ]
+    },
+    plotBorderColor: '#606063'
+  },
+  tooltip: {
+    backgroundColor: 'rgba(0, 0, 0, 0.85)',
+    style: {
+      color: '#F0F0F0'
+    }
+  }
+};
+```
+
+## Best Practices
+
+<Note>
+**Performance Tips**
+- Apply themes once at application startup
+- Use CSS styling mode for better performance with multiple charts
+- Keep custom themes in separate files for maintainability
+</Note>
+
+<Warning>
+**Important Considerations**
+- Theme options are applied globally to all charts
+- Individual chart options override theme settings
+- Always test themes across different chart types
+- Ensure sufficient color contrast for accessibility
+</Warning>
+
+## Related Resources
+
+- [Accessibility Features](/features/accessibility)
+- [Tooltips and Data Labels](/features/tooltips-labels)
+- [Legend Configuration](/features/legends)

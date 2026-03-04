@@ -1,0 +1,427 @@
+---
+title: Heatmap and Treemap Charts
+description: Visualize matrix data and hierarchical structures with heatmaps and treemaps
+---
+
+Heatmaps and treemaps are specialized chart types for displaying complex data structures - heatmaps for matrix data and treemaps for hierarchical data.
+
+## Heatmap Charts
+
+A heatmap is a graphical representation of data where individual values in a matrix are represented as colors.
+
+### Basic Heatmap
+
+<CodeGroup>
+```javascript Simple Heatmap
+Highcharts.chart('container', {
+  chart: {
+    type: 'heatmap'
+  },
+  title: {
+    text: 'Sales per Employee per Weekday'
+  },
+  xAxis: {
+    categories: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+  },
+  yAxis: {
+    categories: ['John', 'Jane', 'Joe', 'Janet', 'Jack'],
+    title: null
+  },
+  colorAxis: {
+    min: 0,
+    minColor: '#FFFFFF',
+    maxColor: '#4CAF50'
+  },
+  series: [{
+    name: 'Sales per employee',
+    borderWidth: 1,
+    data: [
+      [0, 0, 10], [0, 1, 19], [0, 2, 8], [0, 3, 24], [0, 4, 67],
+      [1, 0, 92], [1, 1, 58], [1, 2, 78], [1, 3, 117], [1, 4, 48],
+      [2, 0, 35], [2, 1, 15], [2, 2, 123], [2, 3, 64], [2, 4, 52],
+      [3, 0, 72], [3, 1, 132], [3, 2, 114], [3, 3, 19], [3, 4, 16],
+      [4, 0, 38], [4, 1, 5], [4, 2, 8], [4, 3, 117], [4, 4, 115]
+    ]
+  }]
+});
+```
+
+```javascript With Custom Colors
+Highcharts.chart('container', {
+  chart: {
+    type: 'heatmap'
+  },
+  colorAxis: {
+    stops: [
+      [0, '#3060cf'],
+      [0.5, '#fffbbc'],
+      [0.9, '#c4463a']
+    ],
+    min: -5,
+    max: 25
+  },
+  series: [{
+    data: [[0, 0, -5], [0, 1, 2], [0, 2, 10], [1, 0, 15], [1, 1, 20]]
+  }]
+});
+```
+</CodeGroup>
+
+### Heatmap Configuration
+
+Key configuration options from `~/workspace/source/ts/Series/Heatmap/HeatmapSeriesDefaults.ts:53-346`:
+
+<ParamField path="borderWidth" type="number" default="0">
+  The border width for each heatmap item.
+  ```javascript
+  plotOptions: {
+    heatmap: {
+      borderWidth: 1,
+      borderColor: '#FFFFFF'
+    }
+  }
+  ```
+</ParamField>
+
+<ParamField path="borderRadius" type="number" default="0">
+  The border radius for each heatmap item.
+  ```javascript
+  plotOptions: {
+    heatmap: {
+      borderRadius: 3
+    }
+  }
+  ```
+</ParamField>
+
+<ParamField path="nullColor" type="string" default="#f7f7f7">
+  The color applied to null points.
+  ```javascript
+  plotOptions: {
+    heatmap: {
+      nullColor: '#e0e0e0'
+    }
+  }
+  ```
+</ParamField>
+
+<ParamField path="colsize" type="number" default="1">
+  The column size - how many X axis units each column in the heatmap should span.
+</ParamField>
+
+<ParamField path="rowsize" type="number" default="1">
+  The row size - how many Y axis units each heatmap row should span.
+</ParamField>
+
+<ParamField path="interpolation" type="boolean" default="false">
+  Make the heatmap render its data points as an interpolated image.
+  ```javascript
+  plotOptions: {
+    heatmap: {
+      interpolation: true
+    }
+  }
+  ```
+</ParamField>
+
+### Color Axis Configuration
+
+Heatmaps use a color axis to map values to colors:
+
+```javascript
+Highcharts.chart('container', {
+  chart: {
+    type: 'heatmap'
+  },
+  colorAxis: {
+    min: 0,
+    max: 100,
+    minColor: '#FFFFFF',
+    maxColor: '#FF0000',
+    stops: [
+      [0, '#FFFFFF'],
+      [0.5, '#FFFF00'],
+      [1, '#FF0000']
+    ],
+    labels: {
+      format: '{value}%'
+    }
+  },
+  series: [{
+    data: [[0, 0, 50], [0, 1, 75], [1, 0, 25]]
+  }]
+});
+```
+
+### Large Heatmap with Canvas Renderer
+
+For performance with large datasets:
+
+```javascript
+Highcharts.chart('container', {
+  chart: {
+    type: 'heatmap'
+  },
+  boost: {
+    useGPUTranslations: true
+  },
+  series: [{
+    boostThreshold: 100,
+    data: generateLargeDataset() // Function generating thousands of points
+  }]
+});
+```
+
+## Treemap Charts
+
+A treemap displays hierarchical data using nested rectangles. The size and color of rectangles represent different dimensions.
+
+### Basic Treemap
+
+<CodeGroup>
+```javascript Simple Treemap
+Highcharts.chart('container', {
+  chart: {
+    type: 'treemap'
+  },
+  title: {
+    text: 'Company Organization'
+  },
+  series: [{
+    data: [
+      { name: 'A', value: 6 },
+      { name: 'B', value: 6 },
+      { name: 'C', value: 4 },
+      { name: 'D', value: 3 },
+      { name: 'E', value: 2 },
+      { name: 'F', value: 2 }
+    ]
+  }]
+});
+```
+
+```javascript Hierarchical Treemap
+Highcharts.chart('container', {
+  chart: {
+    type: 'treemap'
+  },
+  series: [{
+    data: [
+      { id: 'A', name: 'Asia' },
+      { id: 'B', name: 'Europe' },
+      { id: 'A1', parent: 'A', name: 'China', value: 1409 },
+      { id: 'A2', parent: 'A', name: 'India', value: 1339 },
+      { id: 'B1', parent: 'B', name: 'Germany', value: 83 },
+      { id: 'B2', parent: 'B', name: 'France', value: 67 }
+    ]
+  }]
+});
+```
+</CodeGroup>
+
+### Treemap Configuration
+
+Key configuration options from `~/workspace/source/ts/Series/Treemap/TreemapSeriesDefaults.ts:47-705`:
+
+<ParamField path="layoutAlgorithm" type="string" default="'sliceAndDice'">
+  Algorithm for positioning and sizing points. Options: 'sliceAndDice', 'stripes', 'squarified', 'strip'.
+  ```javascript
+  plotOptions: {
+    treemap: {
+      layoutAlgorithm: 'squarified'
+    }
+  }
+  ```
+</ParamField>
+
+<ParamField path="allowTraversingTree" type="boolean" default="false">
+  When enabled, users can click on a parent to zoom in on its children.
+  ```javascript
+  plotOptions: {
+    treemap: {
+      allowTraversingTree: true
+    }
+  }
+  ```
+</ParamField>
+
+<ParamField path="layoutStartingDirection" type="string" default="'vertical'">
+  Direction the layout algorithm starts drawing. Options: 'vertical', 'horizontal'.
+</ParamField>
+
+<ParamField path="alternateStartingDirection" type="boolean" default="false">
+  Make the treemap alternate drawing direction between levels.
+</ParamField>
+
+<ParamField path="borderWidth" type="number" default="1">
+  The width of the border surrounding each tree map item.
+</ParamField>
+
+<ParamField path="opacity" type="number" default="0.15">
+  The opacity of grouped points in treemap.
+</ParamField>
+
+### Treemap with Levels
+
+Style different levels differently:
+
+```javascript
+Highcharts.chart('container', {
+  chart: {
+    type: 'treemap'
+  },
+  plotOptions: {
+    treemap: {
+      levels: [{
+        level: 1,
+        layoutAlgorithm: 'sliceAndDice',
+        dataLabels: {
+          enabled: true,
+          align: 'left',
+          verticalAlign: 'top',
+          style: {
+            fontSize: '15px',
+            fontWeight: 'bold'
+          }
+        }
+      }, {
+        level: 2,
+        layoutAlgorithm: 'squarified'
+      }]
+    }
+  },
+  series: [{
+    data: [
+      { id: 'root', name: 'Organization' },
+      { id: 'dept1', parent: 'root', name: 'Sales', value: 100 },
+      { id: 'dept2', parent: 'root', name: 'Engineering', value: 200 },
+      { id: 'team1', parent: 'dept1', name: 'Team A', value: 50 },
+      { id: 'team2', parent: 'dept1', name: 'Team B', value: 50 },
+      { id: 'team3', parent: 'dept2', name: 'Backend', value: 120 },
+      { id: 'team4', parent: 'dept2', name: 'Frontend', value: 80 }
+    ]
+  }]
+});
+```
+
+### Color Variation
+
+Automatically vary colors between parent and children:
+
+```javascript
+Highcharts.chart('container', {
+  chart: {
+    type: 'treemap'
+  },
+  plotOptions: {
+    treemap: {
+      levels: [{
+        level: 1,
+        borderWidth: 3,
+        borderColor: '#FFFFFF',
+        colorVariation: {
+          key: 'brightness',
+          to: -0.5
+        }
+      }]
+    }
+  },
+  series: [{
+    data: [
+      { id: 'A', name: 'Category A' },
+      { id: 'B', name: 'Category B' },
+      { parent: 'A', name: 'Item 1', value: 5 },
+      { parent: 'A', name: 'Item 2', value: 3 },
+      { parent: 'B', name: 'Item 3', value: 4 }
+    ]
+  }]
+});
+```
+
+### Interactive Treemap with Drilldown
+
+```javascript
+Highcharts.chart('container', {
+  chart: {
+    type: 'treemap'
+  },
+  title: {
+    text: 'Drill Down Treemap'
+  },
+  plotOptions: {
+    treemap: {
+      allowTraversingTree: true,
+      layoutAlgorithm: 'squarified',
+      animationLimit: 1000,
+      dataLabels: {
+        enabled: false
+      },
+      levels: [{
+        level: 1,
+        dataLabels: {
+          enabled: true
+        },
+        borderWidth: 3
+      }]
+    }
+  },
+  series: [{
+    data: [
+      { id: 'world', name: 'World' },
+      { id: 'asia', parent: 'world', name: 'Asia' },
+      { id: 'europe', parent: 'world', name: 'Europe' },
+      { parent: 'asia', name: 'China', value: 1444216107 },
+      { parent: 'asia', name: 'India', value: 1393409038 },
+      { parent: 'europe', name: 'Germany', value: 83900473 },
+      { parent: 'europe', name: 'France', value: 67391582 }
+    ]
+  }]
+});
+```
+
+## Use Cases
+
+<CardGroup cols={2}>
+  <Card title="Heatmap" icon="table-cells">
+    - Correlation matrices
+    - Activity patterns over time
+    - Geographic heat maps
+    - Performance metrics
+  </Card>
+  <Card title="Treemap" icon="diagram-project">
+    - Hierarchical data
+    - Disk space usage
+    - Budget allocation
+    - Market capitalization
+  </Card>
+</CardGroup>
+
+## Data Formats
+
+### Heatmap Data
+
+Heatmap data uses [x, y, value] format:
+
+```javascript
+data: [
+  [0, 0, 10],  // x: 0, y: 0, value: 10
+  [0, 1, 19],  // x: 0, y: 1, value: 19
+  [1, 0, 8]    // x: 1, y: 0, value: 8
+]
+```
+
+### Treemap Data
+
+Treemap data uses parent-child relationships:
+
+```javascript
+data: [
+  { id: 'A', name: 'Parent' },
+  { parent: 'A', name: 'Child 1', value: 10 },
+  { parent: 'A', name: 'Child 2', value: 20 }
+]
+```
+
+<Note>
+  Both heatmaps and treemaps require their respective modules to be loaded: `modules/heatmap.js` and `modules/treemap.js`.
+</Note>

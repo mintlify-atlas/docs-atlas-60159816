@@ -1,0 +1,614 @@
+---
+title: TypeScript Usage
+description: Complete guide to using Highcharts with TypeScript including types, interfaces, and type-safe patterns
+---
+
+Highcharts provides comprehensive TypeScript support with detailed type definitions, making it easy to build type-safe charting applications.
+
+## Installation
+
+<CodeGroup>
+
+```bash npm
+npm install highcharts
+```
+
+```bash yarn
+yarn add highcharts
+```
+
+```bash pnpm
+pnpm add highcharts
+```
+
+</CodeGroup>
+
+<Note>
+TypeScript definitions are included in the Highcharts package - no need for `@types/highcharts`.
+</Note>
+
+## Basic Usage
+
+### Importing Highcharts
+
+```typescript
+import * as Highcharts from 'highcharts';
+
+// Create chart with full type safety
+const chart: Highcharts.Chart = Highcharts.chart('container', {
+    chart: {
+        type: 'line'
+    },
+    title: {
+        text: 'My Chart'
+    },
+    series: [{
+        type: 'line',
+        data: [1, 2, 3, 4, 5]
+    }]
+});
+```
+
+### ES Modules
+
+```typescript
+import Highcharts from 'highcharts/es-modules/masters/highcharts.src.js';
+import HighchartsMore from 'highcharts/es-modules/masters/highcharts-more.src.js';
+import HighchartsExporting from 'highcharts/es-modules/masters/modules/exporting.src.js';
+
+// Initialize modules
+HighchartsMore(Highcharts);
+HighchartsExporting(Highcharts);
+```
+
+## TypeScript Configuration
+
+### tsconfig.json
+
+```json
+{
+    "compilerOptions": {
+        "target": "ES2020",
+        "module": "ESNext",
+        "lib": ["DOM", "ES2020"],
+        "moduleResolution": "node",
+        "esModuleInterop": true,
+        "strict": true,
+        "skipLibCheck": true,
+        "resolveJsonModule": true,
+        "declaration": true,
+        "declarationMap": true
+    }
+}
+```
+
+## Type Definitions
+
+### Options Types
+
+```typescript
+import * as Highcharts from 'highcharts';
+
+// Chart options
+const options: Highcharts.Options = {
+    chart: {
+        type: 'column',
+        width: 800,
+        height: 600
+    },
+    title: {
+        text: 'Sales by Region'
+    },
+    xAxis: {
+        categories: ['North', 'South', 'East', 'West']
+    },
+    yAxis: {
+        title: {
+            text: 'Revenue'
+        }
+    },
+    series: [{
+        type: 'column',
+        name: 'Q1 Sales',
+        data: [100, 120, 90, 110]
+    }]
+};
+
+const chart = Highcharts.chart('container', options);
+```
+
+### Series Types
+
+```typescript
+import * as Highcharts from 'highcharts';
+
+// Line series
+const lineSeries: Highcharts.SeriesLineOptions = {
+    type: 'line',
+    name: 'Temperature',
+    data: [20, 22, 21, 23, 25],
+    color: '#7cb5ec'
+};
+
+// Column series
+const columnSeries: Highcharts.SeriesColumnOptions = {
+    type: 'column',
+    name: 'Sales',
+    data: [100, 200, 150, 300],
+    color: '#434348'
+};
+
+// Pie series
+const pieSeries: Highcharts.SeriesPieOptions = {
+    type: 'pie',
+    name: 'Market Share',
+    data: [
+        { name: 'Product A', y: 45 },
+        { name: 'Product B', y: 30 },
+        { name: 'Product C', y: 25 }
+    ]
+};
+```
+
+### Point Options
+
+```typescript
+// Typed point data
+interface CustomPoint extends Highcharts.PointOptionsObject {
+    x: number;
+    y: number;
+    color?: string;
+    custom?: {
+        region: string;
+        sales: number;
+    };
+}
+
+const points: CustomPoint[] = [
+    {
+        x: 0,
+        y: 100,
+        color: '#7cb5ec',
+        custom: {
+            region: 'North',
+            sales: 15000
+        }
+    },
+    {
+        x: 1,
+        y: 120,
+        color: '#434348',
+        custom: {
+            region: 'South',
+            sales: 18000
+        }
+    }
+];
+
+const series: Highcharts.SeriesLineOptions = {
+    type: 'line',
+    data: points
+};
+```
+
+## Accessing Chart API
+
+### Chart Instance
+
+```typescript
+const chart: Highcharts.Chart = Highcharts.chart('container', options);
+
+// Type-safe methods
+chart.setTitle({ text: 'New Title' });
+chart.setSize(1000, 600);
+chart.redraw();
+chart.destroy();
+
+// Accessing properties
+const width: number = chart.chartWidth;
+const height: number = chart.chartHeight;
+const series: Highcharts.Series[] = chart.series;
+const xAxis: Highcharts.Axis[] = chart.xAxis;
+```
+
+### Series API
+
+```typescript
+const series: Highcharts.Series = chart.series[0];
+
+// Series methods
+series.setData([1, 2, 3, 4, 5]);
+series.addPoint([6, 100], true, false);
+series.update({ color: '#ff0000' });
+series.remove();
+
+// Series properties
+const name: string = series.name;
+const data: Highcharts.Point[] = series.data;
+const visible: boolean = series.visible;
+```
+
+### Axis API
+
+```typescript
+const xAxis: Highcharts.Axis = chart.xAxis[0];
+
+// Axis methods
+xAxis.setExtremes(0, 100);
+xAxis.setTitle({ text: 'Time' });
+xAxis.update({ gridLineWidth: 1 });
+
+// Axis properties
+const min: number = xAxis.min;
+const max: number = xAxis.max;
+const categories: string[] | undefined = xAxis.categories;
+```
+
+## Event Handlers
+
+### Chart Events
+
+```typescript
+interface ChartLoadEvent extends Highcharts.ChartLoadCallbackFunction {
+    (this: Highcharts.Chart): void;
+}
+
+const options: Highcharts.Options = {
+    chart: {
+        events: {
+            load: function(this: Highcharts.Chart) {
+                console.log('Chart loaded');
+                console.log('Chart width:', this.chartWidth);
+            },
+            redraw: function(this: Highcharts.Chart) {
+                console.log('Chart redrawn');
+            },
+            render: function(this: Highcharts.Chart) {
+                console.log('Chart rendered');
+            }
+        }
+    }
+};
+```
+
+### Point Events
+
+```typescript
+const series: Highcharts.SeriesLineOptions = {
+    type: 'line',
+    data: [1, 2, 3, 4, 5],
+    point: {
+        events: {
+            click: function(this: Highcharts.Point, e: Highcharts.PointClickEventObject) {
+                console.log('Point clicked:', this.y);
+                console.log('Event:', e);
+            },
+            mouseOver: function(this: Highcharts.Point) {
+                console.log('Mouse over point:', this.index);
+            }
+        }
+    }
+};
+```
+
+### Series Events
+
+```typescript
+const series: Highcharts.SeriesLineOptions = {
+    type: 'line',
+    data: [1, 2, 3],
+    events: {
+        legendItemClick: function(this: Highcharts.Series, e: Highcharts.SeriesLegendItemClickEventObject) {
+            console.log('Legend item clicked:', this.name);
+            return false; // Prevent default
+        },
+        hide: function(this: Highcharts.Series) {
+            console.log('Series hidden');
+        },
+        show: function(this: Highcharts.Series) {
+            console.log('Series shown');
+        }
+    }
+};
+```
+
+## Custom Types and Interfaces
+
+### Extending Point Type
+
+```typescript
+declare module 'highcharts' {
+    interface Point {
+        customProperty?: string;
+        customMethod?(): void;
+    }
+}
+
+// Usage
+const chart = Highcharts.chart('container', options);
+chart.series[0].points[0].customProperty = 'value';
+```
+
+### Custom Chart Options
+
+```typescript
+interface CustomChartOptions extends Highcharts.Options {
+    customConfig?: {
+        theme: 'light' | 'dark';
+        locale: string;
+    };
+}
+
+function createChart(options: CustomChartOptions): Highcharts.Chart {
+    // Apply custom configuration
+    if (options.customConfig?.theme === 'dark') {
+        options.chart = {
+            ...options.chart,
+            backgroundColor: '#1a1a1a'
+        };
+    }
+    
+    return Highcharts.chart('container', options);
+}
+```
+
+### Type Guards
+
+```typescript
+function isLineSeries(series: Highcharts.Series): series is Highcharts.Series & { type: 'line' } {
+    return series.type === 'line';
+}
+
+function isPieSeries(series: Highcharts.Series): series is Highcharts.Series & { type: 'pie' } {
+    return series.type === 'pie';
+}
+
+// Usage
+const series = chart.series[0];
+
+if (isLineSeries(series)) {
+    // TypeScript knows this is a line series
+    console.log('Line series detected');
+}
+```
+
+## React Integration
+
+### Typed Component
+
+```typescript
+import React, { useEffect, useRef } from 'react';
+import * as Highcharts from 'highcharts';
+
+interface ChartComponentProps {
+    options: Highcharts.Options;
+    callback?: (chart: Highcharts.Chart) => void;
+}
+
+const ChartComponent: React.FC<ChartComponentProps> = ({ options, callback }) => {
+    const chartRef = useRef<HTMLDivElement>(null);
+    const chartInstance = useRef<Highcharts.Chart | null>(null);
+    
+    useEffect(() => {
+        if (chartRef.current) {
+            chartInstance.current = Highcharts.chart(chartRef.current, options);
+            
+            if (callback) {
+                callback(chartInstance.current);
+            }
+        }
+        
+        return () => {
+            chartInstance.current?.destroy();
+        };
+    }, [options, callback]);
+    
+    return <div ref={chartRef} />;
+};
+
+export default ChartComponent;
+```
+
+### Custom Hook
+
+```typescript
+import { useEffect, useRef } from 'react';
+import * as Highcharts from 'highcharts';
+
+function useHighcharts(
+    options: Highcharts.Options,
+    container: React.RefObject<HTMLDivElement>
+): Highcharts.Chart | null {
+    const chartRef = useRef<Highcharts.Chart | null>(null);
+    
+    useEffect(() => {
+        if (!container.current) return;
+        
+        chartRef.current = Highcharts.chart(container.current, options);
+        
+        return () => {
+            chartRef.current?.destroy();
+            chartRef.current = null;
+        };
+    }, [options, container]);
+    
+    return chartRef.current;
+}
+
+// Usage
+function MyComponent() {
+    const containerRef = useRef<HTMLDivElement>(null);
+    const chart = useHighcharts({
+        series: [{ type: 'line', data: [1, 2, 3] }]
+    }, containerRef);
+    
+    return <div ref={containerRef} />;
+}
+```
+
+## Advanced Patterns
+
+### Generic Chart Factory
+
+```typescript
+type ChartType = 'line' | 'column' | 'pie' | 'scatter';
+
+interface ChartConfig<T extends ChartType> {
+    type: T;
+    data: number[] | Highcharts.PointOptionsObject[];
+    options?: Partial<Highcharts.Options>;
+}
+
+function createTypedChart<T extends ChartType>(
+    container: string | HTMLElement,
+    config: ChartConfig<T>
+): Highcharts.Chart {
+    const baseOptions: Highcharts.Options = {
+        chart: {
+            type: config.type
+        },
+        series: [{
+            type: config.type,
+            data: config.data
+        }] as any
+    };
+    
+    const mergedOptions = Highcharts.merge(baseOptions, config.options || {});
+    return Highcharts.chart(container, mergedOptions);
+}
+
+// Usage
+const lineChart = createTypedChart('container1', {
+    type: 'line',
+    data: [1, 2, 3, 4, 5]
+});
+
+const pieChart = createTypedChart('container2', {
+    type: 'pie',
+    data: [{ name: 'A', y: 10 }, { name: 'B', y: 20 }]
+});
+```
+
+### Type-Safe Data Fetching
+
+```typescript
+interface ApiDataPoint {
+    timestamp: number;
+    value: number;
+    metadata?: Record<string, any>;
+}
+
+interface ChartData {
+    title: string;
+    points: ApiDataPoint[];
+}
+
+async function fetchChartData(): Promise<ChartData> {
+    const response = await fetch('/api/chart-data');
+    return response.json();
+}
+
+async function createDataChart(container: string): Promise<Highcharts.Chart> {
+    const data = await fetchChartData();
+    
+    const options: Highcharts.Options = {
+        title: {
+            text: data.title
+        },
+        series: [{
+            type: 'line',
+            data: data.points.map((point): Highcharts.PointOptionsObject => ({
+                x: point.timestamp,
+                y: point.value,
+                custom: point.metadata
+            }))
+        }]
+    };
+    
+    return Highcharts.chart(container, options);
+}
+```
+
+## Highcharts Stock
+
+```typescript
+import * as Highcharts from 'highcharts/highstock';
+
+const stockOptions: Highcharts.Options = {
+    rangeSelector: {
+        selected: 1
+    },
+    title: {
+        text: 'Stock Price'
+    },
+    series: [{
+        type: 'candlestick',
+        name: 'AAPL',
+        data: [
+            [1611619200000, 135.83, 136.59, 134.59, 136.08],
+            [1611705600000, 136.03, 137.41, 135.86, 137.09]
+        ]
+    }]
+};
+
+const chart: Highcharts.Chart = Highcharts.stockChart('container', stockOptions);
+```
+
+## Common Issues
+
+### Module Resolution
+
+```typescript
+// If you get "Cannot find module 'highcharts'"
+// Ensure esModuleInterop is enabled in tsconfig.json
+{
+    "compilerOptions": {
+        "esModuleInterop": true
+    }
+}
+```
+
+### Type Inference
+
+```typescript
+// Explicit typing for better type safety
+const series: Highcharts.SeriesLineOptions[] = [
+    {
+        type: 'line',
+        data: [1, 2, 3]
+    }
+];
+
+const options: Highcharts.Options = {
+    series: series
+};
+```
+
+### Any Type Workarounds
+
+```typescript
+// When TypeScript complains about types
+import * as Highcharts from 'highcharts';
+
+// Type assertion
+const customOptions = {
+    customProperty: true
+} as Highcharts.Options;
+
+// Or extend the interface
+declare module 'highcharts' {
+    interface Options {
+        customProperty?: boolean;
+    }
+}
+```
+
+<Warning>
+Always prefer proper typing over `any`. Use type assertions and module augmentation to maintain type safety.
+</Warning>
+
+## Resources
+
+- [TypeScript Handbook](https://www.typescriptlang.org/docs/)
+- [Highcharts API Reference](https://api.highcharts.com/)
+- [Type Definitions on GitHub](https://github.com/highcharts/highcharts/tree/master/ts)

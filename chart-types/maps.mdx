@@ -1,0 +1,468 @@
+---
+title: Map Charts
+description: Create interactive geographical visualizations with map charts, including choropleth maps and map bubbles
+---
+
+Highmaps is a specialized library for creating interactive map charts with features like zoom, pan, and data visualization on geographical regions.
+
+## Overview
+
+Map charts allow you to visualize geographical data with various techniques:
+
+- Choropleth maps (color-coded regions)
+- Map bubbles (sized markers)
+- Map lines (routes and connections)
+- Heat maps on maps
+- Point maps
+
+## Basic Map Chart
+
+<CodeGroup>
+```javascript Simple Map
+Highcharts.mapChart('container', {
+  chart: {
+    map: 'countries/us/us-all'
+  },
+  title: {
+    text: 'US Map'
+  },
+  mapNavigation: {
+    enabled: true,
+    buttonOptions: {
+      verticalAlign: 'bottom'
+    }
+  },
+  series: [{
+    name: 'Basemap',
+    borderColor: '#A0A0A0',
+    nullColor: 'rgba(200, 200, 200, 0.3)',
+    showInLegend: false
+  }]
+});
+```
+
+```javascript With Data
+Highcharts.mapChart('container', {
+  chart: {
+    map: 'countries/us/us-all'
+  },
+  title: {
+    text: 'US Population by State'
+  },
+  colorAxis: {
+    min: 0,
+    minColor: '#E6E7E8',
+    maxColor: '#005645'
+  },
+  series: [{
+    data: [
+      ['us-ma', 0],
+      ['us-wa', 1],
+      ['us-ca', 2],
+      ['us-tx', 3],
+      ['us-ny', 4]
+    ],
+    name: 'Population',
+    states: {
+      hover: {
+        color: '#BADA55'
+      }
+    },
+    dataLabels: {
+      enabled: true,
+      format: '{point.name}'
+    }
+  }]
+});
+```
+</CodeGroup>
+
+## Choropleth Map
+
+Color-coded regions based on data values:
+
+```javascript
+Highcharts.mapChart('container', {
+  chart: {
+    map: 'custom/world'
+  },
+  title: {
+    text: 'Global Population Density'
+  },
+  mapNavigation: {
+    enabled: true,
+    enableMouseWheelZoom: true,
+    buttonOptions: {
+      verticalAlign: 'bottom'
+    }
+  },
+  colorAxis: {
+    min: 0,
+    max: 1000,
+    type: 'logarithmic',
+    minColor: '#EEEEFF',
+    maxColor: '#000022',
+    stops: [
+      [0, '#EFEFFF'],
+      [0.67, '#4444FF'],
+      [1, '#000022']
+    ]
+  },
+  series: [{
+    data: [
+      ['fo', 0],
+      ['us', 56],
+      ['jp', 335],
+      ['in', 382],
+      ['cn', 145]
+    ],
+    name: 'Population density',
+    states: {
+      hover: {
+        color: '#a4edba',
+        borderColor: '#333333'
+      }
+    },
+    tooltip: {
+      valueSuffix: ' people/km²'
+    }
+  }]
+});
+```
+
+## Map Bubble Chart
+
+Display sized bubbles at specific coordinates:
+
+```javascript
+Highcharts.mapChart('container', {
+  chart: {
+    map: 'custom/world'
+  },
+  title: {
+    text: 'World Cities Population'
+  },
+  legend: {
+    enabled: false
+  },
+  mapNavigation: {
+    enabled: true
+  },
+  series: [{
+    name: 'Basemap',
+    borderColor: '#A0A0A0',
+    nullColor: 'rgba(177, 244, 177, 0.5)',
+    showInLegend: false
+  }, {
+    type: 'mapbubble',
+    name: 'Population 2024',
+    joinBy: ['iso-a2', 'code'],
+    data: [
+      { code: 'IN', z: 37400000, name: 'Delhi' },
+      { code: 'JP', z: 37274000, name: 'Tokyo' },
+      { code: 'CN', z: 26317104, name: 'Shanghai' },
+      { code: 'BR', z: 21650000, name: 'São Paulo' },
+      { code: 'MX', z: 21581000, name: 'Mexico City' }
+    ],
+    minSize: 4,
+    maxSize: '12%',
+    tooltip: {
+      pointFormat: '{point.name}: {point.z} people'
+    }
+  }]
+});
+```
+
+## Map Line Chart
+
+Show connections or routes between points:
+
+```javascript
+Highcharts.mapChart('container', {
+  chart: {
+    map: 'custom/world'
+  },
+  title: {
+    text: 'Flight Routes'
+  },
+  series: [{
+    name: 'Basemap',
+    borderColor: '#A0A0A0',
+    nullColor: 'rgba(177, 244, 177, 0.5)',
+    showInLegend: false
+  }, {
+    type: 'mappoint',
+    name: 'Cities',
+    color: '#4169E1',
+    data: [
+      { name: 'London', lat: 51.507222, lon: -0.1275 },
+      { name: 'New York', lat: 40.71, lon: -74.00 },
+      { name: 'Tokyo', lat: 35.68, lon: 139.76 }
+    ]
+  }, {
+    type: 'mapline',
+    name: 'Routes',
+    lineWidth: 2,
+    color: '#FF0000',
+    data: [{
+      from: 'London',
+      to: 'New York'
+    }, {
+      from: 'London',
+      to: 'Tokyo'
+    }]
+  }]
+});
+```
+
+## Custom Map Projections
+
+```javascript
+Highcharts.mapChart('container', {
+  chart: {
+    map: 'custom/world'
+  },
+  title: {
+    text: 'Custom Projection'
+  },
+  mapView: {
+    projection: {
+      name: 'WebMercator'
+      // Other projections: 'EqualEarth', 'Miller', 'Orthographic', 'Robinson'
+    }
+  },
+  series: [{
+    data: mapData
+  }]
+});
+```
+
+## Map Navigation
+
+Configure zoom and pan controls:
+
+```javascript
+Highcharts.mapChart('container', {
+  chart: {
+    map: mapData
+  },
+  mapNavigation: {
+    enabled: true,
+    enableButtons: true,
+    enableMouseWheelZoom: true,
+    enableTouchZoom: true,
+    enableDoubleClickZoom: true,
+    enableDoubleClickZoomTo: true,
+    buttonOptions: {
+      verticalAlign: 'bottom',
+      align: 'left',
+      x: 10,
+      y: -10,
+      theme: {
+        fill: '#ffffff',
+        'stroke-width': 1,
+        stroke: '#cccccc',
+        r: 0,
+        states: {
+          hover: {
+            fill: '#e6e6e6'
+          },
+          select: {
+            stroke: '#039',
+            fill: '#e6e6e6'
+          }
+        }
+      }
+    },
+    mouseWheelSensitivity: 1.1
+  },
+  series: [{
+    data: data
+  }]
+});
+```
+
+## GeoJSON Support
+
+Load custom map data from GeoJSON:
+
+```javascript
+// Fetch GeoJSON data
+fetch('https://example.com/custom-map.geojson')
+  .then(response => response.json())
+  .then(geojson => {
+    Highcharts.mapChart('container', {
+      chart: {
+        map: geojson
+      },
+      title: {
+        text: 'Custom GeoJSON Map'
+      },
+      series: [{
+        data: [
+          ['region-1', 10],
+          ['region-2', 20],
+          ['region-3', 30]
+        ]
+      }]
+    });
+  });
+```
+
+## Drill Down Maps
+
+Navigate from world map to country to state:
+
+```javascript
+let chart;
+
+Highcharts.mapChart('container', {
+  chart: {
+    map: 'custom/world',
+    events: {
+      drilldown: function (e) {
+        if (!e.seriesOptions) {
+          const countryCode = e.point['hc-key'];
+          // Load country map
+          fetch(`maps/countries/${countryCode}.geo.json`)
+            .then(response => response.json())
+            .then(mapData => {
+              chart.addSeriesAsDrilldown(e.point, {
+                name: e.point.name,
+                data: countryData,
+                mapData: mapData
+              });
+            });
+        }
+      },
+      drillup: function () {
+        chart.setTitle({ text: 'World Map' });
+      }
+    }
+  },
+  title: {
+    text: 'World Map - Click to Drill Down'
+  },
+  colorAxis: {
+    min: 0
+  },
+  series: [{
+    data: worldData,
+    name: 'Countries',
+    dataLabels: {
+      enabled: true,
+      format: '{point.name}'
+    }
+  }],
+  drilldown: {
+    activeDataLabelStyle: {
+      color: '#FFFFFF',
+      textDecoration: 'none',
+      textOutline: '1px #000000'
+    },
+    drillUpButton: {
+      relativeTo: 'spacingBox',
+      position: {
+        x: 0,
+        y: 60
+      }
+    }
+  }
+}, function (c) {
+  chart = c;
+});
+```
+
+## Tilemap / Honeycomb
+
+Create gridded geographic layouts:
+
+```javascript
+Highcharts.chart('container', {
+  chart: {
+    type: 'tilemap'
+  },
+  title: {
+    text: 'US States as Tilemap'
+  },
+  plotOptions: {
+    series: {
+      dataLabels: {
+        enabled: true,
+        format: '{point.hc-a2}',
+        color: '#000000',
+        style: {
+          textOutline: false
+        }
+      }
+    }
+  },
+  series: [{
+    name: 'States',
+    data: [{
+      'hc-a2': 'AL',
+      value: 4.9
+    }, {
+      'hc-a2': 'AK',
+      value: 0.7
+    }, {
+      'hc-a2': 'AZ',
+      value: 7.3
+    }]
+  }]
+});
+```
+
+## Use Cases
+
+<CardGroup cols={2}>
+  <Card title="Choropleth Maps" icon="map">
+    - Election results
+    - Population density
+    - Economic indicators
+    - Weather patterns
+  </Card>
+  <Card title="Bubble Maps" icon="location-dot">
+    - City populations
+    - Store locations
+    - Event locations
+    - Earthquake magnitudes
+  </Card>
+</CardGroup>
+
+## Map Data Sources
+
+Highcharts provides map collections:
+
+- World countries
+- US states and counties
+- European countries
+- Individual countries with regions
+
+<Note>
+  Maps require the Highmaps library (`highmaps.js`) or the map module with Highcharts.
+</Note>
+
+<Warning>
+  Large or complex maps may require performance optimization. Consider simplifying geometry or using the boost module.
+</Warning>
+
+## Data Format
+
+Map series data typically uses region identifiers:
+
+```javascript
+data: [
+  ['us-ca', 100],  // [region-code, value]
+  ['us-tx', 200],
+  ['us-ny', 150]
+]
+```
+
+Or with coordinates:
+
+```javascript
+data: [
+  { lat: 40.71, lon: -74.00, z: 100, name: 'New York' }
+]
+```

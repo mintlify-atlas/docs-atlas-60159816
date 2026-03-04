@@ -1,0 +1,610 @@
+---
+title: Axis Configuration
+description: Learn how to configure and customize X-axis, Y-axis, and multiple axes in Highcharts for precise data visualization.
+---
+
+# Axis Configuration
+
+Axes are fundamental components of Highcharts that define the scale and position of data. Understanding axis configuration is essential for creating effective and accurate visualizations.
+
+## Axis Basics
+
+Most Highcharts charts have two axes: the X-axis (horizontal) and Y-axis (vertical). Each axis can be configured independently.
+
+```javascript
+Highcharts.chart('container', {
+    xAxis: {
+        categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+        title: {
+            text: 'Month'
+        }
+    },
+    yAxis: {
+        title: {
+            text: 'Temperature (°C)'
+        },
+        min: 0
+    },
+    series: [{
+        data: [7.0, 6.9, 9.5, 14.5, 18.2]
+    }]
+});
+```
+
+## Axis Configuration Options
+
+<Tabs>
+  <Tab title="Basic Properties">
+    Core axis options from `AxisOptions.ts`:
+
+    ```typescript
+    interface AxisOptions {
+        type?: 'linear' | 'logarithmic' | 'datetime' | 'category';
+        title?: AxisTitleOptions;
+        categories?: Array<string>;
+        min?: number;
+        max?: number;
+        startOnTick?: boolean;
+        endOnTick?: boolean;
+        tickInterval?: number;
+        minorTickInterval?: number | 'auto';
+        reversed?: boolean;
+        opposite?: boolean;
+        visible?: boolean;
+    }
+    ```
+
+    **Example:**
+    ```javascript
+    xAxis: {
+        type: 'datetime',
+        min: Date.UTC(2024, 0, 1),
+        max: Date.UTC(2024, 11, 31),
+        reversed: false,
+        opposite: false
+    }
+    ```
+  </Tab>
+
+  <Tab title="Labels & Formatting">
+    Customize axis labels and their appearance:
+
+    ```javascript
+    xAxis: {
+        labels: {
+            enabled: true,
+            formatter: function() {
+                return this.value + '°';
+            },
+            rotation: -45,
+            align: 'right',
+            style: {
+                fontSize: '12px',
+                color: '#333'
+            },
+            overflow: 'justify'
+        }
+    }
+    ```
+
+    **Date/Time Formatting:**
+    ```javascript
+    xAxis: {
+        type: 'datetime',
+        labels: {
+            format: '{value:%Y-%m-%d}',
+            rotation: -45
+        },
+        dateTimeLabelFormats: {
+            day: '%e %b',
+            week: '%e %b',
+            month: '%b \'%y',
+            year: '%Y'
+        }
+    }
+    ```
+  </Tab>
+
+  <Tab title="Grid & Tick Marks">
+    Control the visual appearance of axis grid lines and ticks:
+
+    ```javascript
+    yAxis: {
+        gridLineWidth: 1,
+        gridLineColor: '#e6e6e6',
+        gridLineDashStyle: 'Dash',
+        minorGridLineWidth: 0,
+        minorGridLineColor: '#f2f2f2',
+        
+        tickWidth: 1,
+        tickLength: 10,
+        tickColor: '#ccc',
+        tickPosition: 'outside',
+        
+        minorTickInterval: 'auto',
+        minorTickWidth: 1,
+        minorTickLength: 5
+    }
+    ```
+  </Tab>
+
+  <Tab title="Plot Bands & Lines">
+    Add visual markers to highlight specific ranges or values:
+
+    ```javascript
+    yAxis: {
+        plotBands: [{
+            from: 0,
+            to: 10,
+            color: 'rgba(68, 170, 213, 0.1)',
+            label: {
+                text: 'Low Range',
+                align: 'center'
+            }
+        }, {
+            from: 10,
+            to: 20,
+            color: 'rgba(255, 200, 0, 0.1)',
+            label: {
+                text: 'Medium Range'
+            }
+        }],
+        plotLines: [{
+            value: 15,
+            color: 'red',
+            dashStyle: 'ShortDash',
+            width: 2,
+            label: {
+                text: 'Target',
+                align: 'right'
+            }
+        }]
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Axis Types
+
+Highcharts supports four primary axis types:
+
+<CardGroup cols={2}>
+  <Card title="Linear" icon="wave-square">
+    Default numeric axis with linear scale
+    ```javascript
+    { type: 'linear' }
+    ```
+  </Card>
+  <Card title="Logarithmic" icon="calculator">
+    Logarithmic scale for exponential data
+    ```javascript
+    { type: 'logarithmic' }
+    ```
+  </Card>
+  <Card title="DateTime" icon="calendar">
+    Time-based axis for temporal data
+    ```javascript
+    { type: 'datetime' }
+    ```
+  </Card>
+  <Card title="Category" icon="list">
+    Categorical axis for discrete values
+    ```javascript
+    { type: 'category', categories: ['A', 'B', 'C'] }
+    ```
+  </Card>
+</CardGroup>
+
+## Multiple Axes
+
+Charts can have multiple X or Y axes to display different scales:
+
+<CodeGroup>
+```javascript Dual Y-Axes
+Highcharts.chart('container', {
+    title: {
+        text: 'Temperature and Rainfall'
+    },
+    xAxis: {
+        categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May']
+    },
+    yAxis: [{
+        // Primary Y-axis
+        title: {
+            text: 'Temperature (°C)'
+        },
+        labels: {
+            format: '{value}°C'
+        }
+    }, {
+        // Secondary Y-axis
+        title: {
+            text: 'Rainfall (mm)'
+        },
+        labels: {
+            format: '{value} mm'
+        },
+        opposite: true
+    }],
+    series: [{
+        name: 'Temperature',
+        type: 'column',
+        yAxis: 0,
+        data: [7.0, 6.9, 9.5, 14.5, 18.2]
+    }, {
+        name: 'Rainfall',
+        type: 'spline',
+        yAxis: 1,
+        data: [49.9, 71.5, 106.4, 129.2, 144.0]
+    }]
+});
+```
+
+```javascript Multiple X-Axes
+Highcharts.chart('container', {
+    xAxis: [{
+        categories: ['Jan', 'Feb', 'Mar'],
+        title: {
+            text: 'Month'
+        }
+    }, {
+        categories: ['Q1', 'Q1', 'Q1'],
+        title: {
+            text: 'Quarter'
+        },
+        opposite: true
+    }],
+    yAxis: {
+        title: {
+            text: 'Values'
+        }
+    },
+    series: [{
+        xAxis: 0,
+        data: [29.9, 71.5, 106.4]
+    }]
+});
+```
+</CodeGroup>
+
+## Axis Methods
+
+Manipulate axes dynamically after chart creation:
+
+<Tabs>
+  <Tab title="Extremes">
+    ```javascript
+    // Set axis extremes
+    chart.xAxis[0].setExtremes(0, 100);
+
+    // Get current extremes
+    const extremes = chart.xAxis[0].getExtremes();
+    console.log(extremes.min, extremes.max);
+
+    // Set with animation
+    chart.yAxis[0].setExtremes(0, 200, true, true);
+
+    // Auto-calculate extremes
+    chart.xAxis[0].setExtremes(null, null);
+    ```
+  </Tab>
+
+  <Tab title="Update Axis">
+    ```javascript
+    // Update axis configuration
+    chart.xAxis[0].update({
+        title: {
+            text: 'Updated Title'
+        },
+        gridLineWidth: 1
+    });
+
+    // Update multiple properties
+    chart.yAxis[0].update({
+        min: 0,
+        max: 100,
+        tickInterval: 10
+    });
+    ```
+  </Tab>
+
+  <Tab title="Plot Bands/Lines">
+    ```javascript
+    // Add plot band
+    chart.xAxis[0].addPlotBand({
+        from: 5,
+        to: 10,
+        color: 'rgba(255, 0, 0, 0.1)',
+        id: 'highlight'
+    });
+
+    // Remove plot band
+    chart.xAxis[0].removePlotBand('highlight');
+
+    // Add plot line
+    chart.yAxis[0].addPlotLine({
+        value: 50,
+        color: 'red',
+        width: 2,
+        id: 'threshold'
+    });
+
+    // Remove plot line
+    chart.yAxis[0].removePlotLine('threshold');
+    ```
+  </Tab>
+
+  <Tab title="Add/Remove Axes">
+    ```javascript
+    // Add new axis
+    chart.addAxis({
+        title: {
+            text: 'New Y-Axis'
+        },
+        opposite: true
+    }, false); // false = Y-axis, true = X-axis
+
+    // Remove axis
+    chart.yAxis[1].remove();
+    ```
+  </Tab>
+</Tabs>
+
+## Crosshair Configuration
+
+Crosshairs help users identify exact values:
+
+```javascript
+xAxis: {
+    crosshair: {
+        width: 2,
+        color: 'gray',
+        dashStyle: 'ShortDash',
+        snap: true,
+        label: {
+            enabled: true,
+            format: '{value}'
+        }
+    }
+},
+yAxis: {
+    crosshair: {
+        color: 'green',
+        width: 1,
+        label: {
+            enabled: true,
+            backgroundColor: '#fff',
+            borderColor: '#000',
+            borderRadius: 3
+        }
+    }
+}
+```
+
+## Real-World Examples
+
+<CodeGroup>
+```javascript Category Axis
+Highcharts.chart('container', {
+    chart: {
+        type: 'column'
+    },
+    title: {
+        text: 'Production by Country'
+    },
+    xAxis: {
+        type: 'category',
+        categories: ['USA', 'China', 'Brazil', 'EU', 'Argentina', 'India'],
+        crosshair: true,
+        labels: {
+            rotation: -45,
+            style: {
+                fontSize: '13px'
+            }
+        }
+    },
+    yAxis: {
+        min: 0,
+        title: {
+            text: '1000 metric tons (MT)'
+        },
+        gridLineWidth: 1,
+        gridLineDashStyle: 'Dot'
+    },
+    series: [{
+        name: 'Production',
+        data: [387749, 280000, 129000, 64300, 54000, 34300]
+    }]
+});
+```
+
+```javascript DateTime Axis
+Highcharts.chart('container', {
+    title: {
+        text: 'Stock Price Over Time'
+    },
+    xAxis: {
+        type: 'datetime',
+        title: {
+            text: 'Date'
+        },
+        labels: {
+            format: '{value:%b %e}'
+        },
+        dateTimeLabelFormats: {
+            day: '%e %b',
+            week: '%e %b',
+            month: '%b \'%y'
+        },
+        crosshair: true
+    },
+    yAxis: {
+        title: {
+            text: 'Stock Price ($)'
+        },
+        labels: {
+            format: '${value}'
+        },
+        plotLines: [{
+            value: 100,
+            color: 'red',
+            dashStyle: 'ShortDash',
+            width: 2,
+            label: {
+                text: 'Target: $100'
+            }
+        }]
+    },
+    series: [{
+        name: 'Stock Price',
+        data: [
+            [Date.UTC(2024, 0, 1), 95],
+            [Date.UTC(2024, 0, 2), 98],
+            [Date.UTC(2024, 0, 3), 102],
+            [Date.UTC(2024, 0, 4), 99],
+            [Date.UTC(2024, 0, 5), 105]
+        ]
+    }]
+});
+```
+
+```javascript Logarithmic Axis
+Highcharts.chart('container', {
+    title: {
+        text: 'Logarithmic Scale'
+    },
+    xAxis: {
+        categories: ['0.1', '1', '10', '100', '1000', '10000']
+    },
+    yAxis: {
+        type: 'logarithmic',
+        title: {
+            text: 'Values (log scale)'
+        },
+        minorTickInterval: 'auto',
+        gridLineWidth: 1
+    },
+    series: [{
+        data: [1, 10, 100, 1000, 10000, 100000]
+    }]
+});
+```
+</CodeGroup>
+
+## Axis Options Reference
+
+<ParamField path="type" type="string" default="linear">
+  The type of axis: `'linear'`, `'logarithmic'`, `'datetime'`, or `'category'`.
+</ParamField>
+
+<ParamField path="categories" type="string[]">
+  Array of category names for a category axis. Automatically sets `type` to `'category'`.
+</ParamField>
+
+<ParamField path="min" type="number">
+  The minimum value of the axis. If `null`, the min value is automatically calculated.
+</ParamField>
+
+<ParamField path="max" type="number">
+  The maximum value of the axis. If `null`, the max value is automatically calculated.
+</ParamField>
+
+<ParamField path="reversed" type="boolean" default={false}>
+  Whether to reverse the axis so that the highest number is closest to the origin.
+</ParamField>
+
+<ParamField path="opposite" type="boolean" default={false}>
+  Whether to display the axis on the opposite side of the normal. The normal is on the left for vertical axes and bottom for horizontal axes.
+</ParamField>
+
+<ParamField path="tickInterval" type="number">
+  The interval of the tick marks in axis units. When `null`, the tick interval is computed to approximately follow the `tickPixelInterval`.
+</ParamField>
+
+<ParamField path="gridLineWidth" type="number" default={0}>
+  The width of the grid lines extending from the axis across the gradient or plot area.
+</ParamField>
+
+<ParamField path="labels" type="AxisLabelsOptions">
+  Configuration for the axis labels, including formatting, rotation, and styling.
+</ParamField>
+
+<ParamField path="title" type="AxisTitleOptions">
+  The axis title, displayed next to the axis line.
+</ParamField>
+
+<ParamField path="crosshair" type="AxisCrosshairOptions | boolean">
+  Configure a crosshair that follows the mouse pointer along the axis.
+</ParamField>
+
+## TypeScript Interface
+
+Key axis interfaces from `AxisOptions.ts`:
+
+```typescript
+interface AxisOptions {
+    type?: 'linear' | 'logarithmic' | 'datetime' | 'category';
+    categories?: Array<string>;
+    min?: number;
+    max?: number;
+    startOnTick?: boolean;
+    endOnTick?: boolean;
+    tickInterval?: number;
+    minorTickInterval?: number | 'auto';
+    reversed?: boolean;
+    opposite?: boolean;
+    visible?: boolean;
+    labels?: AxisLabelsOptions;
+    title?: AxisTitleOptions;
+    gridLineWidth?: number;
+    gridLineColor?: ColorType;
+    gridLineDashStyle?: DashStyleValue;
+    plotBands?: Array<AxisPlotBandsOptions>;
+    plotLines?: Array<AxisPlotLinesOptions>;
+    crosshair?: boolean | AxisCrosshairOptions;
+}
+
+interface AxisCrosshairLabelOptions {
+    align?: AlignValue;
+    backgroundColor?: ColorType;
+    borderColor?: ColorType;
+    borderRadius?: number;
+    borderWidth?: number;
+    enabled?: boolean;
+    format?: string;
+    formatter?: FormatterCallback<Axis>;
+}
+```
+
+## Best Practices
+
+<Note>
+  When using multiple Y-axes, set `opposite: true` on secondary axes to position them on the right side for better clarity.
+</Note>
+
+1. **Clarity** - Always include descriptive axis titles
+2. **Range** - Set appropriate `min` and `max` values to avoid misleading visualizations
+3. **Labels** - Rotate labels when they overlap, or use `staggerLines` for alternating positions
+4. **Performance** - For datetime axes with large datasets, set `tickPixelInterval` to reduce tick count
+5. **Accessibility** - Use contrasting colors for grid lines and ensure labels are readable
+
+<Warning>
+  Logarithmic axes cannot display zero or negative values. Ensure your data contains only positive numbers when using `type: 'logarithmic'`.
+</Warning>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Data Handling" icon="database" href="/concepts/data">
+    Learn about data formats and loading
+  </Card>
+  <Card title="Series Configuration" icon="chart-line" href="/concepts/series">
+    Configure data series
+  </Card>
+  <Card title="Responsive Charts" icon="mobile" href="/concepts/responsive">
+    Make axes responsive to screen size
+  </Card>
+  <Card title="API Reference" icon="code" href="/api/axis">
+    Complete axis API documentation
+  </Card>
+</CardGroup>

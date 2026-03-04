@@ -1,0 +1,552 @@
+---
+title: Highcharts Maps
+description: Create interactive geographic maps with choropleth visualization, tiled web maps, and custom map projections
+---
+
+Highcharts Maps is a comprehensive mapping library for creating interactive geographic visualizations. It supports both traditional choropleth maps with TopoJSON/GeoJSON data and modern tiled web maps with external providers, making it ideal for data-driven geographic visualizations.
+
+## Overview
+
+Highcharts Maps provides powerful features for geographic data visualization:
+
+- **Choropleth Maps**: Color-code regions based on data values
+- **Tiled Web Maps**: Integration with OpenStreetMap, MapBox, and other providers
+- **Multiple Projections**: Built-in support for various map projections
+- **Map Collection**: 1,600+ free maps ready to use
+- **GeoJSON/TopoJSON**: Standard format support for geographic data
+- **Interactive Features**: Zoom, pan, drill-down, and more
+
+## Installation
+
+<CodeGroup>
+```bash npm
+npm install highcharts
+```
+
+```bash yarn
+yarn add highcharts
+```
+
+```html CDN - Standalone
+<script src="https://code.highcharts.com/maps/highmaps.js"></script>
+```
+
+```html CDN - As Plugin
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/maps/modules/map.js"></script>
+```
+</CodeGroup>
+
+### ES6 Module Import
+
+```javascript
+import Highcharts from 'highcharts';
+import mapModule from 'highcharts/modules/map';
+
+mapModule(Highcharts);
+```
+
+## Getting Started
+
+<Steps>
+  <Step title="Load the required files">
+    Include Highcharts Maps library in your project:
+    ```html
+    <script src="https://code.highcharts.com/maps/highmaps.js"></script>
+    ```
+  </Step>
+  
+  <Step title="Load map data">
+    Use a map from the Highcharts Map Collection:
+    ```javascript
+    const topology = await fetch(
+      'https://code.highcharts.com/mapdata/countries/us/us-all.topo.json'
+    ).then(response => response.json());
+    ```
+  </Step>
+  
+  <Step title="Create the map">
+    Initialize the map with your data:
+    ```javascript
+    Highcharts.mapChart('container', {
+      chart: {
+        map: topology
+      },
+      title: {
+        text: 'US Population by State'
+      },
+      series: [{
+        data: [
+          ['us-ma', 10],
+          ['us-wa', 11],
+          ['us-ca', 12]
+        ],
+        mapData: topology,
+        joinBy: 'hc-key',
+        name: 'Population',
+        states: {
+          hover: {
+            color: '#BADA55'
+          }
+        },
+        dataLabels: {
+          enabled: true,
+          format: '{point.name}'
+        }
+      }]
+    });
+    ```
+  </Step>
+</Steps>
+
+## Map Types
+
+<CardGroup cols={2}>
+  <Card title="Choropleth Maps" icon="map">
+    Color-code geographic regions based on data values - perfect for showing population, elections, or statistical data
+  </Card>
+  <Card title="Tiled Web Maps" icon="map-location-dot">
+    Modern web maps with street tiles from providers like OpenStreetMap and MapBox
+  </Card>
+  <Card title="Bubble Maps" icon="circle-dot">
+    Display data as sized bubbles on geographic locations
+  </Card>
+  <Card title="Flow Maps" icon="route">
+    Visualize movement and connections between locations
+  </Card>
+</CardGroup>
+
+## Map Collection
+
+Highcharts provides 1,600+ free maps in TopoJSON format, covering:
+
+- **World maps**: Countries, regions, and continents
+- **Country maps**: States, provinces, and administrative divisions
+- **Custom regions**: EU, Nordic countries, and more
+
+All maps are available at [https://code.highcharts.com/mapdata/](https://code.highcharts.com/mapdata/)
+
+```javascript
+// Load a map from the collection
+const mapData = await fetch(
+  'https://code.highcharts.com/mapdata/countries/gb/gb-all.topo.json'
+).then(response => response.json());
+```
+
+## Map View and Projection
+
+The MapView class controls how maps are projected and displayed.
+
+### Center and Zoom
+
+```javascript
+mapView: {
+  center: [-100, 40], // [longitude, latitude]
+  zoom: 3,
+  projection: {
+    name: 'WebMercator'
+  }
+}
+```
+
+### Built-in Projections
+
+Highcharts Maps includes several built-in projections:
+
+- **WebMercator**: Default for tiled web maps
+- **EqualEarth**: Equal-area projection
+- **Miller**: Compromise cylindrical projection
+- **Orthographic**: Globe-like 3D appearance
+- **LambertConformalConic**: For mid-latitude regions
+
+```javascript
+mapView: {
+  projection: {
+    name: 'Orthographic',
+    rotation: [60, -30]
+  }
+}
+```
+
+### Insets
+
+Display non-contiguous areas (like Alaska and Hawaii for the US):
+
+```javascript
+mapView: {
+  insetOptions: {
+    borderColor: '#606060',
+    borderWidth: 1
+  },
+  insets: [{
+    id: 'us-hi',
+    units: '%',
+    borderColor: '#606060',
+    borderWidth: 1,
+    relativeTo: 'mapBoundingBox',
+    field: {
+      x: 5,
+      y: 80,
+      width: 10,
+      height: 15
+    }
+  }]
+}
+```
+
+## Series Types
+
+### Map Series (Choropleth)
+
+The standard map series colors regions based on data values.
+
+```javascript
+series: [{
+  type: 'map',
+  mapData: topology,
+  data: [
+    ['us-ny', 100],
+    ['us-ca', 200],
+    ['us-tx', 150]
+  ],
+  joinBy: 'hc-key',
+  name: 'Population'
+}]
+```
+
+### MapBubble Series
+
+Display sized bubbles at geographic locations.
+
+```javascript
+series: [{
+  type: 'mapbubble',
+  name: 'Cities',
+  data: [
+    { lat: 40.7128, lon: -74.0060, z: 8336817, name: 'New York' },
+    { lat: 34.0522, lon: -118.2437, z: 3979576, name: 'Los Angeles' }
+  ],
+  minSize: 4,
+  maxSize: '12%'
+}]
+```
+
+### MapPoint Series
+
+Display markers at specific locations.
+
+```javascript
+series: [{
+  type: 'mappoint',
+  name: 'Cities',
+  data: [
+    { lat: 51.5074, lon: -0.1278, name: 'London' },
+    { lat: 48.8566, lon: 2.3522, name: 'Paris' }
+  ],
+  marker: {
+    radius: 5,
+    fillColor: 'red'
+  }
+}]
+```
+
+### MapLine Series
+
+Draw lines between locations (routes, borders).
+
+```javascript
+series: [{
+  type: 'mapline',
+  name: 'Flight Route',
+  data: [{
+    geometry: {
+      type: 'LineString',
+      coordinates: [
+        [-74.0060, 40.7128], // New York
+        [-0.1278, 51.5074]   // London
+      ]
+    }
+  }],
+  color: '#0066cc',
+  lineWidth: 2
+}]
+```
+
+### FlowMap Series
+
+Visualize movement and migration between locations.
+
+```javascript
+series: [{
+  type: 'flowmap',
+  data: [
+    {
+      from: 'New York',
+      to: 'London',
+      weight: 1000
+    },
+    {
+      from: 'London',
+      to: 'Paris',
+      weight: 500
+    }
+  ],
+  lineWidth: 2
+}]
+```
+
+## Tiled Web Maps
+
+Integrate modern tiled web maps from providers like OpenStreetMap.
+
+```javascript
+Highcharts.mapChart('container', {
+  chart: {
+    map: 'custom/world'
+  },
+  mapView: {
+    center: [10, 59],
+    zoom: 10
+  },
+  series: [{
+    type: 'tiledwebmap',
+    name: 'Basemap Tiles',
+    provider: {
+      type: 'OpenStreetMap'
+    },
+    showInLegend: false
+  }, {
+    type: 'mappoint',
+    name: 'Cities',
+    data: pointData
+  }]
+});
+```
+
+### Supported Providers
+
+- OpenStreetMap
+- Stamen (Terrain, Toner, Watercolor)
+- Thunderforest
+- Esri (WorldStreetMap, WorldTopoMap, WorldImagery)
+- USGS (USImagery, USTopo)
+
+## Color Axis
+
+Create color scales for choropleth maps.
+
+```javascript
+colorAxis: {
+  min: 0,
+  max: 1000,
+  stops: [
+    [0, '#F1EEF6'],
+    [0.5, '#900037'],
+    [1, '#500007']
+  ],
+  labels: {
+    format: '{value}'
+  }
+}
+```
+
+### Data Classes
+
+Define discrete color ranges:
+
+```javascript
+colorAxis: {
+  dataClasses: [
+    { from: 0, to: 100, color: '#F1EEF6', name: 'Low' },
+    { from: 100, to: 500, color: '#900037', name: 'Medium' },
+    { from: 500, color: '#500007', name: 'High' }
+  ]
+}
+```
+
+## Map Navigation
+
+Enable interactive zoom and pan controls.
+
+```javascript
+mapNavigation: {
+  enabled: true,
+  buttonOptions: {
+    verticalAlign: 'bottom'
+  },
+  enableMouseWheelZoom: true,
+  enableTouchZoom: true,
+  enableDoubleClickZoom: true,
+  enableDoubleClickZoomTo: true
+}
+```
+
+## Advanced Examples
+
+### Map Drill-Down
+
+Click regions to drill down to more detailed maps:
+
+```javascript
+series: [{
+  data: countryData,
+  mapData: worldMap,
+  joinBy: ['iso-a2', 'code'],
+  name: 'Countries',
+  states: {
+    hover: {
+      color: '#a4edba'
+    }
+  },
+  point: {
+    events: {
+      click: function() {
+        // Load detailed map for this country
+        const drilldown = this.drilldown;
+        if (drilldown) {
+          loadDetailedMap(drilldown);
+        }
+      }
+    }
+  }
+}]
+```
+
+### Marker Clusters
+
+Automatically cluster nearby points:
+
+```html
+<script src="https://code.highcharts.com/maps/modules/marker-clusters.js"></script>
+```
+
+```javascript
+plotOptions: {
+  mappoint: {
+    cluster: {
+      enabled: true,
+      allowOverlap: false,
+      animation: {
+        duration: 450
+      },
+      layoutAlgorithm: {
+        type: 'grid',
+        gridSize: 50
+      }
+    }
+  }
+}
+```
+
+### GeoHeatmap
+
+Visualize density with geographic heatmaps:
+
+```javascript
+series: [{
+  type: 'geoheatmap',
+  data: [
+    { lat: 40.7128, lon: -74.0060, value: 100 },
+    { lat: 34.0522, lon: -118.2437, value: 80 }
+  ],
+  colsize: 5, // degrees
+  rowsize: 5,
+  nullColor: 'transparent'
+}]
+```
+
+## Custom Maps
+
+Create maps from your own geographic data:
+
+<Steps>
+  <Step title="Prepare GeoJSON/TopoJSON">
+    Use GIS software to export your geographic data as GeoJSON or TopoJSON
+  </Step>
+  
+  <Step title="Convert to TopoJSON (recommended)">
+    TopoJSON is more compact than GeoJSON:
+    ```bash
+    geo2topo input.geojson > output.topojson
+    ```
+  </Step>
+  
+  <Step title="Load in Highcharts">
+    ```javascript
+    const customMap = await fetch('path/to/custom-map.topojson')
+      .then(response => response.json());
+    
+    Highcharts.mapChart('container', {
+      chart: {
+        map: customMap
+      },
+      series: [{
+        data: yourData
+      }]
+    });
+    ```
+  </Step>
+</Steps>
+
+## Joining Data to Maps
+
+Connect your data to map regions using the `joinBy` option:
+
+```javascript
+series: [{
+  mapData: topology,
+  data: [
+    ['us-ny', 100],
+    ['us-ca', 200]
+  ],
+  joinBy: 'hc-key', // Join by the 'hc-key' property
+  name: 'Random data'
+}]
+```
+
+Alternative methods:
+
+```javascript
+// Join by different properties
+joinBy: ['iso-a2', 'code'] // [mapProperty, dataProperty]
+
+// Or include geometry directly in data
+data: [{
+  geometry: { /* GeoJSON geometry */ },
+  value: 100
+}]
+```
+
+## Performance Tips
+
+<Card title="Optimize Map Performance" icon="gauge-high">
+  - Use TopoJSON instead of GeoJSON (smaller file size)
+  - Simplify complex geometries before importing
+  - Use marker clusters for large point datasets
+  - Enable data grouping for time-series map data
+  - Limit the number of regions displayed at once
+</Card>
+
+## Related Resources
+
+<CardGroup cols={2}>
+  <Card title="API Reference" icon="code" href="https://api.highcharts.com/highmaps/">
+    Complete Highcharts Maps API documentation
+  </Card>
+  <Card title="Map Collection" icon="map" href="https://code.highcharts.com/mapdata/">
+    1,600+ free maps in TopoJSON format
+  </Card>
+  <Card title="Live Demos" icon="flask" href="https://www.highcharts.com/demo/maps">
+    Interactive examples and demos
+  </Card>
+  <Card title="Map Editor" icon="pen-to-square" href="https://highcharts.github.io/map-from-svg/">
+    Convert SVG files to Highcharts maps
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+- Explore the [Map Collection](https://code.highcharts.com/mapdata/) to find pre-built maps
+- Learn about [Map Projections](/products/highmaps#map-view-and-projection) for different visualizations
+- Try [Tiled Web Maps](/products/highmaps#tiled-web-maps) for modern street map backgrounds
+- Implement [Drill-Down](/products/highmaps#map-drill-down) for interactive geographic exploration

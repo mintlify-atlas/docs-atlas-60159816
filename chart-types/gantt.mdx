@@ -1,0 +1,500 @@
+---
+title: Gantt Charts
+description: Create project management and timeline visualizations with Gantt charts
+---
+
+Gantt charts are specialized project management charts that display tasks over time, showing dependencies, progress, and milestones.
+
+## Overview
+
+Gantt charts in Highcharts provide:
+
+- Task scheduling and timelines
+- Dependencies between tasks
+- Progress tracking
+- Milestones
+- Hierarchical task structure
+- Resource allocation
+- Interactive editing
+
+## Basic Gantt Chart
+
+<CodeGroup>
+```javascript Simple Gantt
+const day = 24 * 36e5;
+const today = Math.floor(Date.now() / day) * day;
+
+Highcharts.ganttChart('container', {
+  title: {
+    text: 'Simple Gantt Chart'
+  },
+  xAxis: {
+    currentDateIndicator: true,
+    min: today - 2 * day,
+    max: today + 18 * day
+  },
+  series: [{
+    name: 'Project 1',
+    data: [{
+      name: 'Planning',
+      start: today,
+      end: today + 5 * day
+    }, {
+      name: 'Development',
+      start: today + 5 * day,
+      end: today + 15 * day
+    }, {
+      name: 'Testing',
+      start: today + 15 * day,
+      end: today + 18 * day
+    }]
+  }]
+});
+```
+
+```javascript With Dependencies
+Highcharts.ganttChart('container', {
+  title: {
+    text: 'Gantt Chart with Dependencies'
+  },
+  series: [{
+    name: 'Tasks',
+    data: [{
+      id: 'task1',
+      name: 'Task 1',
+      start: today,
+      end: today + 5 * day
+    }, {
+      id: 'task2',
+      name: 'Task 2',
+      dependency: 'task1',
+      start: today + 5 * day,
+      end: today + 10 * day
+    }, {
+      id: 'task3',
+      name: 'Task 3',
+      dependency: 'task2',
+      start: today + 10 * day,
+      end: today + 15 * day
+    }]
+  }]
+});
+```
+</CodeGroup>
+
+## Project Management Example
+
+Based on `~/workspace/source/samples/gantt/demo/project-management/demo.js:1-281`:
+
+```javascript
+const day = 24 * 36e5;
+const today = Math.floor(Date.now() / day) * day;
+
+Highcharts.ganttChart('container', {
+  chart: {
+    plotBackgroundColor: 'rgba(128,128,128,0.02)',
+    plotBorderColor: 'rgba(128,128,128,0.1)',
+    plotBorderWidth: 1
+  },
+  title: {
+    text: 'Gantt Project Management'
+  },
+  plotOptions: {
+    series: {
+      borderRadius: '50%',
+      connectors: {
+        dashStyle: 'ShortDot',
+        lineWidth: 2,
+        radius: 5,
+        startMarker: {
+          enabled: false
+        }
+      },
+      groupPadding: 0,
+      dataLabels: [{
+        enabled: true,
+        align: 'left',
+        format: '{point.name}',
+        padding: 10,
+        style: {
+          fontWeight: 'normal',
+          textOutline: 'none'
+        }
+      }, {
+        enabled: true,
+        align: 'right',
+        format: '{#if point.completed}{(multiply point.completed.amount 100):.0f}%{/if}',
+        padding: 10,
+        style: {
+          fontWeight: 'normal',
+          textOutline: 'none',
+          opacity: 0.6
+        }
+      }]
+    }
+  },
+  xAxis: {
+    currentDateIndicator: {
+      color: '#2caffe',
+      dashStyle: 'ShortDot',
+      width: 2
+    },
+    min: today - 3 * day,
+    max: today + 18 * day
+  },
+  yAxis: {
+    grid: {
+      borderWidth: 0
+    },
+    gridLineWidth: 0,
+    staticScale: 30
+  },
+  series: [{
+    name: 'Offices',
+    data: [{
+      name: 'New offices',
+      id: 'new_offices',
+      owner: 'Peter'
+    }, {
+      name: 'Prepare office building',
+      id: 'prepare_building',
+      parent: 'new_offices',
+      start: today - (2 * day),
+      end: today + (6 * day),
+      completed: {
+        amount: 0.2
+      },
+      owner: 'Linda'
+    }, {
+      name: 'Inspect building',
+      id: 'inspect_building',
+      dependency: 'prepare_building',
+      parent: 'new_offices',
+      start: today + 6 * day,
+      end: today + 8 * day,
+      owner: 'Ivy'
+    }, {
+      name: 'Passed inspection',
+      id: 'passed_inspection',
+      dependency: 'inspect_building',
+      parent: 'new_offices',
+      start: today + 9.5 * day,
+      milestone: true,
+      owner: 'Peter'
+    }]
+  }],
+  tooltip: {
+    pointFormat: '<span style="font-weight: bold">{point.name}</span><br>' +
+      '{point.start:%e %b}' +
+      '{#unless point.milestone} → {point.end:%e %b}{/unless}' +
+      '<br>' +
+      '{#if point.completed}' +
+      'Completed: {multiply point.completed.amount 100}%<br>' +
+      '{/if}' +
+      'Owner: {#if point.owner}{point.owner}{else}unassigned{/if}'
+  }
+});
+```
+
+## Hierarchical Tasks
+
+Organize tasks in parent-child relationships:
+
+```javascript
+Highcharts.ganttChart('container', {
+  title: {
+    text: 'Hierarchical Gantt Chart'
+  },
+  series: [{
+    name: 'Project',
+    data: [{
+      id: 'phase1',
+      name: 'Phase 1',
+      owner: 'Team A'
+    }, {
+      id: 'task1.1',
+      parent: 'phase1',
+      name: 'Task 1.1',
+      start: today,
+      end: today + 3 * day,
+      owner: 'John'
+    }, {
+      id: 'task1.2',
+      parent: 'phase1',
+      name: 'Task 1.2',
+      start: today + 3 * day,
+      end: today + 6 * day,
+      owner: 'Jane'
+    }, {
+      id: 'phase2',
+      name: 'Phase 2',
+      owner: 'Team B'
+    }, {
+      id: 'task2.1',
+      parent: 'phase2',
+      name: 'Task 2.1',
+      dependency: 'task1.2',
+      start: today + 6 * day,
+      end: today + 10 * day,
+      owner: 'Bob'
+    }]
+  }]
+});
+```
+
+## Progress Indicator
+
+Show task completion status:
+
+```javascript
+Highcharts.ganttChart('container', {
+  title: {
+    text: 'Tasks with Progress'
+  },
+  series: [{
+    name: 'Tasks',
+    data: [{
+      name: 'Design',
+      start: today,
+      end: today + 5 * day,
+      completed: {
+        amount: 1.0,  // 100% complete
+        fill: '#4CAF50'
+      }
+    }, {
+      name: 'Development',
+      start: today + 5 * day,
+      end: today + 15 * day,
+      completed: {
+        amount: 0.6,  // 60% complete
+        fill: '#2196F3'
+      }
+    }, {
+      name: 'Testing',
+      start: today + 15 * day,
+      end: today + 20 * day,
+      completed: {
+        amount: 0.2,  // 20% complete
+        fill: '#FFC107'
+      }
+    }]
+  }]
+});
+```
+
+## Milestones
+
+Mark important deadlines:
+
+```javascript
+Highcharts.ganttChart('container', {
+  title: {
+    text: 'Project with Milestones'
+  },
+  series: [{
+    name: 'Tasks',
+    data: [{
+      name: 'Planning',
+      start: today,
+      end: today + 5 * day
+    }, {
+      name: 'Planning Complete',
+      start: today + 5 * day,
+      milestone: true,
+      marker: {
+        symbol: 'diamond'
+      }
+    }, {
+      name: 'Development',
+      start: today + 5 * day,
+      end: today + 15 * day
+    }, {
+      name: 'Beta Release',
+      start: today + 15 * day,
+      milestone: true
+    }, {
+      name: 'Testing',
+      start: today + 15 * day,
+      end: today + 20 * day
+    }, {
+      name: 'Launch',
+      start: today + 20 * day,
+      milestone: true
+    }]
+  }]
+});
+```
+
+## Dependency Types
+
+Define different dependency relationships:
+
+```javascript
+Highcharts.ganttChart('container', {
+  title: {
+    text: 'Complex Dependencies'
+  },
+  series: [{
+    name: 'Tasks',
+    data: [{
+      id: 'task1',
+      name: 'Task 1',
+      start: today,
+      end: today + 5 * day
+    }, {
+      id: 'task2',
+      name: 'Task 2 (Finish to Start)',
+      dependency: {
+        to: 'task1',
+        type: 'finishToStart'
+      },
+      start: today + 5 * day,
+      end: today + 10 * day
+    }, {
+      id: 'task3',
+      name: 'Task 3 (Start to Start)',
+      dependency: {
+        to: 'task1',
+        type: 'startToStart'
+      },
+      start: today,
+      end: today + 8 * day
+    }]
+  }]
+});
+```
+
+## Current Date Indicator
+
+Show the current date on the timeline:
+
+```javascript
+Highcharts.ganttChart('container', {
+  xAxis: {
+    currentDateIndicator: {
+      color: '#2caffe',
+      dashStyle: 'ShortDot',
+      width: 2,
+      label: {
+        format: '%a, %b %d',
+        style: {
+          fontWeight: 'bold',
+          color: '#2caffe'
+        }
+      }
+    }
+  },
+  series: [{
+    data: tasksData
+  }]
+});
+```
+
+## Resource Allocation
+
+Show who is assigned to each task:
+
+```javascript
+Highcharts.ganttChart('container', {
+  title: {
+    text: 'Resource Allocation'
+  },
+  yAxis: {
+    labels: {
+      formatter: function () {
+        const point = this.chart.series[0].data[this.pos];
+        return point ? `${point.name}<br><small>${point.owner}</small>` : '';
+      }
+    }
+  },
+  series: [{
+    name: 'Tasks',
+    data: [{
+      name: 'Design UI',
+      owner: 'John Doe',
+      start: today,
+      end: today + 5 * day
+    }, {
+      name: 'Backend API',
+      owner: 'Jane Smith',
+      start: today,
+      end: today + 10 * day
+    }, {
+      name: 'Integration',
+      owner: 'Bob Johnson',
+      start: today + 10 * day,
+      end: today + 15 * day
+    }]
+  }]
+});
+```
+
+## Use Cases
+
+<CardGroup cols={2}>
+  <Card title="Project Management" icon="diagram-project">
+    - Software development
+    - Construction planning
+    - Event planning
+    - Product launches
+  </Card>
+  <Card title="Resource Planning" icon="users">
+    - Team schedules
+    - Equipment allocation
+    - Manufacturing processes
+    - Production timelines
+  </Card>
+</CardGroup>
+
+## Configuration Options
+
+Key Gantt-specific options from `~/workspace/source/ts/Series/Gantt/GanttSeriesDefaults.ts:41-141`:
+
+<ParamField path="grouping" type="boolean" default="false">
+  Whether to group tasks or render independently.
+</ParamField>
+
+<ParamField path="connectors" type="object">
+  Options for the lines connecting dependent tasks.
+  ```javascript
+  connectors: {
+    type: 'simpleConnect',
+    dashStyle: 'ShortDot',
+    lineWidth: 2,
+    radius: 0,
+    startMarker: {
+      enabled: true,
+      symbol: 'arrow-filled',
+      radius: 4
+    }
+  }
+  ```
+</ParamField>
+
+## Data Format
+
+Gantt chart data points require start and end times:
+
+```javascript
+data: [{
+  id: 'task1',
+  name: 'Task Name',
+  start: Date.UTC(2024, 0, 1),  // or timestamp
+  end: Date.UTC(2024, 0, 5),
+  completed: {
+    amount: 0.5  // 50% complete
+  },
+  milestone: false,
+  dependency: 'previousTask',
+  parent: 'parentTask',
+  owner: 'Assignee Name'
+}]
+```
+
+<Note>
+  Gantt charts require the Highcharts Gantt library (`highcharts-gantt.js`).
+</Note>
+
+<Warning>
+  For large projects with hundreds of tasks, consider using data grouping or virtualization for better performance.
+</Warning>

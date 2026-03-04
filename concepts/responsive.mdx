@@ -1,0 +1,739 @@
+---
+title: Responsive Charts
+description: Learn how to create responsive Highcharts that adapt to different screen sizes and devices using responsive options and best practices.
+---
+
+# Responsive Charts
+
+Responsive design is essential for modern web applications. Highcharts provides powerful responsive features that automatically adapt charts to different screen sizes and orientations.
+
+## Responsive Options
+
+The `responsive` option allows you to define rules that apply different chart configurations based on screen dimensions:
+
+```javascript
+Highcharts.chart('container', {
+    title: {
+        text: 'Responsive Chart'
+    },
+    series: [{
+        data: [1, 2, 3, 4, 5]
+    }],
+    responsive: {
+        rules: [{
+            condition: {
+                maxWidth: 500
+            },
+            chartOptions: {
+                // Options to apply when width <= 500px
+                legend: {
+                    enabled: false
+                },
+                title: {
+                    text: 'Mobile View'
+                }
+            }
+        }]
+    }
+});
+```
+
+## Responsive Rules
+
+<Tabs>
+  <Tab title="Basic Rules">
+    Define rules based on chart dimensions:
+
+    ```javascript
+    responsive: {
+        rules: [{
+            // Mobile portrait
+            condition: {
+                maxWidth: 400
+            },
+            chartOptions: {
+                legend: {
+                    enabled: false
+                },
+                yAxis: {
+                    labels: {
+                        align: 'left',
+                        x: 0,
+                        y: -2
+                    },
+                    title: {
+                        text: ''
+                    }
+                }
+            }
+        }, {
+            // Mobile landscape
+            condition: {
+                minWidth: 401,
+                maxWidth: 767
+            },
+            chartOptions: {
+                legend: {
+                    layout: 'horizontal',
+                    align: 'center',
+                    verticalAlign: 'bottom'
+                }
+            }
+        }, {
+            // Tablet
+            condition: {
+                minWidth: 768,
+                maxWidth: 1024
+            },
+            chartOptions: {
+                legend: {
+                    layout: 'vertical',
+                    align: 'right'
+                }
+            }
+        }]
+    }
+    ```
+  </Tab>
+
+  <Tab title="Callback Functions">
+    Use callbacks for dynamic conditions:
+
+    ```javascript
+    responsive: {
+        rules: [{
+            condition: {
+                callback: function() {
+                    // Custom logic
+                    return this.chartWidth < 600 && 
+                           window.innerHeight < 400;
+                }
+            },
+            chartOptions: {
+                chart: {
+                    height: 200
+                },
+                title: {
+                    style: {
+                        fontSize: '12px'
+                    }
+                }
+            }
+        }]
+    }
+    ```
+  </Tab>
+
+  <Tab title="Multiple Conditions">
+    Combine width and height conditions:
+
+    ```javascript
+    responsive: {
+        rules: [{
+            condition: {
+                maxWidth: 500,
+                maxHeight: 300
+            },
+            chartOptions: {
+                chart: {
+                    className: 'small-chart'
+                },
+                xAxis: {
+                    labels: {
+                        formatter: function() {
+                            // Abbreviate labels
+                            return this.value.substring(0, 3);
+                        }
+                    }
+                },
+                yAxis: {
+                    title: {
+                        text: null
+                    }
+                }
+            }
+        }]
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Responsive Interface
+
+TypeScript interface from `Responsive.ts`:
+
+```typescript
+namespace Responsive {
+    interface Options {
+        rules?: Array<RuleOptions>;
+    }
+    
+    interface RuleOptions {
+        condition?: ConditionOptions;
+        chartOptions?: Partial<GlobalOptions>;
+    }
+    
+    interface ConditionOptions {
+        maxWidth?: number;
+        minWidth?: number;
+        maxHeight?: number;
+        minHeight?: number;
+        callback?: CallbackFunction;
+    }
+    
+    interface CallbackFunction {
+        (this: Chart): boolean;
+    }
+}
+```
+
+## Container-Based Responsiveness
+
+Charts automatically reflow to fit their container:
+
+<CodeGroup>
+```html HTML Container
+<div id="container" style="width: 100%; height: 400px;"></div>
+```
+
+```javascript Auto Reflow
+// Chart automatically adapts to container size
+const chart = Highcharts.chart('container', {
+    chart: {
+        // Don't set explicit width/height
+        // Chart will use container dimensions
+    },
+    title: {
+        text: 'Responsive Chart'
+    },
+    series: [{
+        data: [1, 2, 3, 4, 5]
+    }]
+});
+
+// Manually trigger reflow
+window.addEventListener('resize', function() {
+    chart.reflow();
+});
+```
+
+```javascript Dynamic Container
+// Container with responsive width
+const container = document.getElementById('container');
+
+// Chart adapts when container size changes
+function updateContainerSize() {
+    if (window.innerWidth < 600) {
+        container.style.width = '100%';
+        container.style.height = '300px';
+    } else {
+        container.style.width = '800px';
+        container.style.height = '400px';
+    }
+    chart.reflow();
+}
+
+window.addEventListener('resize', updateContainerSize);
+```
+</CodeGroup>
+
+## Common Responsive Patterns
+
+<Tabs>
+  <Tab title="Mobile Optimized">
+    ```javascript
+    Highcharts.chart('container', {
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: 'Monthly Sales'
+        },
+        xAxis: {
+            categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']
+        },
+        series: [{
+            name: 'Sales',
+            data: [29.9, 71.5, 106.4, 129.2, 144.0, 176.0]
+        }],
+        responsive: {
+            rules: [{
+                condition: {
+                    maxWidth: 500
+                },
+                chartOptions: {
+                    // Simplify for mobile
+                    chart: {
+                        className: 'mobile-chart'
+                    },
+                    legend: {
+                        enabled: false
+                    },
+                    xAxis: {
+                        labels: {
+                            rotation: -45,
+                            style: {
+                                fontSize: '10px'
+                            }
+                        }
+                    },
+                    yAxis: {
+                        labels: {
+                            align: 'left',
+                            x: 0,
+                            y: -2
+                        },
+                        title: {
+                            text: null
+                        }
+                    },
+                    plotOptions: {
+                        column: {
+                            pointPadding: 0.1,
+                            borderWidth: 0
+                        }
+                    }
+                }
+            }]
+        }
+    });
+    ```
+  </Tab>
+
+  <Tab title="Tablet & Desktop">
+    ```javascript
+    Highcharts.chart('container', {
+        title: {
+            text: 'Multi-Device Chart'
+        },
+        series: [{
+            data: [1, 2, 3, 4, 5]
+        }],
+        responsive: {
+            rules: [{
+                // Tablet
+                condition: {
+                    minWidth: 768,
+                    maxWidth: 1024
+                },
+                chartOptions: {
+                    legend: {
+                        align: 'center',
+                        verticalAlign: 'bottom',
+                        layout: 'horizontal'
+                    },
+                    subtitle: {
+                        text: 'Tablet View'
+                    }
+                }
+            }, {
+                // Desktop
+                condition: {
+                    minWidth: 1025
+                },
+                chartOptions: {
+                    legend: {
+                        align: 'right',
+                        verticalAlign: 'middle',
+                        layout: 'vertical'
+                    },
+                    subtitle: {
+                        text: 'Desktop View'
+                    },
+                    chart: {
+                        height: 600
+                    }
+                }
+            }]
+        }
+    });
+    ```
+  </Tab>
+
+  <Tab title="Orientation Change">
+    ```javascript
+    Highcharts.chart('container', {
+        title: {
+            text: 'Orientation-Aware Chart'
+        },
+        series: [{
+            data: [29.9, 71.5, 106.4, 129.2, 144.0]
+        }],
+        responsive: {
+            rules: [{
+                // Portrait
+                condition: {
+                    callback: function() {
+                        return window.innerHeight > window.innerWidth;
+                    }
+                },
+                chartOptions: {
+                    legend: {
+                        layout: 'horizontal',
+                        align: 'center',
+                        verticalAlign: 'bottom'
+                    },
+                    chart: {
+                        height: window.innerHeight * 0.6
+                    }
+                }
+            }, {
+                // Landscape
+                condition: {
+                    callback: function() {
+                        return window.innerWidth > window.innerHeight;
+                    }
+                },
+                chartOptions: {
+                    legend: {
+                        layout: 'vertical',
+                        align: 'right',
+                        verticalAlign: 'middle'
+                    },
+                    chart: {
+                        height: window.innerHeight * 0.8
+                    }
+                }
+            }]
+        }
+    });
+    ```
+  </Tab>
+</Tabs>
+
+## Real-World Example
+
+Complete responsive chart from the source samples:
+
+```javascript
+const chart = Highcharts.chart('container', {
+    chart: {
+        type: 'column'
+    },
+    title: {
+        text: 'Highcharts Responsive Chart'
+    },
+    subtitle: {
+        text: 'Resize the frame to see the axes change'
+    },
+    xAxis: {
+        categories: [
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
+        ]
+    },
+    yAxis: {
+        labels: {
+            x: -15
+        },
+        title: {
+            text: 'Items'
+        }
+    },
+    series: [{
+        name: 'Sales',
+        data: [434, 523, 345, 785, 565, 843, 726, 590, 665, 434, 312, 432]
+    }],
+    responsive: {
+        rules: [{
+            condition: {
+                maxWidth: 500
+            },
+            // Make the labels less space demanding on mobile
+            chartOptions: {
+                xAxis: {
+                    labels: {
+                        formatter: function () {
+                            return this.value.charAt(0);
+                        }
+                    }
+                },
+                yAxis: {
+                    labels: {
+                        align: 'left',
+                        x: 0,
+                        y: -2
+                    },
+                    title: {
+                        text: ''
+                    }
+                }
+            }
+        }]
+    }
+});
+
+// Manual resize triggers
+document.getElementById('small').addEventListener('click', () => {
+    chart.setSize(400, 300);
+});
+
+document.getElementById('large').addEventListener('click', () => {
+    chart.setSize(800, 300);
+});
+```
+
+## Chart Methods
+
+<CardGroup cols={2}>
+  <Card title="chart.reflow()" icon="arrows-rotate">
+    Reflow the chart to fit container
+    ```javascript
+    chart.reflow();
+    ```
+  </Card>
+  <Card title="chart.setSize()" icon="expand">
+    Set explicit chart dimensions
+    ```javascript
+    chart.setSize(width, height, animation);
+    ```
+  </Card>
+  <Card title="chart.setResponsive()" icon="mobile">
+    Re-evaluate responsive rules
+    ```javascript
+    chart.setResponsive(redraw, reset);
+    ```
+  </Card>
+  <Card title="chart.update()" icon="rotate">
+    Update responsive options
+    ```javascript
+    chart.update({ responsive: {...} });
+    ```
+  </Card>
+</CardGroup>
+
+## CSS Integration
+
+Combine responsive options with CSS:
+
+<CodeGroup>
+```css Responsive Styles
+/* Container responsive styling */
+.chart-container {
+    width: 100%;
+    height: 400px;
+}
+
+@media (max-width: 768px) {
+    .chart-container {
+        height: 300px;
+    }
+}
+
+@media (max-width: 480px) {
+    .chart-container {
+        height: 250px;
+    }
+}
+
+/* Chart-specific classes */
+.mobile-chart {
+    font-size: 12px;
+}
+
+.mobile-chart .highcharts-title {
+    font-size: 14px !important;
+}
+```
+
+```javascript Using CSS Classes
+Highcharts.chart('container', {
+    responsive: {
+        rules: [{
+            condition: {
+                maxWidth: 500
+            },
+            chartOptions: {
+                chart: {
+                    className: 'mobile-chart'
+                }
+            }
+        }]
+    }
+});
+```
+</CodeGroup>
+
+## Performance Optimization
+
+<Note>
+  Avoid setting too many responsive rules or using complex callback functions, as they can impact performance during window resize events.
+</Note>
+
+```javascript
+// Debounce resize events
+let resizeTimeout;
+window.addEventListener('resize', function() {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(function() {
+        chart.reflow();
+    }, 100);
+});
+
+// Or use ResizeObserver
+const resizeObserver = new ResizeObserver(entries => {
+    for (let entry of entries) {
+        chart.reflow();
+    }
+});
+
+resizeObserver.observe(document.getElementById('container'));
+```
+
+## Responsive Options Reference
+
+<ParamField path="responsive.rules" type="Array<RuleOptions>">
+  Array of responsive rules. Each rule contains a condition and chart options to apply.
+</ParamField>
+
+<ParamField path="condition.maxWidth" type="number">
+  The responsive rule applies when the chart width is less than or equal to this value.
+</ParamField>
+
+<ParamField path="condition.minWidth" type="number">
+  The responsive rule applies when the chart width is greater than or equal to this value.
+</ParamField>
+
+<ParamField path="condition.maxHeight" type="number">
+  The responsive rule applies when the chart height is less than or equal to this value.
+</ParamField>
+
+<ParamField path="condition.minHeight" type="number">
+  The responsive rule applies when the chart height is greater than or equal to this value.
+</ParamField>
+
+<ParamField path="condition.callback" type="function">
+  A callback function to determine if the rule should be applied. Return `true` to apply the rule.
+</ParamField>
+
+<ParamField path="chartOptions" type="Partial<Options>">
+  Chart options to apply when the condition is met. These options are merged with the current chart options.
+</ParamField>
+
+## Best Practices
+
+1. **Container First** - Use percentage-based container sizes with `reflow()`
+2. **Breakpoints** - Define clear breakpoints (mobile, tablet, desktop)
+3. **Simplify on Mobile** - Hide legends, abbreviate labels, reduce data points
+4. **Test Thoroughly** - Test on actual devices, not just browser resize
+5. **Performance** - Limit the number of responsive rules
+6. **Touch Friendly** - Increase touch target sizes on mobile
+
+<Warning>
+  Responsive rules are evaluated from first to last. If multiple rules match, the last matching rule's options take precedence. Order your rules carefully.
+</Warning>
+
+## Framework Integration
+
+<Tabs>
+  <Tab title="React">
+    ```jsx
+    import React, { useEffect, useRef } from 'react';
+    import Highcharts from 'highcharts';
+
+    function ResponsiveChart() {
+        const chartRef = useRef(null);
+        const containerRef = useRef(null);
+
+        useEffect(() => {
+            chartRef.current = Highcharts.chart(containerRef.current, {
+                // Chart options with responsive rules
+                responsive: {
+                    rules: [{
+                        condition: { maxWidth: 500 },
+                        chartOptions: {
+                            legend: { enabled: false }
+                        }
+                    }]
+                }
+            });
+
+            return () => {
+                chartRef.current?.destroy();
+            };
+        }, []);
+
+        return <div ref={containerRef} style={{ width: '100%', height: '400px' }} />;
+    }
+    ```
+  </Tab>
+
+  <Tab title="Vue">
+    ```vue
+    <template>
+        <div ref="chartContainer" style="width: 100%; height: 400px;"></div>
+    </template>
+
+    <script>
+    import Highcharts from 'highcharts';
+
+    export default {
+        mounted() {
+            this.chart = Highcharts.chart(this.$refs.chartContainer, {
+                responsive: {
+                    rules: [{
+                        condition: { maxWidth: 500 },
+                        chartOptions: {
+                            legend: { enabled: false }
+                        }
+                    }]
+                }
+            });
+        },
+        beforeUnmount() {
+            this.chart?.destroy();
+        }
+    };
+    </script>
+    ```
+  </Tab>
+
+  <Tab title="Angular">
+    ```typescript
+    import { Component, OnInit, OnDestroy } from '@angular/core';
+    import * as Highcharts from 'highcharts';
+
+    @Component({
+        selector: 'app-responsive-chart',
+        template: '<div #chartContainer style="width: 100%; height: 400px;"></div>'
+    })
+    export class ResponsiveChartComponent implements OnInit, OnDestroy {
+        private chart: Highcharts.Chart;
+
+        ngOnInit() {
+            this.chart = Highcharts.chart('chartContainer', {
+                responsive: {
+                    rules: [{
+                        condition: { maxWidth: 500 },
+                        chartOptions: {
+                            legend: { enabled: false }
+                        }
+                    }]
+                }
+            });
+        }
+
+        ngOnDestroy() {
+            this.chart?.destroy();
+        }
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Chart Configuration" icon="chart-mixed" href="/concepts/charts">
+    Learn about chart structure and options
+  </Card>
+  <Card title="Options" icon="sliders" href="/concepts/options">
+    Explore global configuration options
+  </Card>
+  <Card title="Examples" icon="code" href="/examples/basic-charts">
+    See responsive chart examples
+  </Card>
+  <Card title="API Reference" icon="code" href="/api/responsive-options">
+    Complete responsive API documentation
+  </Card>
+</CardGroup>

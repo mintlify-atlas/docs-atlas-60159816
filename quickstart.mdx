@@ -1,80 +1,405 @@
 ---
-title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+title: Quick Start Guide
+description: Create your first Highcharts visualization in under 5 minutes with this quick start guide.
 ---
 
-## Get started in three steps
+## Create Your First Chart in 5 Minutes
 
-Get your documentation site running locally and make your first customization.
+This quick start guide will help you create a working chart with minimal setup. We'll use the CDN approach for simplicity.
 
-### Step 1: Set up your local environment
+<Note>
+  This guide uses the CDN for quick setup. For production projects, consider using [npm installation](/installation#1-install-from-npm) instead.
+</Note>
 
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
+## Complete Example
+
+Here's a complete HTML file that creates a column chart:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My First Highcharts</title>
+  
+  <!-- Load Highcharts from CDN -->
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+</head>
+<body>
+  <!-- Container for the chart -->
+  <div id="container" style="width:100%; height:400px;"></div>
+  
+  <script>
+    // Create the chart
+    document.addEventListener('DOMContentLoaded', function () {
+      Highcharts.chart('container', {
+        chart: {
+          type: 'column'
+        },
+        title: {
+          text: 'Corn vs Wheat Production 2023'
+        },
+        subtitle: {
+          text: 'Source: indexmundi.com'
+        },
+        xAxis: {
+          categories: ['USA', 'China', 'Brazil', 'EU', 'Argentina', 'India'],
+          crosshair: true
+        },
+        yAxis: {
+          min: 0,
+          title: {
+            text: '1000 metric tons (MT)'
+          }
+        },
+        tooltip: {
+          valueSuffix: ' (1000 MT)'
+        },
+        series: [
+          {
+            name: 'Corn',
+            data: [387749, 280000, 129000, 64300, 54000, 34300]
+          },
+          {
+            name: 'Wheat',
+            data: [45321, 140000, 10000, 140500, 19500, 113500]
+          }
+        ]
+      });
+    });
+  </script>
+</body>
+</html>
+```
+
+Copy this code into an HTML file and open it in your browser - you'll see a working chart!
+
+## Step-by-Step Breakdown
+
+<Steps>
+  <Step title="Load Highcharts">
+    Include the Highcharts library from the CDN:
     
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
+    ```html
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    ```
     
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
-
-### Step 2: Deploy your changes
-
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
+    <Note>
+      For production, consider loading additional modules like accessibility:
+      ```html
+      <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+      ```
+    </Note>
+  </Step>
+  
+  <Step title="Create a container">
+    Add a `<div>` element where the chart will be rendered:
     
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
+    ```html
+    <div id="container" style="width:100%; height:400px;"></div>
+    ```
+    
+    The container needs an ID (used by Highcharts) and dimensions (width and height).
+  </Step>
+  
+  <Step title="Initialize the chart">
+    Call `Highcharts.chart()` with the container ID and configuration:
+    
+    ```javascript
+    document.addEventListener('DOMContentLoaded', function () {
+      Highcharts.chart('container', {
+        chart: { type: 'column' },
+        title: { text: 'My Chart' },
+        series: [{
+          name: 'Sales',
+          data: [1, 3, 2, 4]
+        }]
+      });
+    });
+    ```
+    
+    The `DOMContentLoaded` event ensures the page is fully loaded before creating the chart.
+  </Step>
+</Steps>
 
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
+## Chart Types
 
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
+Change the chart type by modifying the `chart.type` option:
 
-### Step 3: Go live
+<CodeGroup>
 
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
+```javascript Line Chart
+Highcharts.chart('container', {
+  chart: { type: 'line' },
+  title: { text: 'Monthly Sales' },
+  xAxis: {
+    categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May']
+  },
+  series: [{
+    name: 'Revenue',
+    data: [29.9, 71.5, 106.4, 129.2, 144.0]
+  }]
+});
+```
 
-## Next steps
+```javascript Bar Chart
+Highcharts.chart('container', {
+  chart: { type: 'bar' },
+  title: { text: 'Fruit Consumption' },
+  xAxis: {
+    categories: ['Apples', 'Bananas', 'Oranges']
+  },
+  series: [{
+    name: 'Jane',
+    data: [1, 0, 4]
+  }, {
+    name: 'John',
+    data: [5, 7, 3]
+  }]
+});
+```
 
-Now that you have your docs running, explore these key features:
+```javascript Pie Chart
+Highcharts.chart('container', {
+  chart: { type: 'pie' },
+  title: { text: 'Browser Market Share' },
+  series: [{
+    name: 'Share',
+    data: [
+      { name: 'Chrome', y: 61.41 },
+      { name: 'Firefox', y: 11.84 },
+      { name: 'Safari', y: 10.85 },
+      { name: 'Edge', y: 4.67 },
+      { name: 'Other', y: 11.23 }
+    ]
+  }]
+});
+```
+
+```javascript Area Chart
+Highcharts.chart('container', {
+  chart: { type: 'area' },
+  title: { text: 'Area Chart Example' },
+  xAxis: {
+    categories: ['Q1', 'Q2', 'Q3', 'Q4']
+  },
+  series: [{
+    name: 'Revenue',
+    data: [1000, 1200, 1400, 1100]
+  }, {
+    name: 'Costs',
+    data: [800, 900, 950, 1000]
+  }]
+});
+```
+
+</CodeGroup>
+
+## Using with npm
+
+If you prefer npm installation:
+
+<Steps>
+  <Step title="Install Highcharts">
+    ```bash
+    npm install highcharts --save
+    ```
+  </Step>
+  
+  <Step title="Import and use">
+    ```javascript
+    import Highcharts from 'highcharts';
+    
+    Highcharts.chart('container', {
+      chart: { type: 'line' },
+      title: { text: 'My Chart' },
+      series: [{ data: [1, 2, 3, 4, 5] }]
+    });
+    ```
+  </Step>
+</Steps>
+
+## Adding Interactivity
+
+Enhance your chart with built-in features:
+
+### Enable Exporting
+
+Add the exporting module to let users download charts:
+
+```html
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+```
+
+This adds a menu button to export as PNG, JPEG, PDF, SVG, or CSV.
+
+### Add Tooltips
+
+Customize the tooltip that appears on hover:
+
+```javascript
+Highcharts.chart('container', {
+  tooltip: {
+    pointFormat: '{series.name}: <b>{point.y}</b><br/>',
+    valueSuffix: ' units'
+  },
+  // ... rest of config
+});
+```
+
+### Enable Data Labels
+
+Show values directly on the chart:
+
+```javascript
+Highcharts.chart('container', {
+  plotOptions: {
+    series: {
+      dataLabels: {
+        enabled: true
+      }
+    }
+  },
+  // ... rest of config
+});
+```
+
+## Stock Charts (Time Series)
+
+For time-series data, use Highcharts Stock:
+
+```html
+<script src="https://code.highcharts.com/stock/highstock.js"></script>
+
+<div id="container" style="width:100%; height:400px;"></div>
+
+<script>
+Highcharts.stockChart('container', {
+  rangeSelector: {
+    selected: 1
+  },
+  title: {
+    text: 'USD to EUR Exchange Rate'
+  },
+  series: [{
+    name: 'USD to EUR',
+    data: [
+      [Date.UTC(2024, 0, 1), 0.85],
+      [Date.UTC(2024, 1, 1), 0.87],
+      [Date.UTC(2024, 2, 1), 0.86],
+      [Date.UTC(2024, 3, 1), 0.88]
+    ],
+    tooltip: {
+      valueDecimals: 2
+    }
+  }]
+});
+</script>
+```
+
+<Note>
+  Stock charts use `Highcharts.stockChart()` instead of `Highcharts.chart()`.
+</Note>
+
+## Framework Integration
+
+Highcharts works with popular frameworks:
+
+<CodeGroup>
+
+```jsx React
+import Highcharts from 'highcharts';
+import HighchartsReact from 'highcharts-react-official';
+
+function MyChart() {
+  const options = {
+    title: { text: 'My Chart' },
+    series: [{ data: [1, 2, 3, 4, 5] }]
+  };
+  
+  return <HighchartsReact highcharts={Highcharts} options={options} />;
+}
+```
+
+```vue Vue
+<template>
+  <highcharts :options="chartOptions"></highcharts>
+</template>
+
+<script>
+import { Chart } from 'highcharts-vue';
+
+export default {
+  components: { highcharts: Chart },
+  data() {
+    return {
+      chartOptions: {
+        title: { text: 'My Chart' },
+        series: [{ data: [1, 2, 3, 4, 5] }]
+      }
+    };
+  }
+};
+</script>
+```
+
+```typescript Angular
+import * as Highcharts from 'highcharts';
+
+@Component({
+  selector: 'app-chart',
+  template: '<div id="container"></div>'
+})
+export class ChartComponent implements OnInit {
+  ngOnInit() {
+    Highcharts.chart('container', {
+      title: { text: 'My Chart' },
+      series: [{ data: [1, 2, 3, 4, 5] }]
+    });
+  }
+}
+```
+
+</CodeGroup>
+
+See the [integrations overview](https://www.highcharts.com/integrations/) for official wrappers.
+
+## Common Options
+
+Here are the most commonly used configuration options:
+
+| Option | Description | Example |
+|--------|-------------|----------|
+| `chart.type` | Chart type | `'line'`, `'bar'`, `'pie'`, `'column'` |
+| `title.text` | Chart title | `'Monthly Revenue'` |
+| `xAxis.categories` | X-axis labels | `['Jan', 'Feb', 'Mar']` |
+| `yAxis.title.text` | Y-axis label | `'Sales ($)'` |
+| `series` | Data series | `[{ name: 'Sales', data: [1, 2, 3] }]` |
+| `tooltip` | Hover tooltip config | `{ valueSuffix: ' units' }` |
+| `plotOptions` | Series-specific settings | `{ line: { marker: { enabled: false } } }` |
+
+## Next Steps
 
 <CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
+  <Card title="Your First Chart" icon="graduation-cap" href="/your-first-chart">
+    Detailed tutorial with explanations of every option
+  </Card>
+  
+  <Card title="API Reference" icon="book" href="/api/overview">
+    Complete reference of all configuration options
+  </Card>
+  
+  <Card title="Chart Types" icon="chart-mixed" href="/chart-types/line-area">
+    Explore all available chart types
+  </Card>
+  
+  <Card title="Examples" icon="images" href="/examples/basic-charts">
+    Browse hundreds of live examples
+  </Card>
 </CardGroup>
 
 <Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
+  For a more detailed walkthrough, continue to [Your First Chart](/your-first-chart) where we explain each configuration option in depth.
 </Note>

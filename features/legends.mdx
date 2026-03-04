@@ -1,0 +1,468 @@
+---
+title: Legend Configuration
+description: Configure and customize chart legends to help users identify data series
+---
+
+# Legend Configuration
+
+The legend provides a key to identify different series in your chart. Highcharts offers extensive options to customize legend appearance, position, and behavior.
+
+## Basic Legend Setup
+
+By default, legends are enabled and positioned at the bottom of the chart:
+
+```javascript
+Highcharts.chart('container', {
+  legend: {
+    enabled: true,
+    align: 'center',
+    verticalAlign: 'bottom',
+    layout: 'horizontal'
+  },
+  series: [
+    { name: 'Series 1', data: [1, 2, 3] },
+    { name: 'Series 2', data: [2, 3, 4] }
+  ]
+});
+```
+
+## Legend Positioning
+
+### Alignment and Layout
+
+<CodeGroup>
+```javascript Bottom Center (Default)
+{
+  legend: {
+    align: 'center',
+    verticalAlign: 'bottom',
+    layout: 'horizontal'
+  }
+}
+```
+
+```javascript Right Side
+{
+  legend: {
+    align: 'right',
+    verticalAlign: 'middle',
+    layout: 'vertical'
+  }
+}
+```
+
+```javascript Top Left
+{
+  legend: {
+    align: 'left',
+    verticalAlign: 'top',
+    layout: 'horizontal',
+    x: 0,
+    y: 0
+  }
+}
+```
+
+```javascript Floating
+{
+  legend: {
+    floating: true,
+    align: 'right',
+    verticalAlign: 'top',
+    x: -10,
+    y: 100,
+    backgroundColor: 'rgba(255, 255, 255, 0.85)',
+    borderWidth: 1
+  }
+}
+```
+</CodeGroup>
+
+### Fine-tuning Position
+
+Use `x` and `y` offsets for precise positioning:
+
+```javascript
+{
+  legend: {
+    align: 'right',
+    verticalAlign: 'middle',
+    layout: 'vertical',
+    x: -10,  // 10px from right edge
+    y: 0     // Centered vertically
+  }
+}
+```
+
+## Legend Styling
+
+### Basic Appearance
+
+From the Legend options (`ts/Core/Legend/LegendOptions.ts:64-111`):
+
+```javascript
+{
+  legend: {
+    backgroundColor: '#FFFFFF',
+    borderColor: '#999999',
+    borderWidth: 1,
+    borderRadius: 5,
+    shadow: true,
+    padding: 8
+  }
+}
+```
+
+### Item Styling
+
+Customize how legend items appear:
+
+```javascript
+{
+  legend: {
+    itemStyle: {
+      color: '#333333',
+      fontSize: '12px',
+      fontWeight: 'normal',
+      fontFamily: 'Arial, sans-serif'
+    },
+    itemHoverStyle: {
+      color: '#000000',
+      fontWeight: 'bold'
+    },
+    itemHiddenStyle: {
+      color: '#CCCCCC'
+    },
+    itemDistance: 20  // Space between items
+  }
+}
+```
+
+### Symbol Customization
+
+```javascript
+{
+  legend: {
+    symbolHeight: 12,
+    symbolWidth: 12,
+    symbolRadius: 6,
+    symbolPadding: 5,
+    squareSymbol: true  // Use square symbols instead of circles
+  }
+}
+```
+
+## Legend Behavior
+
+### Interactive Features
+
+<Steps>
+  <Step title="Clickable Items">
+    By default, clicking legend items toggles series visibility:
+    
+    ```javascript
+    {
+      legend: {
+        enabled: true
+        // Items are clickable by default
+      },
+      plotOptions: {
+        series: {
+          events: {
+            legendItemClick: function (e) {
+              // Custom behavior when legend item is clicked
+              console.log('Clicked:', this.name);
+              // Return false to prevent default toggle
+              // return false;
+            }
+          }
+        }
+      }
+    }
+    ```
+  </Step>
+  
+  <Step title="Checkboxes">
+    Add checkboxes to legend items:
+    
+    ```javascript
+    {
+      series: [{
+        name: 'Series 1',
+        showCheckbox: true,
+        selected: true,
+        data: [1, 2, 3]
+      }]
+    }
+    ```
+  </Step>
+  
+  <Step title="Navigation for Long Legends">
+    Enable pagination for legends with many items:
+    
+    ```javascript
+    {
+      legend: {
+        maxHeight: 100,
+        navigation: {
+          enabled: true,
+          animation: true,
+          arrowSize: 12,
+          activeColor: '#003399',
+          inactiveColor: '#CCC',
+          style: {
+            fontSize: '12px'
+          }
+        }
+      }
+    }
+    ```
+  </Step>
+</Steps>
+
+### Series-Specific Legend Options
+
+Control which series appear in the legend:
+
+```javascript
+{
+  series: [
+    {
+      name: 'Visible in legend',
+      showInLegend: true,
+      data: [1, 2, 3]
+    },
+    {
+      name: 'Hidden from legend',
+      showInLegend: false,
+      data: [2, 3, 4]
+    },
+    {
+      name: 'Custom order',
+      legendIndex: 0,  // Display first regardless of series order
+      data: [3, 4, 5]
+    }
+  ]
+}
+```
+
+## Advanced Legend Features
+
+### Custom Legend Labels
+
+<CodeGroup>
+```javascript Label Format
+{
+  legend: {
+    labelFormat: '{name} - Total: {options.total}'
+  },
+  series: [{
+    name: 'Sales',
+    total: 12500,
+    data: [1, 2, 3]
+  }]
+}
+```
+
+```javascript Label Formatter
+{
+  legend: {
+    labelFormatter: function () {
+      return this.name + ' (' + this.yData.length + ' points)';
+    }
+  }
+}
+```
+
+```javascript With Value Display
+{
+  legend: {
+    labelFormatter: function () {
+      const total = this.yData.reduce((a, b) => a + b, 0);
+      return this.name + ': ' + total;
+    }
+  }
+}
+```
+</CodeGroup>
+
+### Legend Title
+
+Add a title to your legend:
+
+```javascript
+{
+  legend: {
+    title: {
+      text: 'Data Series',
+      style: {
+        fontSize: '14px',
+        fontWeight: 'bold',
+        color: '#333'
+      }
+    }
+  }
+}
+```
+
+### Reversed Legend
+
+Reverse the order of legend items:
+
+```javascript
+{
+  legend: {
+    reversed: true
+    // Items appear in reverse order
+  }
+}
+```
+
+## Layout Options
+
+### Responsive Width
+
+Control legend width based on container:
+
+```javascript
+{
+  legend: {
+    width: '60%',      // Percentage of chart width
+    maxWidth: 400,     // Maximum width in pixels
+    itemWidth: 150     // Fixed width per item
+  }
+}
+```
+
+### Column Alignment
+
+For vertical legends with multiple columns:
+
+```javascript
+{
+  legend: {
+    layout: 'vertical',
+    alignColumns: true,  // Align items in columns
+    itemWidth: 100
+  }
+}
+```
+
+## Legend Events
+
+Handle legend interactions:
+
+```javascript
+{
+  legend: {
+    events: {
+      itemClick: function (event) {
+        console.log('Legend item clicked:', event.target.name);
+        // Prevent default behavior
+        // return false;
+      }
+    }
+  }
+}
+```
+
+## Theme Example
+
+From the DarkUnica theme (`ts/Extensions/Themes/DarkUnica.ts:137-153`):
+
+```javascript
+{
+  legend: {
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    itemStyle: {
+      color: '#E0E0E3'
+    },
+    itemHoverStyle: {
+      color: '#FFF'
+    },
+    itemHiddenStyle: {
+      color: '#606063'
+    },
+    title: {
+      style: {
+        color: '#C0C0C0'
+      }
+    }
+  }
+}
+```
+
+## HTML Legends
+
+Create completely custom legends using HTML:
+
+```javascript
+{
+  legend: {
+    enabled: false  // Disable default legend
+  },
+  // Create custom HTML legend
+  chart: {
+    events: {
+      load: function () {
+        const chart = this;
+        const legendDiv = document.getElementById('custom-legend');
+        
+        chart.series.forEach((series, i) => {
+          const item = document.createElement('div');
+          item.innerHTML = `
+            <span style="color: ${series.color};">■</span>
+            ${series.name}
+          `;
+          item.onclick = function () {
+            series.setVisible(!series.visible);
+          };
+          legendDiv.appendChild(item);
+        });
+      }
+    }
+  }
+}
+```
+
+## Accessibility
+
+Ensure legends are accessible:
+
+```javascript
+{
+  legend: {
+    accessibility: {
+      enabled: true,
+      keyboardNavigation: {
+        enabled: true
+      }
+    }
+  }
+}
+```
+
+## Best Practices
+
+<Note>
+**Legend Design Tips**
+- Keep legend labels concise and descriptive
+- Use consistent symbol sizes for visual harmony
+- Position legends where they don't obscure important data
+- Enable navigation for legends with many items
+- Consider using colors with sufficient contrast
+</Note>
+
+<Warning>
+**Common Pitfalls**
+- Too many legend items can overwhelm users
+- Floating legends may obscure data on smaller screens
+- Custom formatters can impact performance with many series
+- Ensure legend width doesn't cause unwanted wrapping
+</Warning>
+
+## Related Resources
+
+- [Styling and Themes](/features/styling-themes)
+- [Accessibility Features](/features/accessibility)
+- [Tooltips and Data Labels](/features/tooltips-labels)

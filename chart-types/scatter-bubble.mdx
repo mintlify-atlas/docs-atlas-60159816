@@ -1,0 +1,413 @@
+---
+title: Scatter and Bubble Charts
+description: Visualize correlations and multi-dimensional data with scatter plots and bubble charts
+---
+
+Scatter and bubble charts use cartesian coordinates to display values for two or more variables, making them ideal for showing relationships and correlations.
+
+## Scatter Charts
+
+Scatter plots display values for two variables as points on a cartesian coordinate system.
+
+### Basic Scatter Chart
+
+<CodeGroup>
+```javascript Simple Scatter
+Highcharts.chart('container', {
+  chart: {
+    type: 'scatter'
+  },
+  title: {
+    text: 'Height vs Weight'
+  },
+  xAxis: {
+    title: {
+      text: 'Height (cm)'
+    }
+  },
+  yAxis: {
+    title: {
+      text: 'Weight (kg)'
+    }
+  },
+  series: [{
+    name: 'Observations',
+    data: [
+      [161.2, 51.6],
+      [167.5, 59.0],
+      [159.5, 49.2],
+      [157.0, 63.0],
+      [155.8, 53.6]
+    ]
+  }]
+});
+```
+
+```javascript Multiple Series
+Highcharts.chart('container', {
+  chart: {
+    type: 'scatter'
+  },
+  title: {
+    text: 'Comparison of Data Sets'
+  },
+  series: [{
+    name: 'Group A',
+    color: 'rgba(223, 83, 83, .5)',
+    data: [[1, 1.5], [2, 2.8], [3, 3.2], [4, 4.1]]
+  }, {
+    name: 'Group B',
+    color: 'rgba(119, 152, 191, .5)',
+    data: [[1, 2.1], [2, 1.9], [3, 2.5], [4, 3.8]]
+  }]
+});
+```
+</CodeGroup>
+
+### Scatter Chart Configuration
+
+Key configuration options from `~/workspace/source/ts/Series/Scatter/ScatterSeriesDefaults.ts:42-137`:
+
+<ParamField path="lineWidth" type="number" default="0">
+  The width of the line connecting data points. Default is 0 (no line).
+  ```javascript
+  plotOptions: {
+    scatter: {
+      lineWidth: 1 // Show connecting lines
+    }
+  }
+  ```
+</ParamField>
+
+<ParamField path="marker" type="object">
+  Marker options. Markers are always enabled for scatter charts.
+  ```javascript
+  plotOptions: {
+    scatter: {
+      marker: {
+        radius: 5,
+        symbol: 'circle',
+        states: {
+          hover: {
+            enabled: true,
+            lineColor: 'rgb(100,100,100)'
+          }
+        }
+      }
+    }
+  }
+  ```
+</ParamField>
+
+<ParamField path="jitter" type="object">
+  Apply random displacement to help distinguish overlapping points.
+  ```javascript
+  plotOptions: {
+    scatter: {
+      jitter: {
+        x: 0.24,
+        y: 0.24
+      }
+    }
+  }
+  ```
+</ParamField>
+
+<ParamField path="findNearestPointBy" type="string" default="'xy'">
+  How to find the nearest point for tooltips. Can be 'x', 'y', or 'xy'.
+</ParamField>
+
+### Jitter for Overlapping Points
+
+When plotting discrete values, jitter helps distinguish overlapping points:
+
+```javascript
+Highcharts.chart('container', {
+  chart: {
+    type: 'scatter'
+  },
+  title: {
+    text: 'Scatter Plot with Jitter'
+  },
+  plotOptions: {
+    scatter: {
+      jitter: {
+        x: 0.24,
+        y: 0
+      },
+      marker: {
+        radius: 2,
+        symbol: 'circle'
+      }
+    }
+  },
+  series: [{
+    data: [
+      [1, 2], [1, 2], [1, 2], [1, 3], [1, 3],
+      [2, 1], [2, 2], [2, 2], [2, 3]
+    ]
+  }]
+});
+```
+
+## Bubble Charts
+
+Bubble charts display three dimensions of data where the third dimension is represented by bubble size.
+
+### Basic Bubble Chart
+
+<CodeGroup>
+```javascript Simple Bubble
+Highcharts.chart('container', {
+  chart: {
+    type: 'bubble'
+  },
+  title: {
+    text: 'Sales Performance'
+  },
+  xAxis: {
+    title: {
+      text: 'Sales'
+    }
+  },
+  yAxis: {
+    title: {
+      text: 'Profit'
+    }
+  },
+  series: [{
+    name: 'Products',
+    data: [
+      [97, 36, 79],
+      [94, 74, 60],
+      [68, 76, 58],
+      [64, 87, 56],
+      [68, 27, 73]
+    ]
+  }]
+});
+```
+
+```javascript With Labels
+Highcharts.chart('container', {
+  chart: {
+    type: 'bubble'
+  },
+  series: [{
+    data: [
+      { x: 95, y: 95, z: 13.8, name: 'Product A' },
+      { x: 86.5, y: 102.9, z: 14.7, name: 'Product B' },
+      { x: 80.8, y: 91.5, z: 15.8, name: 'Product C' }
+    ],
+    dataLabels: {
+      enabled: true,
+      format: '{point.name}'
+    }
+  }]
+});
+```
+</CodeGroup>
+
+### Bubble Chart Configuration
+
+<ParamField path="minSize" type="number | string" default="8">
+  Minimum bubble size. Can be a pixel value or percentage of the plot area.
+  ```javascript
+  plotOptions: {
+    bubble: {
+      minSize: '1%',
+      maxSize: '15%'
+    }
+  }
+  ```
+</ParamField>
+
+<ParamField path="maxSize" type="number | string" default="'20%'">
+  Maximum bubble size. Prevents bubbles from becoming too large.
+</ParamField>
+
+<ParamField path="sizeBy" type="string" default="'area'">
+  Whether the bubble size should be relative to area or width.
+  ```javascript
+  plotOptions: {
+    bubble: {
+      sizeBy: 'width' // Size by diameter instead of area
+    }
+  }
+  ```
+</ParamField>
+
+<ParamField path="zMin" type="number">
+  The minimum for the Z value range. Defaults to the lowest Z value in the data.
+</ParamField>
+
+<ParamField path="zMax" type="number">
+  The maximum for the Z value range. Defaults to the highest Z value in the data.
+</ParamField>
+
+### Multiple Bubble Series
+
+```javascript
+Highcharts.chart('container', {
+  chart: {
+    type: 'bubble',
+    plotBorderWidth: 1
+  },
+  title: {
+    text: 'Multi-Series Bubble Chart'
+  },
+  legend: {
+    enabled: true
+  },
+  xAxis: {
+    gridLineWidth: 1,
+    title: {
+      text: 'Metric X'
+    }
+  },
+  yAxis: {
+    title: {
+      text: 'Metric Y'
+    }
+  },
+  plotOptions: {
+    bubble: {
+      minSize: 3,
+      maxSize: 50
+    }
+  },
+  series: [{
+    name: 'Region A',
+    data: [[97, 36, 79], [94, 74, 60], [68, 76, 58]]
+  }, {
+    name: 'Region B',
+    data: [[25, 10, 87], [2, 75, 59], [11, 54, 8]]
+  }, {
+    name: 'Region C',
+    data: [[47, 47, 21], [20, 12, 4], [6, 76, 91]]
+  }]
+});
+```
+
+## Packed Bubble Chart
+
+A special bubble chart type that packs bubbles without axes:
+
+```javascript
+Highcharts.chart('container', {
+  chart: {
+    type: 'packedbubble'
+  },
+  title: {
+    text: 'Carbon emissions around the world (2014)'
+  },
+  plotOptions: {
+    packedbubble: {
+      minSize: '20%',
+      maxSize: '100%',
+      layoutAlgorithm: {
+        gravitationalConstant: 0.05,
+        splitSeries: true,
+        seriesInteraction: false,
+        dragBetweenSeries: true,
+        parentNodeLimit: true
+      }
+    }
+  },
+  series: [{
+    name: 'Europe',
+    data: [
+      { name: 'Germany', value: 767.1 },
+      { name: 'Croatia', value: 20.7 },
+      { name: 'Belgium', value: 97.2 }
+    ]
+  }, {
+    name: 'Africa',
+    data: [
+      { name: 'South Africa', value: 447.6 },
+      { name: 'Egypt', value: 225.1 }
+    ]
+  }]
+});
+```
+
+## Marker Symbols
+
+Customize marker appearance:
+
+<Tabs>
+  <Tab title="Built-in Symbols">
+    ```javascript
+    plotOptions: {
+      scatter: {
+        marker: {
+          symbol: 'circle' // circle, square, diamond, triangle, triangle-down
+        }
+      }
+    }
+    ```
+  </Tab>
+  <Tab title="Custom Image">
+    ```javascript
+    plotOptions: {
+      scatter: {
+        marker: {
+          symbol: 'url(https://example.com/icon.png)',
+          width: 20,
+          height: 20
+        }
+      }
+    }
+    ```
+  </Tab>
+  <Tab title="Different per Point">
+    ```javascript
+    series: [{
+      data: [
+        { x: 1, y: 2, marker: { symbol: 'square' } },
+        { x: 2, y: 3, marker: { symbol: 'diamond' } },
+        { x: 3, y: 1, marker: { symbol: 'triangle' } }
+      ]
+    }]
+    ```
+  </Tab>
+</Tabs>
+
+## Use Cases
+
+<CardGroup cols={2}>
+  <Card title="Scatter Charts" icon="chart-scatter">
+    - Correlation analysis
+    - Distribution patterns
+    - Outlier detection
+    - Scientific data
+  </Card>
+  <Card title="Bubble Charts" icon="circle">
+    - Three-dimensional data
+    - Portfolio analysis
+    - Market positioning
+    - Resource allocation
+  </Card>
+</CardGroup>
+
+## Data Formats
+
+### Scatter Chart Data
+
+1. **Array of arrays**: `data: [[1, 2], [2, 3], [3, 1]]`
+2. **Array of objects**: `data: [{x: 1, y: 2, name: 'Point 1'}]`
+
+### Bubble Chart Data
+
+Bubble charts require x, y, and z values:
+
+1. **Array of arrays**: `data: [[1, 2, 10], [2, 3, 20]]` (x, y, z)
+2. **Array of objects**: `data: [{x: 1, y: 2, z: 10, name: 'Bubble 1'}]`
+
+<Note>
+  The z value in bubble charts represents the size. Larger z values create larger bubbles.
+</Note>
+
+<Warning>
+  Too many overlapping bubbles can make the chart difficult to read. Consider using jitter or adjusting bubble sizes.
+</Warning>

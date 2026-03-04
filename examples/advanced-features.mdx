@@ -1,0 +1,495 @@
+---
+title: Advanced Features
+description: Explore advanced Highcharts features including annotations, 3D charts, and custom interactions
+---
+
+## Overview
+
+Highcharts offers powerful advanced features for creating sophisticated, interactive visualizations. This guide covers annotations, 3D rendering, and custom interactions.
+
+## Annotations
+
+Add labels and markers to highlight specific data points or events on your chart.
+
+<Tabs>
+  <Tab title="Overview">
+    Annotations allow you to add custom labels, shapes, and markers to highlight important data points or events. They're perfect for:
+    
+    - Marking significant events on time series data
+    - Highlighting outliers or anomalies
+    - Adding context to specific data points
+    - Creating interactive explanations
+  </Tab>
+  
+  <Tab title="Example">
+    ```javascript
+    Highcharts.chart('container', {
+        chart: {
+            type: 'area',
+            zooming: {
+                type: 'x'
+            },
+            panning: true,
+            panKey: 'shift'
+        },
+
+        title: {
+            text: 'TSLA Stock price 2017 - March 17, 2025',
+            align: 'left'
+        },
+
+        annotations: [
+            {
+                draggable: '',
+                labelOptions: {
+                    shape: 'connector'
+                },
+                labels: [
+                    {
+                        allowOverlap: true,
+                        point: {
+                            xAxis: 0,
+                            yAxis: 0,
+                            x: '2020-08-20',
+                            y: 133.45
+                        },
+                        x: -100,
+                        text: '5 for 1 Stock split announcement'
+                    },
+                    {
+                        point: {
+                            xAxis: 0,
+                            yAxis: 0,
+                            x: '2020-12-21',
+                            y: 216.62
+                        },
+                        text: 'Inclusion to S&P 500 Index',
+                        x: -70,
+                        y: -20
+                    },
+                    {
+                        point: {
+                            xAxis: 0,
+                            yAxis: 0,
+                            x: '2021-04-01',
+                            y: 220.58
+                        },
+                        text: 'Record earnings in Q1 2021',
+                        y: -60,
+                        x: -25
+                    },
+                    {
+                        point: {
+                            xAxis: 0,
+                            yAxis: 0,
+                            x: '2021-11-01',
+                            y: 402.86
+                        },
+                        x: -100,
+                        text: 'Stock Sale by Elon Musk'
+                    }
+                ]
+            }
+        ],
+
+        xAxis: {
+            type: 'datetime'
+        },
+
+        yAxis: {
+            title: {
+                text: null
+            },
+            labels: {
+                format: '{value} USD'
+            }
+        },
+
+        series: [
+            {
+                data: data, // Your time series data
+                name: 'TSLA Stock Price',
+                marker: {
+                    enabled: false
+                }
+            }
+        ]
+    });
+    ```
+  </Tab>
+  
+  <Tab title="Required Module">
+    ```html
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/annotations.js"></script>
+    ```
+    
+    <Note>
+    The annotations module must be loaded after the main Highcharts library.
+    </Note>
+  </Tab>
+</Tabs>
+
+## 3D Charts
+
+Create visually stunning 3D charts with customizable viewing angles.
+
+### Interactive 3D Column Chart
+
+```javascript
+const chart = new Highcharts.Chart({
+    chart: {
+        renderTo: 'container',
+        type: 'column',
+        options3d: {
+            enabled: true,
+            alpha: 15,
+            beta: 15,
+            depth: 50,
+            viewDistance: 25
+        }
+    },
+    xAxis: {
+        type: 'category'
+    },
+    yAxis: {
+        title: {
+            enabled: false
+        }
+    },
+    title: {
+        text: 'Sold passenger cars in Norway by brand, May 2024'
+    },
+    plotOptions: {
+        column: {
+            depth: 25
+        }
+    },
+    series: [{
+        data: [
+            ['Toyota', 1795],
+            ['Volkswagen', 1242],
+            ['Volvo', 1074],
+            ['Tesla', 832],
+            ['Hyundai', 593],
+            ['MG', 509],
+            ['Skoda', 471],
+            ['BMW', 442],
+            ['Ford', 385],
+            ['Nissan', 371]
+        ],
+        colorByPoint: true
+    }]
+});
+```
+
+<Accordion title="Adding Interactive Controls">
+
+Make your 3D charts interactive with sliders:
+
+```javascript
+function showValues() {
+    document.getElementById('alpha-value').innerHTML = 
+        chart.options.chart.options3d.alpha;
+    document.getElementById('beta-value').innerHTML = 
+        chart.options.chart.options3d.beta;
+    document.getElementById('depth-value').innerHTML = 
+        chart.options.chart.options3d.depth;
+}
+
+// Activate the sliders
+document.querySelectorAll('#sliders input').forEach(input => 
+    input.addEventListener('input', e => {
+        chart.options.chart.options3d[e.target.id] = parseFloat(e.target.value);
+        showValues();
+        chart.redraw(false);
+    })
+);
+
+showValues();
+```
+
+```html
+<div id="sliders">
+    <label>Alpha: <span id="alpha-value"></span></label>
+    <input id="alpha" type="range" min="0" max="45" value="15" />
+    
+    <label>Beta: <span id="beta-value"></span></label>
+    <input id="beta" type="range" min="-45" max="45" value="15" />
+    
+    <label>Depth: <span id="depth-value"></span></label>
+    <input id="depth" type="range" min="20" max="100" value="50" />
+</div>
+```
+
+</Accordion>
+
+### 3D Options Reference
+
+<AccordionGroup>
+
+<Accordion title="alpha">
+The vertical rotation angle in degrees.
+
+- **Type:** Number
+- **Range:** 0-90
+- **Default:** 0
+
+Controls the tilt of the chart from top to bottom.
+</Accordion>
+
+<Accordion title="beta">
+The horizontal rotation angle in degrees.
+
+- **Type:** Number
+- **Range:** -180 to 180
+- **Default:** 0
+
+Controls the rotation of the chart from left to right.
+</Accordion>
+
+<Accordion title="depth">
+The total depth of the chart.
+
+- **Type:** Number
+- **Default:** 100
+
+Defines how "deep" the 3D effect appears.
+</Accordion>
+
+<Accordion title="viewDistance">
+Defines how far the viewer is from the chart.
+
+- **Type:** Number
+- **Default:** 25
+
+A smaller value creates a more pronounced 3D effect.
+</Accordion>
+
+</AccordionGroup>
+
+## Custom Event Handlers
+
+Create rich interactions with custom event handlers.
+
+### Click Events
+
+```javascript
+Highcharts.chart('container', {
+    chart: {
+        type: 'scatter',
+        events: {
+            click: function (e) {
+                // Chart click event
+                const x = Math.round(e.xAxis[0].value);
+                const y = Math.round(e.yAxis[0].value);
+                
+                console.log('Clicked at:', x, y);
+                this.series[0].addPoint([x, y]);
+            }
+        }
+    },
+    plotOptions: {
+        series: {
+            point: {
+                events: {
+                    click: function () {
+                        // Point click event
+                        console.log('Point clicked:', this.category, this.y);
+                        
+                        if (this.series.data.length > 1) {
+                            this.remove();
+                        }
+                    },
+                    mouseOver: function () {
+                        // Point hover event
+                        this.update({
+                            marker: {
+                                radius: 8
+                            }
+                        });
+                    },
+                    mouseOut: function () {
+                        // Point mouse leave event
+                        this.update({
+                            marker: {
+                                radius: 4
+                            }
+                        });
+                    }
+                }
+            }
+        }
+    },
+    series: [{
+        data: [[20, 20], [80, 80]]
+    }]
+});
+```
+
+## Custom Plugins
+
+Extend Highcharts functionality with custom plugins.
+
+### Pulsating Marker Plugin
+
+```javascript
+// Plugin to add a pulsating marker on add point
+Highcharts.addEvent(Highcharts.Series, 'addPoint', e => {
+    const point = e.point,
+        series = e.target;
+
+    if (!series.pulse) {
+        series.pulse = series.chart.renderer.circle()
+            .add(series.markerGroup);
+    }
+
+    setTimeout(() => {
+        series.pulse
+            .attr({
+                x: series.xAxis.toPixels(point.x, true),
+                y: series.yAxis.toPixels(point.y, true),
+                r: series.options.marker.radius,
+                opacity: 1,
+                fill: series.color
+            })
+            .animate({
+                r: 20,
+                opacity: 0
+            }, {
+                duration: 1000
+            });
+    }, 1);
+});
+```
+
+<Tip>
+This plugin creates a pulsating animation whenever a new point is added to any series, providing immediate visual feedback to users.
+</Tip>
+
+## Performance Optimization
+
+<CardGroup cols={2}>
+
+<Card title="Boost Module" icon="rocket">
+Use the boost module for charts with thousands of data points.
+
+```html
+<script src="https://code.highcharts.com/modules/boost.js"></script>
+```
+</Card>
+
+<Card title="Turbo Threshold" icon="gauge-high">
+Adjust the turboThreshold for better performance with large datasets.
+
+```javascript
+plotOptions: {
+    series: {
+        turboThreshold: 5000
+    }
+}
+```
+</Card>
+
+<Card title="Lazy Loading" icon="spinner">
+Load data asynchronously to improve initial page load times.
+
+```javascript
+async function loadData() {
+    const response = await fetch('/api/data');
+    const data = await response.json();
+    chart.series[0].setData(data);
+}
+```
+</Card>
+
+<Card title="Disable Animations" icon="ban">
+Disable animations for better performance in production.
+
+```javascript
+plotOptions: {
+    series: {
+        animation: false
+    }
+}
+```
+</Card>
+
+</CardGroup>
+
+## Advanced Modules
+
+<Tabs>
+  <Tab title="Exporting">
+    Enable chart export functionality:
+    
+    ```html
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    ```
+    
+    Users can export charts as PNG, JPEG, PDF, SVG, or CSV.
+  </Tab>
+  
+  <Tab title="Drilldown">
+    Create hierarchical charts with drilldown:
+    
+    ```html
+    <script src="https://code.highcharts.com/modules/drilldown.js"></script>
+    ```
+    
+    Enable users to drill down into data categories for more detail.
+  </Tab>
+  
+  <Tab title="Accessibility">
+    Ensure charts are accessible to all users:
+    
+    ```html
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+    ```
+    
+    Provides keyboard navigation, screen reader support, and WCAG compliance.
+  </Tab>
+  
+  <Tab title="Data Tools">
+    Enable data manipulation tools:
+    
+    ```html
+    <script src="https://code.highcharts.com/modules/data.js"></script>
+    ```
+    
+    Load data from CSV, HTML tables, or Google Spreadsheets.
+  </Tab>
+</Tabs>
+
+## Best Practices
+
+<Warning>
+**Performance Considerations:**
+- Limit the number of annotations on a single chart
+- Use the boost module for large datasets (>1000 points)
+- Disable animations for charts that update frequently
+- Consider lazy loading data for complex dashboards
+</Warning>
+
+<Note>
+**Accessibility Tips:**
+- Always include meaningful titles and descriptions
+- Use the accessibility module for keyboard navigation
+- Provide text alternatives for visual information
+- Test with screen readers
+</Note>
+
+## Next Steps
+
+<CardGroup cols={2}>
+
+<Card title="Framework Integrations" href="/examples/integrations" icon="code">
+Learn how to integrate Highcharts with React, Vue, and Angular
+</Card>
+
+<Card title="API Reference" href="/api/overview" icon="book">
+Explore the complete API documentation
+</Card>
+
+</CardGroup>

@@ -1,0 +1,614 @@
+---
+title: Your First Chart
+description: A comprehensive tutorial for creating your first Highcharts visualization with detailed explanations of every step.
+---
+
+## Tutorial: Building a Bar Chart
+
+In this tutorial, you'll create a complete bar chart visualization from scratch. We'll explain every configuration option and show you how to customize the chart.
+
+<Note>
+  This tutorial assumes you've already installed Highcharts. If not, see the [Installation](/installation) guide first.
+</Note>
+
+## What We're Building
+
+We'll create a horizontal bar chart showing fruit consumption by two people. Here's what the final result will look like:
+
+- Horizontal bars (not vertical columns)
+- Two data series (Jane and John)
+- Three categories (Apples, Bananas, Oranges)
+- Interactive tooltips and legend
+
+## Step-by-Step Implementation
+
+<Steps>
+  <Step title="Create the HTML structure">
+    First, create an HTML file with the Highcharts library and a container for the chart:
+    
+    ```html
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>My First Highcharts Bar Chart</title>
+      
+      <!-- Load Highcharts from CDN -->
+      <script src="https://code.highcharts.com/highcharts.js"></script>
+      <script src="https://code.highcharts.com/modules/exporting.js"></script>
+      <script src="https://code.highcharts.com/modules/export-data.js"></script>
+      <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+    </head>
+    <body>
+      <div id="container" style="width:100%; height:400px;"></div>
+    </body>
+    </html>
+    ```
+    
+    **Key points:**
+    - The `container` div needs an ID for Highcharts to reference
+    - Set explicit width and height (either inline styles or CSS)
+    - The exporting module adds the download menu
+    - The accessibility module improves screen reader support
+  </Step>
+  
+  <Step title="Initialize the chart">
+    Add a script tag with the chart initialization code:
+    
+    ```javascript
+    document.addEventListener('DOMContentLoaded', function () {
+      const chart = Highcharts.chart('container', {
+        // Configuration options go here
+      });
+    });
+    ```
+    
+    **Why use DOMContentLoaded?**
+    
+    This event ensures the page is fully loaded before trying to create the chart. Without it, the container div might not exist yet.
+    
+    <Note>
+      The `Highcharts.chart()` function returns a chart object that you can use to update or destroy the chart later.
+    </Note>
+  </Step>
+  
+  <Step title="Set the chart type">
+    Configure the chart type as 'bar' (horizontal bars):
+    
+    ```javascript
+    Highcharts.chart('container', {
+      chart: {
+        type: 'bar'
+      }
+    });
+    ```
+    
+    **Available chart types:**
+    - `'bar'` - Horizontal bars
+    - `'column'` - Vertical bars
+    - `'line'` - Line chart
+    - `'area'` - Area chart
+    - `'pie'` - Pie chart
+    - `'scatter'` - Scatter plot
+    - And [many more](/chart-types)
+  </Step>
+  
+  <Step title="Add title and subtitle">
+    Give your chart a descriptive title:
+    
+    ```javascript
+    Highcharts.chart('container', {
+      chart: { type: 'bar' },
+      title: {
+        text: 'Fruit Consumption'
+      },
+      subtitle: {
+        text: 'Source: Local Survey'
+      }
+    });
+    ```
+    
+    You can customize the title further:
+    
+    ```javascript
+    title: {
+      text: 'Fruit Consumption',
+      align: 'left',  // 'left', 'center', or 'right'
+      style: {
+        fontSize: '18px',
+        fontWeight: 'bold'
+      }
+    }
+    ```
+  </Step>
+  
+  <Step title="Configure the X-axis">
+    Set up the categories for the X-axis (which appears vertically in a bar chart):
+    
+    ```javascript
+    xAxis: {
+      categories: ['Apples', 'Bananas', 'Oranges'],
+      title: {
+        text: null  // Hide the axis title
+      }
+    }
+    ```
+    
+    **Understanding axes in bar charts:**
+    - In bar charts, the X-axis is vertical (shows categories)
+    - The Y-axis is horizontal (shows values)
+    - This is opposite from column charts
+  </Step>
+  
+  <Step title="Configure the Y-axis">
+    Set up the Y-axis (horizontal in bar charts) for the values:
+    
+    ```javascript
+    yAxis: {
+      min: 0,
+      title: {
+        text: 'Fruit eaten',
+        align: 'high'
+      },
+      labels: {
+        overflow: 'justify'
+      }
+    }
+    ```
+    
+    **Y-axis options explained:**
+    - `min: 0` - Start the axis at zero
+    - `align: 'high'` - Position title at the end of the axis
+    - `overflow: 'justify'` - Keep labels within chart bounds
+  </Step>
+  
+  <Step title="Add the data series">
+    Define the data you want to visualize:
+    
+    ```javascript
+    series: [
+      {
+        name: 'Jane',
+        data: [1, 0, 4]
+      },
+      {
+        name: 'John',
+        data: [5, 7, 3]
+      }
+    ]
+    ```
+    
+    **Data structure:**
+    - Each object in the `series` array is one data series
+    - `name` appears in the legend and tooltips
+    - `data` array values correspond to the X-axis categories
+    - First value is Apples, second is Bananas, third is Oranges
+    
+    <Note>
+      You can also use object notation for more control:
+      ```javascript
+      data: [
+        { y: 1, color: '#ff0000' },
+        { y: 0, color: '#00ff00' },
+        { y: 4, color: '#0000ff' }
+      ]
+      ```
+    </Note>
+  </Step>
+</Steps>
+
+## Complete Code
+
+Here's the full implementation:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My First Bar Chart</title>
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+</head>
+<body>
+  <div id="container" style="width:100%; height:400px;"></div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const chart = Highcharts.chart('container', {
+        chart: {
+          type: 'bar'
+        },
+        title: {
+          text: 'Fruit Consumption'
+        },
+        xAxis: {
+          categories: ['Apples', 'Bananas', 'Oranges']
+        },
+        yAxis: {
+          min: 0,
+          title: {
+            text: 'Fruit eaten'
+          }
+        },
+        series: [
+          {
+            name: 'Jane',
+            data: [1, 0, 4]
+          },
+          {
+            name: 'John',
+            data: [5, 7, 3]
+          }
+        ]
+      });
+    });
+  </script>
+</body>
+</html>
+```
+
+## Understanding the Output
+
+When you load this page in a browser, you'll see:
+
+1. **Chart Area**: The main visualization with horizontal bars
+2. **Legend**: Color-coded labels for Jane and John (bottom of chart)
+3. **Axes**: 
+   - X-axis (vertical): Shows fruit categories
+   - Y-axis (horizontal): Shows quantity values
+4. **Tooltips**: Hover over bars to see exact values
+5. **Export Menu**: Button to download chart as image or data (if exporting module loaded)
+
+## Customization Examples
+
+### Change Colors
+
+```javascript
+series: [
+  {
+    name: 'Jane',
+    data: [1, 0, 4],
+    color: '#FF69B4'  // Hot pink
+  },
+  {
+    name: 'John',
+    data: [5, 7, 3],
+    color: '#4169E1'  // Royal blue
+  }
+]
+```
+
+### Add Data Labels
+
+Show values directly on the bars:
+
+```javascript
+plotOptions: {
+  bar: {
+    dataLabels: {
+      enabled: true,
+      format: '{point.y} pieces'
+    }
+  }
+}
+```
+
+### Stack the Bars
+
+Create a stacked bar chart:
+
+```javascript
+plotOptions: {
+  bar: {
+    stacking: 'normal'  // or 'percent' for 100% stacked
+  }
+}
+```
+
+### Customize Tooltips
+
+```javascript
+tooltip: {
+  headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+  pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+               '<td style="padding:0"><b>{point.y} pieces</b></td></tr>',
+  footerFormat: '</table>',
+  shared: true,
+  useHTML: true
+}
+```
+
+## Working with Stock Charts
+
+For time-series data, use `Highcharts.stockChart()` instead:
+
+```javascript
+document.addEventListener('DOMContentLoaded', function () {
+  let chart;
+  chart = Highcharts.stockChart('container', {
+    rangeSelector: {
+      selected: 1
+    },
+    title: {
+      text: 'USD to EUR Exchange Rate'
+    },
+    series: [{
+      name: 'USD to EUR',
+      data: usdToEurData,  // Array of [timestamp, value] pairs
+      tooltip: {
+        valueDecimals: 2
+      }
+    }]
+  });
+});
+```
+
+<Note>
+  Stock charts require the `highstock.js` file instead of `highcharts.js`, or load Stock as a module.
+</Note>
+
+## Example: Column Chart
+
+Here's a complete column chart example based on a real demo from the Highcharts repository:
+
+```javascript
+Highcharts.chart('container', {
+  chart: {
+    type: 'column'
+  },
+  title: {
+    text: 'Corn vs Wheat Production for 2023'
+  },
+  subtitle: {
+    text: 'Source: <a target="_blank" href="https://www.indexmundi.com/agriculture/?commodity=corn">indexmundi</a>'
+  },
+  xAxis: {
+    categories: ['USA', 'China', 'Brazil', 'EU', 'Argentina', 'India'],
+    crosshair: true,
+    accessibility: {
+      description: 'Countries'
+    }
+  },
+  yAxis: {
+    min: 0,
+    title: {
+      text: '1000 metric tons (MT)'
+    }
+  },
+  tooltip: {
+    valueSuffix: ' (1000 MT)'
+  },
+  plotOptions: {
+    column: {
+      pointPadding: 0.2,
+      borderWidth: 0
+    }
+  },
+  series: [
+    {
+      name: 'Corn',
+      data: [387749, 280000, 129000, 64300, 54000, 34300]
+    },
+    {
+      name: 'Wheat',
+      data: [45321, 140000, 10000, 140500, 19500, 113500]
+    }
+  ]
+});
+```
+
+## Using with npm
+
+If you installed via npm, use this approach:
+
+```javascript
+import Highcharts from 'highcharts';
+import 'highcharts/modules/exporting';
+import 'highcharts/modules/export-data';
+
+document.addEventListener('DOMContentLoaded', function () {
+  Highcharts.chart('container', {
+    chart: { type: 'bar' },
+    title: { text: 'Fruit Consumption' },
+    xAxis: { categories: ['Apples', 'Bananas', 'Oranges'] },
+    yAxis: { title: { text: 'Fruit eaten' } },
+    series: [
+      { name: 'Jane', data: [1, 0, 4] },
+      { name: 'John', data: [5, 7, 3] }
+    ]
+  });
+});
+```
+
+## Applying Themes
+
+Customize the look of all your charts with themes:
+
+<CodeGroup>
+
+```html Load Preconfigured Theme
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/themes/dark-unica.js"></script>
+```
+
+```css Styled Mode (CSS)
+@import url("/css/highcharts.css");
+@import url("/css/themes/dark-unica.css");
+```
+
+```javascript Custom Theme
+Highcharts.setOptions({
+  colors: ['#058DC7', '#50B432', '#ED561B', '#DDDF00', '#24CBE5'],
+  chart: {
+    backgroundColor: '#f4f4f4',
+    style: {
+      fontFamily: 'Arial, sans-serif'
+    }
+  },
+  title: {
+    style: {
+      color: '#333',
+      fontSize: '20px'
+    }
+  }
+});
+```
+
+</CodeGroup>
+
+<Note>
+  Apply themes before creating charts using `Highcharts.setOptions()`. These settings will affect all subsequent charts.
+</Note>
+
+## Common Configuration Options
+
+Here's a reference for the most frequently used options:
+
+### Chart Options
+
+```javascript
+chart: {
+  type: 'bar',              // Chart type
+  backgroundColor: '#fff',   // Background color
+  width: 800,               // Fixed width (or null for responsive)
+  height: 400,              // Fixed height
+  animation: true,          // Enable/disable animations
+  zoomType: 'x'            // Enable zooming: 'x', 'y', or 'xy'
+}
+```
+
+### Title and Subtitle
+
+```javascript
+title: {
+  text: 'My Chart',
+  align: 'center',          // 'left', 'center', 'right'
+  style: { fontSize: '18px' }
+},
+subtitle: {
+  text: 'Subtitle text',
+  align: 'center'
+}
+```
+
+### Axes
+
+```javascript
+xAxis: {
+  categories: ['A', 'B', 'C'],  // Category labels
+  title: { text: 'X Axis' },     // Axis title
+  labels: { rotation: -45 }      // Rotate labels
+},
+yAxis: {
+  min: 0,                        // Minimum value
+  max: 100,                      // Maximum value
+  title: { text: 'Y Axis' },
+  plotLines: [{                  // Reference line
+    value: 50,
+    color: 'red',
+    width: 2
+  }]
+}
+```
+
+### Legend
+
+```javascript
+legend: {
+  enabled: true,           // Show/hide legend
+  align: 'right',          // 'left', 'center', 'right'
+  verticalAlign: 'top',    // 'top', 'middle', 'bottom'
+  layout: 'vertical'       // 'horizontal' or 'vertical'
+}
+```
+
+### Tooltip
+
+```javascript
+tooltip: {
+  enabled: true,
+  shared: true,            // Share tooltip across series
+  valueSuffix: ' units',
+  valueDecimals: 2,        // Decimal places
+  backgroundColor: '#fff',
+  borderColor: '#ccc'
+}
+```
+
+## Updating Charts Dynamically
+
+You can update charts after creation:
+
+```javascript
+// Store reference to chart
+const chart = Highcharts.chart('container', { /* config */ });
+
+// Add a new series
+chart.addSeries({
+  name: 'New Series',
+  data: [1, 2, 3]
+});
+
+// Update existing series
+chart.series[0].setData([5, 6, 7]);
+
+// Update chart title
+chart.setTitle({ text: 'New Title' });
+
+// Add a point to a series
+chart.series[0].addPoint([4, 8], true, false);
+```
+
+## Live Examples
+
+Explore these working examples:
+
+- [Simple Bar Chart](https://jsfiddle.net/gh/get/library/pure/highcharts/highcharts/tree/master/samples/highcharts/docs/simple-bar/)
+- [Column Chart Demo](https://jsfiddle.net/gh/get/library/pure/highcharts/highcharts/tree/master/samples/highcharts/demo/column-basic/)
+- [Stock Chart Example](https://jsfiddle.net/gh/get/library/pure/highcharts/highcharts/tree/master/samples/stock/demo/basic-line/)
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Chart Configuration" icon="sliders" href="https://highcharts.com/docs/getting-started/how-to-set-options">
+    Learn how to set and organize chart options
+  </Card>
+  
+  <Card title="API Reference" icon="book" href="/api/overview">
+    Complete API documentation for all options
+  </Card>
+  
+  <Card title="Chart Types" icon="chart-mixed" href="/chart-types/line-area">
+    Explore all available chart types
+  </Card>
+  
+  <Card title="Styling with CSS" icon="paintbrush" href="https://www.highcharts.com/docs/chart-design-and-style/style-by-css">
+    Advanced styling with CSS and styled mode
+  </Card>
+</CardGroup>
+
+## Troubleshooting
+
+### Chart not displaying
+
+- Ensure the container div has explicit dimensions (width and height)
+- Check that Highcharts is loaded before your chart code runs
+- Verify the container ID matches in both HTML and JavaScript
+- Open browser console to check for JavaScript errors
+
+### Data not showing
+
+- Verify your data array matches the number of categories
+- Check that data values are numbers, not strings
+- Ensure the series array is properly formatted
+
+### Module not working
+
+- Load modules **after** the main Highcharts script
+- Check the correct module name and path
+- Some features require specific modules (e.g., 3D charts need `highcharts-3d.js`)
+
+<Note>
+  For more help, visit [www.highcharts.com/support](https://www.highcharts.com/support) or search [Stack Overflow](https://stackoverflow.com/questions/tagged/highcharts) with the `highcharts` tag.
+</Note>

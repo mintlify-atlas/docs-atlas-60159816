@@ -1,0 +1,554 @@
+---
+title: Zooming and Panning
+description: Enable users to explore charts in detail with zooming and panning functionality
+---
+
+# Zooming and Panning
+
+Zooming and panning allow users to explore chart data in greater detail by focusing on specific regions of the chart.
+
+## Zoom Types
+
+Highcharts supports several zoom types that can be configured on the chart level.
+
+### Basic Zoom Configuration
+
+<CodeGroup>
+```javascript X-Axis Zoom
+Highcharts.chart('container', {
+  chart: {
+    zoomType: 'x'
+  },
+  series: [{
+    data: [29.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5]
+  }]
+});
+```
+
+```javascript Y-Axis Zoom
+Highcharts.chart('container', {
+  chart: {
+    zoomType: 'y'
+  },
+  series: [{
+    data: [29.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5]
+  }]
+});
+```
+
+```javascript XY Zoom
+// From samples/highcharts/chart/zoomtype-xy/demo.js
+Highcharts.chart('container', {
+  chart: {
+    type: 'line',
+    zoomType: 'xy'  // Zoom both axes
+  },
+  xAxis: {
+    categories: [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    ]
+  },
+  series: [{
+    data: [
+      29.9, 71.5, 106.4, 129.2, 144.0, 176.0, 
+      135.6, 148.5, 216.4, 194.1, 95.6, 54.4
+    ]
+  }]
+});
+```
+
+```javascript Disabled Zoom
+Highcharts.chart('container', {
+  chart: {
+    zoomType: undefined  // Zooming disabled
+  }
+});
+```
+</CodeGroup>
+
+## Zoom Methods
+
+### Selection-Based Zoom
+
+The default zoom method where users drag to select an area:
+
+```javascript
+{
+  chart: {
+    zoomType: 'xy',
+    // Users click and drag to create a zoom rectangle
+    zooming: {
+      type: 'xy'
+    }
+  }
+}
+```
+
+### Mouse Wheel Zoom
+
+Enable zooming with the mouse wheel:
+
+```javascript
+import Highcharts from 'highcharts';
+import MouseWheelZoom from 'highcharts/modules/mouse-wheel-zoom';
+
+MouseWheelZoom(Highcharts);
+
+Highcharts.chart('container', {
+  chart: {
+    zooming: {
+      mouseWheel: {
+        enabled: true,
+        sensitivity: 1.1,
+        type: 'x'  // or 'y', 'xy'
+      }
+    }
+  },
+  series: [{
+    data: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+  }]
+});
+```
+
+### Pinch to Zoom
+
+On touch devices, pinch gestures enable zooming:
+
+```javascript
+{
+  chart: {
+    zooming: {
+      pinchType: 'x',  // Enable pinch zoom on touch devices
+      type: 'x'        // Regular zoom for desktop
+    }
+  }
+}
+```
+
+### Single Touch Zoom
+
+Enable zoom by dragging with a single finger:
+
+```javascript
+{
+  chart: {
+    zoomBySingleTouch: true,
+    zoomType: 'x'
+  }
+}
+```
+
+## Reset Zoom Button
+
+When users zoom in, a reset button appears to return to the original view.
+
+### Basic Reset Button
+
+```javascript
+{
+  chart: {
+    zoomType: 'xy',
+    resetZoomButton: {
+      theme: {
+        fill: 'white',
+        stroke: 'silver',
+        r: 3,
+        states: {
+          hover: {
+            fill: '#EAEAEA',
+            style: {
+              cursor: 'pointer'
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+### Custom Reset Button Position
+
+<CodeGroup>
+```javascript Relative to Plot Area
+{
+  chart: {
+    zoomType: 'xy',
+    resetZoomButton: {
+      position: {
+        align: 'right',
+        verticalAlign: 'top',
+        x: -10,
+        y: 10
+      },
+      relativeTo: 'plot'
+    }
+  }
+}
+```
+
+```javascript Relative to Chart
+{
+  chart: {
+    zoomType: 'xy',
+    resetZoomButton: {
+      position: {
+        align: 'left',
+        verticalAlign: 'bottom',
+        x: 10,
+        y: -10
+      },
+      relativeTo: 'chart'
+    }
+  }
+}
+```
+</CodeGroup>
+
+### Custom Reset Button Theme
+
+```javascript
+{
+  chart: {
+    zoomType: 'xy',
+    resetZoomButton: {
+      theme: {
+        fill: '#4CAF50',
+        stroke: '#2E7D32',
+        r: 5,
+        style: {
+          color: 'white',
+          fontWeight: 'bold'
+        },
+        states: {
+          hover: {
+            fill: '#66BB6A'
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+## Panning
+
+Panning allows users to move around a zoomed chart without zooming out.
+
+### Enable Panning
+
+<Steps>
+  <Step title="Basic Panning">
+    Enable panning on one or both axes:
+    
+    ```javascript
+    {
+      chart: {
+        panning: {
+          enabled: true,
+          type: 'xy'  // Pan on both axes
+        },
+        zooming: {
+          type: 'xy'
+        }
+      }
+    }
+    ```
+  </Step>
+  
+  <Step title="Pan Key">
+    Require a modifier key for panning:
+    
+    ```javascript
+    {
+      chart: {
+        panKey: 'shift',  // Hold shift to pan
+        panning: {
+          enabled: true,
+          type: 'xy'
+        }
+      }
+    }
+    ```
+    
+    Available keys: `'shift'`, `'ctrl'`, `'alt'`, `'meta'`
+  </Step>
+  
+  <Step title="Panning Type">
+    Control which axes can be panned:
+    
+    ```javascript
+    {
+      chart: {
+        panning: {
+          enabled: true,
+          type: 'x'  // Pan only horizontally
+        }
+      }
+    }
+    ```
+  </Step>
+</Steps>
+
+## Programmatic Zooming
+
+Zoom charts programmatically using API methods:
+
+### Zoom to Range
+
+```javascript
+const chart = Highcharts.chart('container', {
+  chart: {
+    zoomType: 'x'
+  },
+  xAxis: {
+    min: 0,
+    max: 100
+  },
+  series: [{
+    data: [/* data */]
+  }]
+});
+
+// Zoom to specific range
+chart.xAxis[0].setExtremes(20, 60);
+
+// With animation
+chart.xAxis[0].setExtremes(20, 60, true, {
+  duration: 500,
+  easing: 'easeOutBounce'
+});
+```
+
+### Reset Zoom Programmatically
+
+```javascript
+// Reset zoom on all axes
+chart.zoomOut();
+
+// Or reset specific axis
+chart.xAxis[0].setExtremes(null, null);
+```
+
+### Zoom on Chart Events
+
+```javascript
+{
+  chart: {
+    events: {
+      selection: function (event) {
+        // Custom behavior on zoom selection
+        if (event.xAxis) {
+          console.log('Zoomed to:', 
+            event.xAxis[0].min, 
+            event.xAxis[0].max
+          );
+        }
+        // Return false to prevent default zoom
+        // return false;
+      }
+    }
+  }
+}
+```
+
+## Boost Module for Large Datasets
+
+For charts with large datasets, use the Boost module to maintain zoom performance:
+
+```javascript
+import Highcharts from 'highcharts';
+import Boost from 'highcharts/modules/boost';
+
+Boost(Highcharts);
+
+Highcharts.chart('container', {
+  boost: {
+    useGPUTranslations: true,
+    usePreallocated: true
+  },
+  chart: {
+    zoomType: 'x'
+  },
+  series: [{
+    data: largeDataArray,  // Thousands or millions of points
+    boostThreshold: 5000   // Enable boost for > 5000 points
+  }]
+});
+```
+
+## Zooming on Different Chart Types
+
+### Polar Charts
+
+```javascript
+{
+  chart: {
+    polar: true,
+    zoomType: undefined  // Zooming not supported on polar charts
+  }
+}
+```
+
+### Non-Cartesian Series
+
+For pie charts and other non-cartesian types, use the NonCartesianSeriesZoom module:
+
+```javascript
+import NonCartesianSeriesZoom from 'highcharts/modules/non-cartesian-series-zoom';
+
+NonCartesianSeriesZoom(Highcharts);
+```
+
+## Advanced Zoom Features
+
+### Scrollbar for Navigation
+
+Combine zooming with a scrollbar:
+
+```javascript
+{
+  scrollbar: {
+    enabled: true,
+    barBackgroundColor: '#808083',
+    barBorderRadius: 7,
+    barBorderWidth: 0,
+    buttonBackgroundColor: '#606063',
+    buttonBorderWidth: 0,
+    buttonArrowColor: '#CCC',
+    buttonBorderRadius: 7,
+    rifleColor: '#FFF',
+    trackBackgroundColor: '#404043',
+    trackBorderWidth: 1,
+    trackBorderRadius: 8,
+    trackBorderColor: '#404043'
+  },
+  xAxis: {
+    scrollbar: {
+      enabled: true
+    },
+    min: 0,
+    max: 10  // Show only 10 points at a time
+  }
+}
+```
+
+### Min/Max Zoom Range
+
+Set limits on how far users can zoom:
+
+```javascript
+{
+  xAxis: {
+    minRange: 5,  // Minimum range that can be displayed
+    maxZoom: 100  // Deprecated - use minRange instead
+  }
+}
+```
+
+### Zoom Animation
+
+```javascript
+{
+  chart: {
+    animation: {
+      duration: 1000,
+      easing: 'easeOutBounce'
+    },
+    zoomType: 'x'
+  }
+}
+```
+
+## Accessibility
+
+Ensure zoom features are accessible:
+
+```javascript
+{
+  accessibility: {
+    screenReaderSection: {
+      beforeChartFormat: '<div>Use arrow keys to navigate chart. ' +
+        'Press + or - to zoom in or out.</div>'
+    },
+    keyboardNavigation: {
+      enabled: true
+    }
+  },
+  chart: {
+    zoomType: 'xy'
+  }
+}
+```
+
+## Best Practices
+
+<Note>
+**Zoom Performance Tips**
+- Use the Boost module for datasets with > 1000 points
+- Enable `useGPUTranslations` for better performance
+- Consider using `turboThreshold` to optimize large datasets
+- Use `pointStart` and `pointInterval` instead of explicit x values
+</Note>
+
+<Warning>
+**Important Considerations**
+- Zooming is not supported on all chart types (e.g., pie charts)
+- Mobile devices may require specific touch configurations
+- Consider showing instructions for zoom controls
+- Test zoom behavior on different screen sizes
+- Pan key modifiers may not work on all operating systems
+</Warning>
+
+## Complete Example
+
+```javascript
+Highcharts.chart('container', {
+  chart: {
+    type: 'line',
+    zooming: {
+      type: 'xy',
+      mouseWheel: {
+        enabled: true,
+        sensitivity: 1.1
+      },
+      pinchType: 'xy'
+    },
+    panning: {
+      enabled: true,
+      type: 'xy'
+    },
+    panKey: 'shift',
+    resetZoomButton: {
+      position: {
+        align: 'right',
+        verticalAlign: 'top',
+        x: -10,
+        y: 10
+      },
+      relativeTo: 'plot'
+    }
+  },
+  title: {
+    text: 'Zoom and Pan Demo'
+  },
+  subtitle: {
+    text: 'Drag to zoom, Shift+drag to pan, Mouse wheel to zoom'
+  },
+  xAxis: {
+    minRange: 5
+  },
+  series: [{
+    name: 'Data',
+    data: [29.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 
+           216.4, 194.1, 95.6, 54.4, 29.9, 71.5, 106.4, 129.2]
+  }]
+});
+```
+
+## Related Resources
+
+- [Accessibility Features](/features/accessibility)
+- [Export Functionality](/features/exporting)
+- [Tooltips and Data Labels](/features/tooltips-labels)

@@ -1,0 +1,685 @@
+---
+title: Framework Integrations
+description: Learn how to integrate Highcharts with React, Vue, Angular, and other popular frameworks
+---
+
+## Overview
+
+Highcharts provides official wrappers and components for popular JavaScript frameworks, making it easy to create reactive, component-based charts.
+
+## React Integration
+
+Use the official `@highcharts/react` wrapper for seamless React integration.
+
+### Installation
+
+<CodeGroup>
+
+```bash npm
+npm install highcharts @highcharts/react
+```
+
+```bash yarn
+yarn add highcharts @highcharts/react
+```
+
+```bash pnpm
+pnpm add highcharts @highcharts/react
+```
+
+</CodeGroup>
+
+### Basic Example
+
+<Tabs>
+  <Tab title="JSX Component">
+    ```jsx
+    import React from 'react';
+    import { Chart, Series, Title } from '@highcharts/react';
+
+    export default function ChartComponent() {
+        return (
+            <div>
+                <Chart>
+                    <Title>Line chart</Title>
+                    <Series type="line" data={[1, 2, 3]} />
+                </Chart>
+            </div>
+        );
+    }
+    ```
+  </Tab>
+  
+  <Tab title="With Options Object">
+    ```jsx
+    import React from 'react';
+    import Highcharts from 'highcharts';
+    import HighchartsReact from 'highcharts-react-official';
+
+    const ChartComponent = () => {
+        const options = {
+            title: {
+                text: 'My Chart'
+            },
+            series: [{
+                type: 'line',
+                data: [1, 2, 3, 4, 5]
+            }]
+        };
+
+        return (
+            <div>
+                <HighchartsReact
+                    highcharts={Highcharts}
+                    options={options}
+                />
+            </div>
+        );
+    };
+
+    export default ChartComponent;
+    ```
+  </Tab>
+  
+  <Tab title="With State">
+    ```jsx
+    import React, { useState, useEffect } from 'react';
+    import Highcharts from 'highcharts';
+    import HighchartsReact from 'highcharts-react-official';
+
+    const DynamicChart = () => {
+        const [data, setData] = useState([1, 2, 3, 4, 5]);
+
+        useEffect(() => {
+            // Update data every 2 seconds
+            const interval = setInterval(() => {
+                setData(prevData => [...prevData.slice(1), Math.random() * 10]);
+            }, 2000);
+
+            return () => clearInterval(interval);
+        }, []);
+
+        const options = {
+            title: {
+                text: 'Live Data Chart'
+            },
+            series: [{
+                type: 'line',
+                data: data
+            }]
+        };
+
+        return <HighchartsReact highcharts={Highcharts} options={options} />;
+    };
+
+    export default DynamicChart;
+    ```
+  </Tab>
+</Tabs>
+
+### React Hooks Example
+
+```jsx
+import React, { useRef, useEffect } from 'react';
+import Highcharts from 'highcharts';
+import HighchartsReact from 'highcharts-react-official';
+
+const ChartWithRef = () => {
+    const chartComponentRef = useRef(null);
+
+    useEffect(() => {
+        // Access the chart instance
+        const chart = chartComponentRef.current?.chart;
+        
+        if (chart) {
+            // Perform operations on the chart
+            console.log('Chart instance:', chart);
+            
+            // Example: Add a point after 2 seconds
+            setTimeout(() => {
+                chart.series[0].addPoint(Math.random() * 10);
+            }, 2000);
+        }
+    }, []);
+
+    const options = {
+        title: { text: 'Chart with Ref' },
+        series: [{ type: 'line', data: [1, 2, 3, 4, 5] }]
+    };
+
+    return (
+        <HighchartsReact
+            highcharts={Highcharts}
+            options={options}
+            ref={chartComponentRef}
+        />
+    );
+};
+
+export default ChartWithRef;
+```
+
+<Note>
+Use refs to access the chart instance directly and call Highcharts API methods.
+</Note>
+
+## Vue Integration
+
+Integrate Highcharts with Vue 3 using the official wrapper.
+
+### Installation
+
+```bash
+npm install highcharts highcharts-vue
+```
+
+### Basic Example
+
+<Tabs>
+  <Tab title="Composition API">
+    ```vue
+    <template>
+      <div>
+        <highcharts :options="chartOptions"></highcharts>
+      </div>
+    </template>
+
+    <script setup>
+    import { ref } from 'vue';
+    import { Chart } from 'highcharts-vue';
+
+    const chartOptions = ref({
+      title: {
+        text: 'My Vue Chart'
+      },
+      series: [{
+        type: 'line',
+        data: [1, 2, 3, 4, 5]
+      }]
+    });
+    </script>
+    ```
+  </Tab>
+  
+  <Tab title="Options API">
+    ```vue
+    <template>
+      <div>
+        <highcharts :options="chartOptions"></highcharts>
+      </div>
+    </template>
+
+    <script>
+    import { Chart } from 'highcharts-vue';
+
+    export default {
+      components: {
+        highcharts: Chart
+      },
+      data() {
+        return {
+          chartOptions: {
+            title: {
+              text: 'My Vue Chart'
+            },
+            series: [{
+              type: 'line',
+              data: [1, 2, 3, 4, 5]
+            }]
+          }
+        };
+      }
+    };
+    </script>
+    ```
+  </Tab>
+  
+  <Tab title="Dynamic Data">
+    ```vue
+    <template>
+      <div>
+        <highcharts :options="chartOptions"></highcharts>
+        <button @click="addPoint">Add Point</button>
+      </div>
+    </template>
+
+    <script setup>
+    import { ref } from 'vue';
+    import { Chart } from 'highcharts-vue';
+
+    const chartOptions = ref({
+      title: { text: 'Dynamic Chart' },
+      series: [{
+        type: 'line',
+        data: [1, 2, 3, 4, 5]
+      }]
+    });
+
+    const addPoint = () => {
+      const newData = [...chartOptions.value.series[0].data, Math.random() * 10];
+      chartOptions.value.series[0].data = newData;
+    };
+    </script>
+    ```
+  </Tab>
+</Tabs>
+
+### Global Registration
+
+```javascript
+// main.js
+import { createApp } from 'vue';
+import App from './App.vue';
+import Highcharts from 'highcharts';
+import HighchartsVue from 'highcharts-vue';
+
+const app = createApp(App);
+
+app.use(HighchartsVue, { highcharts: Highcharts });
+app.mount('#app');
+```
+
+## Angular Integration
+
+Use `highcharts-angular` for Angular applications.
+
+### Installation
+
+```bash
+npm install highcharts highcharts-angular
+```
+
+### Module Setup
+
+```typescript
+// app.module.ts
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { HighchartsChartModule } from 'highcharts-angular';
+import { AppComponent } from './app.component';
+
+@NgModule({
+  declarations: [AppComponent],
+  imports: [
+    BrowserModule,
+    HighchartsChartModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+
+### Component Example
+
+<Tabs>
+  <Tab title="Basic">
+    ```typescript
+    import { Component } from '@angular/core';
+    import * as Highcharts from 'highcharts';
+
+    @Component({
+      selector: 'app-chart',
+      template: `
+        <highcharts-chart
+          [Highcharts]="Highcharts"
+          [options]="chartOptions"
+          style="width: 100%; height: 400px; display: block;"
+        ></highcharts-chart>
+      `
+    })
+    export class ChartComponent {
+      Highcharts: typeof Highcharts = Highcharts;
+      
+      chartOptions: Highcharts.Options = {
+        title: {
+          text: 'My Angular Chart'
+        },
+        series: [{
+          type: 'line',
+          data: [1, 2, 3, 4, 5]
+        }]
+      };
+    }
+    ```
+  </Tab>
+  
+  <Tab title="With Chart Reference">
+    ```typescript
+    import { Component, ViewChild } from '@angular/core';
+    import * as Highcharts from 'highcharts';
+    import { HighchartsChartComponent } from 'highcharts-angular';
+
+    @Component({
+      selector: 'app-chart',
+      template: `
+        <highcharts-chart
+          #chartRef
+          [Highcharts]="Highcharts"
+          [options]="chartOptions"
+        ></highcharts-chart>
+        <button (click)="addPoint()">Add Point</button>
+      `
+    })
+    export class ChartComponent {
+      @ViewChild('chartRef', { static: false }) 
+      chartRef!: HighchartsChartComponent;
+      
+      Highcharts: typeof Highcharts = Highcharts;
+      
+      chartOptions: Highcharts.Options = {
+        title: { text: 'Dynamic Chart' },
+        series: [{
+          type: 'line',
+          data: [1, 2, 3, 4, 5]
+        }]
+      };
+
+      addPoint(): void {
+        const chart = this.chartRef.chart;
+        chart.series[0].addPoint(Math.random() * 10);
+      }
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Vanilla JavaScript
+
+For projects without a framework, use Highcharts directly.
+
+### CDN Usage
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+</head>
+<body>
+    <div id="container"></div>
+    
+    <script>
+        Highcharts.chart('container', {
+            title: {
+                text: 'My Chart'
+            },
+            series: [{
+                type: 'line',
+                data: [1, 2, 3, 4, 5]
+            }]
+        });
+    </script>
+</body>
+</html>
+```
+
+### NPM/ES Modules
+
+```javascript
+import Highcharts from 'highcharts';
+
+Highcharts.chart('container', {
+    title: {
+        text: 'My Chart'
+    },
+    series: [{
+        type: 'line',
+        data: [1, 2, 3, 4, 5]
+    }]
+});
+```
+
+## TypeScript Support
+
+Highcharts provides comprehensive TypeScript definitions.
+
+```typescript
+import * as Highcharts from 'highcharts';
+
+const options: Highcharts.Options = {
+    chart: {
+        type: 'line'
+    },
+    title: {
+        text: 'TypeScript Chart'
+    },
+    series: [{
+        type: 'line',
+        data: [1, 2, 3, 4, 5]
+    }]
+};
+
+const chart: Highcharts.Chart = Highcharts.chart('container', options);
+
+// Type-safe API calls
+chart.series[0].addPoint(6);
+chart.setTitle({ text: 'Updated Title' });
+```
+
+<Tip>
+TypeScript provides autocomplete and type checking for all Highcharts options and API methods.
+</Tip>
+
+## Loading Additional Modules
+
+<AccordionGroup>
+
+<Accordion title="React">
+```jsx
+import Highcharts from 'highcharts';
+import HighchartsReact from 'highcharts-react-official';
+import highcharts3d from 'highcharts/highcharts-3d';
+import exporting from 'highcharts/modules/exporting';
+
+// Initialize modules
+highcharts3d(Highcharts);
+exporting(Highcharts);
+
+const ChartComponent = () => {
+    const options = {
+        chart: {
+            type: 'column',
+            options3d: {
+                enabled: true,
+                alpha: 15,
+                beta: 15
+            }
+        },
+        series: [{ data: [1, 2, 3, 4, 5] }]
+    };
+
+    return <HighchartsReact highcharts={Highcharts} options={options} />;
+};
+```
+</Accordion>
+
+<Accordion title="Vue">
+```javascript
+import Highcharts from 'highcharts';
+import highcharts3d from 'highcharts/highcharts-3d';
+import exporting from 'highcharts/modules/exporting';
+
+// Initialize modules
+highcharts3d(Highcharts);
+exporting(Highcharts);
+
+export default {
+    data() {
+        return {
+            chartOptions: {
+                chart: {
+                    type: 'column',
+                    options3d: {
+                        enabled: true
+                    }
+                },
+                series: [{ data: [1, 2, 3, 4, 5] }]
+            }
+        };
+    }
+};
+```
+</Accordion>
+
+<Accordion title="Angular">
+```typescript
+import * as Highcharts from 'highcharts';
+import HC_3D from 'highcharts/highcharts-3d';
+import HC_exporting from 'highcharts/modules/exporting';
+
+// Initialize modules
+HC_3D(Highcharts);
+HC_exporting(Highcharts);
+
+@Component({
+    selector: 'app-chart',
+    template: `<highcharts-chart [Highcharts]="Highcharts" [options]="chartOptions"></highcharts-chart>`
+})
+export class ChartComponent {
+    Highcharts: typeof Highcharts = Highcharts;
+    chartOptions: Highcharts.Options = {
+        chart: {
+            type: 'column',
+            options3d: { enabled: true }
+        },
+        series: [{ type: 'column', data: [1, 2, 3, 4, 5] }]
+    };
+}
+```
+</Accordion>
+
+</AccordionGroup>
+
+## Common Modules
+
+<CardGroup cols={2}>
+
+<Card title="3D Charts" icon="cube">
+```javascript
+import highcharts3d from 'highcharts/highcharts-3d';
+highcharts3d(Highcharts);
+```
+</Card>
+
+<Card title="Exporting" icon="download">
+```javascript
+import exporting from 'highcharts/modules/exporting';
+exporting(Highcharts);
+```
+</Card>
+
+<Card title="Accessibility" icon="universal-access">
+```javascript
+import accessibility from 'highcharts/modules/accessibility';
+accessibility(Highcharts);
+```
+</Card>
+
+<Card title="Annotations" icon="pen">
+```javascript
+import annotations from 'highcharts/modules/annotations';
+annotations(Highcharts);
+```
+</Card>
+
+<Card title="Boost" icon="rocket">
+```javascript
+import boost from 'highcharts/modules/boost';
+boost(Highcharts);
+```
+</Card>
+
+<Card title="Drilldown" icon="chart-simple">
+```javascript
+import drilldown from 'highcharts/modules/drilldown';
+drilldown(Highcharts);
+```
+</Card>
+
+</CardGroup>
+
+## Best Practices
+
+<Warning>
+**Important Considerations:**
+- Always import and initialize modules before creating charts
+- Use refs to access chart instances in React and Angular
+- Avoid recreating chart options on every render
+- Use memoization for complex chart options
+- Clean up chart instances in component unmount hooks
+</Warning>
+
+<Note>
+**Performance Tips:**
+- Lazy load Highcharts modules only when needed
+- Use the boost module for large datasets
+- Debounce chart updates when data changes frequently
+- Consider using web workers for data processing
+</Note>
+
+## Server-Side Rendering (SSR)
+
+<Tabs>
+  <Tab title="Next.js">
+    ```jsx
+    'use client'; // Mark as client component
+
+    import { useEffect, useState } from 'react';
+    import dynamic from 'next/dynamic';
+
+    const HighchartsReact = dynamic(
+      () => import('highcharts-react-official'),
+      { ssr: false }
+    );
+
+    export default function Chart() {
+      const [Highcharts, setHighcharts] = useState(null);
+
+      useEffect(() => {
+        import('highcharts').then(module => {
+          setHighcharts(module.default);
+        });
+      }, []);
+
+      if (!Highcharts) return <div>Loading...</div>;
+
+      const options = {
+        series: [{ data: [1, 2, 3] }]
+      };
+
+      return <HighchartsReact highcharts={Highcharts} options={options} />;
+    }
+    ```
+  </Tab>
+  
+  <Tab title="Nuxt.js">
+    ```vue
+    <template>
+      <client-only>
+        <highcharts :options="chartOptions"></highcharts>
+      </client-only>
+    </template>
+
+    <script setup>
+    const chartOptions = {
+      series: [{ data: [1, 2, 3] }]
+    };
+    </script>
+    ```
+  </Tab>
+</Tabs>
+
+## Next Steps
+
+<CardGroup cols={2}>
+
+<Card title="Basic Charts" href="/examples/basic-charts" icon="chart-line">
+Explore basic chart examples and patterns
+</Card>
+
+<Card title="API Reference" href="/api/overview" icon="book">
+Browse the complete API documentation
+</Card>
+
+</CardGroup>

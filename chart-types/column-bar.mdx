@@ -1,0 +1,325 @@
+---
+title: Column and Bar Charts
+description: Create column and bar charts with Highcharts for comparing categorical data and showing distributions
+---
+
+Column and bar charts are excellent for comparing discrete categories of data. Column charts display vertical bars, while bar charts display horizontal bars.
+
+## Column Charts
+
+Column charts display one column per value along an X axis, making them ideal for comparing values across categories.
+
+### Basic Column Chart
+
+<CodeGroup>
+```javascript Simple Column Chart
+Highcharts.chart('container', {
+  chart: {
+    type: 'column'
+  },
+  title: {
+    text: 'Monthly Revenue'
+  },
+  xAxis: {
+    categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May']
+  },
+  yAxis: {
+    title: {
+      text: 'Revenue ($)'
+    }
+  },
+  series: [{
+    name: 'Revenue',
+    data: [49000, 71000, 106000, 129000, 144000]
+  }]
+});
+```
+
+```javascript Grouped Columns
+Highcharts.chart('container', {
+  chart: {
+    type: 'column'
+  },
+  xAxis: {
+    categories: ['Q1', 'Q2', 'Q3', 'Q4']
+  },
+  series: [{
+    name: '2023',
+    data: [49, 71, 106, 129]
+  }, {
+    name: '2024',
+    data: [83, 78, 98, 93]
+  }]
+});
+```
+</CodeGroup>
+
+### Column Chart Configuration
+
+Key configuration options from `~/workspace/source/ts/Series/Column/ColumnSeriesDefaults.ts:45-406`:
+
+<ParamField path="borderRadius" type="number | string" default="3">
+  The corner radius of the border surrounding each column. Can be a number (pixels) or percentage string.
+  ```javascript
+  plotOptions: {
+    column: {
+      borderRadius: '50%' // Creates rounded columns
+    }
+  }
+  ```
+</ParamField>
+
+<ParamField path="borderWidth" type="number">
+  The width of the border surrounding each column. Defaults to 1 when there is room, but 0 when columns are dense.
+  ```javascript
+  plotOptions: {
+    column: {
+      borderWidth: 2,
+      borderColor: '#000000'
+    }
+  }
+  ```
+</ParamField>
+
+<ParamField path="groupPadding" type="number" default="0.2">
+  Padding between each value group, in x axis units.
+  ```javascript
+  plotOptions: {
+    column: {
+      groupPadding: 0.1 // Reduce space between groups
+    }
+  }
+  ```
+</ParamField>
+
+<ParamField path="pointPadding" type="number" default="0.1">
+  Padding between each column or bar, in x axis units.
+  ```javascript
+  plotOptions: {
+    column: {
+      pointPadding: 0 // Tightly packed columns
+    }
+  }
+  ```
+</ParamField>
+
+<ParamField path="pointWidth" type="number">
+  A pixel value specifying a fixed width for each column. When undefined, width is calculated from pointPadding and groupPadding.
+  ```javascript
+  plotOptions: {
+    column: {
+      pointWidth: 20 // Fixed 20px width
+    }
+  }
+  ```
+</ParamField>
+
+<ParamField path="maxPointWidth" type="number">
+  The maximum allowed pixel width for a column. Prevents columns from becoming too wide with few data points.
+</ParamField>
+
+<ParamField path="minPointLength" type="number" default="0">
+  The minimal height for a column. By default, 0 values are not shown. Set to a pixel value like 3 to visualize near-zero points.
+</ParamField>
+
+<ParamField path="colorByPoint" type="boolean" default="false">
+  When true, each column receives a different color from the colors array.
+</ParamField>
+
+### Stacked Column Chart
+
+<Tabs>
+  <Tab title="Normal Stacking">
+    ```javascript
+    Highcharts.chart('container', {
+      chart: {
+        type: 'column'
+      },
+      plotOptions: {
+        column: {
+          stacking: 'normal'
+        }
+      },
+      series: [{
+        name: 'Product A',
+        data: [5, 3, 4, 7, 2]
+      }, {
+        name: 'Product B',
+        data: [2, 2, 3, 2, 1]
+      }, {
+        name: 'Product C',
+        data: [3, 4, 4, 2, 5]
+      }]
+    });
+    ```
+  </Tab>
+  <Tab title="Percentage Stacking">
+    ```javascript
+    Highcharts.chart('container', {
+      chart: {
+        type: 'column'
+      },
+      plotOptions: {
+        column: {
+          stacking: 'percent'
+        }
+      },
+      series: [{
+        name: 'Product A',
+        data: [5, 3, 4, 7, 2]
+      }, {
+        name: 'Product B',
+        data: [2, 2, 3, 2, 1]
+      }]
+    });
+    ```
+  </Tab>
+</Tabs>
+
+## Bar Charts
+
+Bar charts are simply column charts rotated 90 degrees, displaying horizontal bars instead of vertical columns.
+
+### Basic Bar Chart
+
+```javascript
+Highcharts.chart('container', {
+  chart: {
+    type: 'bar'
+  },
+  title: {
+    text: 'Top 5 Products'
+  },
+  xAxis: {
+    categories: ['Product A', 'Product B', 'Product C', 'Product D', 'Product E']
+  },
+  yAxis: {
+    title: {
+      text: 'Sales'
+    }
+  },
+  series: [{
+    name: 'Sales',
+    data: [107, 31, 635, 203, 2]
+  }]
+});
+```
+
+<Note>
+  Bar charts use the same configuration options as column charts. Simply change `chart.type` to 'bar'.
+</Note>
+
+## Advanced Column Types
+
+### Column Range
+
+Display ranges with a low and high value for each point.
+
+```javascript
+Highcharts.chart('container', {
+  chart: {
+    type: 'columnrange'
+  },
+  title: {
+    text: 'Temperature Ranges'
+  },
+  yAxis: {
+    title: {
+      text: 'Temperature (°C)'
+    }
+  },
+  series: [{
+    name: 'Temperatures',
+    data: [
+      [-9.7, 9.4],
+      [-8.7, 6.5],
+      [-3.5, 9.4],
+      [-1.4, 19.9],
+      [0.0, 22.6]
+    ]
+  }]
+});
+```
+
+### Waterfall Chart
+
+Show how an initial value is affected by intermediate positive or negative values.
+
+```javascript
+Highcharts.chart('container', {
+  chart: {
+    type: 'waterfall'
+  },
+  title: {
+    text: 'Cash Flow'
+  },
+  series: [{
+    data: [
+      { name: 'Start', y: 120000 },
+      { name: 'Product Revenue', y: 569000 },
+      { name: 'Service Revenue', y: 231000 },
+      { name: 'Positive Balance', isIntermediateSum: true },
+      { name: 'Fixed Costs', y: -342000 },
+      { name: 'Variable Costs', y: -233000 },
+      { name: 'Balance', isSum: true }
+    ]
+  }]
+});
+```
+
+## Data Labels and Styling
+
+```javascript
+Highcharts.chart('container', {
+  chart: {
+    type: 'column'
+  },
+  plotOptions: {
+    column: {
+      borderRadius: '25%',
+      dataLabels: {
+        enabled: true,
+        format: '{y} units'
+      },
+      states: {
+        hover: {
+          brightness: 0.1,
+          borderColor: '#000000'
+        }
+      }
+    }
+  },
+  series: [{
+    data: [29, 71, 106, 129, 144, 176]
+  }]
+});
+```
+
+## Use Cases
+
+<CardGroup cols={2}>
+  <Card title="Column Charts" icon="chart-column">
+    - Comparing values across categories
+    - Showing changes over time
+    - Displaying frequency distributions
+    - Budget vs. actual comparisons
+  </Card>
+  <Card title="Bar Charts" icon="chart-bar">
+    - Ranking items
+    - Long category names
+    - Comparing many categories
+    - Survey results
+  </Card>
+</CardGroup>
+
+## Data Formats
+
+Column and bar charts support these data formats:
+
+1. **Array of numbers**: `data: [0, 5, 3, 5]`
+2. **Array of arrays**: `data: [[0, 6], [1, 2], [2, 6]]`
+3. **Array of objects**: `data: [{x: 1, y: 9, name: "Point2", color: "#00FF00"}]`
+
+<Warning>
+  When using `colorByPoint: true`, each point gets a different color, which may not be suitable for all use cases.
+</Warning>

@@ -1,0 +1,391 @@
+---
+title: Tooltips and Data Labels
+description: Configure interactive tooltips and data labels to display information about chart data points
+---
+
+# Tooltips and Data Labels
+
+Tooltips and data labels are essential features for displaying detailed information about data points in your charts.
+
+## Tooltips
+
+Tooltips appear when users hover over data points, providing contextual information about the data.
+
+### Basic Tooltip Configuration
+
+```javascript
+Highcharts.chart('container', {
+  tooltip: {
+    enabled: true,
+    backgroundColor: 'rgba(255, 255, 255, 0.85)',
+    borderWidth: 1,
+    borderColor: '#999',
+    borderRadius: 3,
+    shadow: true
+  },
+  series: [{
+    data: [29.9, 71.5, 106.4, 129.2]
+  }]
+});
+```
+
+### Tooltip Positioning
+
+<CodeGroup>
+```javascript Default
+{
+  tooltip: {
+    // Tooltip follows the mouse pointer
+    followPointer: false,
+    
+    // Distance from point to tooltip
+    distance: 16
+  }
+}
+```
+
+```javascript Custom Position
+{
+  tooltip: {
+    positioner: function (labelWidth, labelHeight, point) {
+      return {
+        x: point.plotX + this.chart.plotLeft,
+        y: point.plotY + this.chart.plotTop - labelHeight
+      };
+    }
+  }
+}
+```
+
+```javascript Outside Container
+{
+  tooltip: {
+    outside: true,
+    // When outside is true, tooltip can overflow the chart container
+    // Useful for charts with limited space
+  }
+}
+```
+</CodeGroup>
+
+### Tooltip Formatting
+
+Customize tooltip content using formatters:
+
+```javascript
+Highcharts.chart('container', {
+  tooltip: {
+    formatter: function () {
+      return '<b>' + this.series.name + '</b><br/>' +
+        this.x + ': ' + this.y + ' units';
+    }
+  }
+});
+```
+
+Or use format strings (from `ts/Core/TooltipOptions.ts:89-150`):
+
+```javascript
+{
+  tooltip: {
+    headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+    pointFormat: '<span style="color:{point.color}">{point.name}</span>: <b>{point.y:.2f}%</b><br/>'
+  }
+}
+```
+
+### Shared Tooltips
+
+Display information for multiple series in one tooltip:
+
+```javascript
+{
+  tooltip: {
+    shared: true,
+    crosshairs: true,
+    headerFormat: '<b>{point.key}</b><br/>',
+    pointFormat: '{series.name}: {point.y}<br/>'
+  }
+}
+```
+
+### Split Tooltips
+
+Show separate tooltip boxes for each series:
+
+```javascript
+{
+  tooltip: {
+    split: true,
+    distance: 30,
+    padding: 5
+  }
+}
+```
+
+### Advanced Tooltip Features
+
+<Steps>
+  <Step title="Sticky Tooltips">
+    Keep tooltips visible on touch devices:
+    
+    ```javascript
+    {
+      tooltip: {
+        stickOnContact: true,
+        // Tooltip stays visible until user touches elsewhere
+      }
+    }
+    ```
+  </Step>
+  
+  <Step title="Animation">
+    Control tooltip animation:
+    
+    ```javascript
+    {
+      tooltip: {
+        animation: true,
+        // Or disable for better performance
+        animation: false,
+        // Or custom animation
+        animation: {
+          duration: 500,
+          easing: 'easeOutBounce'
+        }
+      }
+    }
+    ```
+  </Step>
+  
+  <Step title="HTML Tooltips">
+    Use HTML for rich formatting:
+    
+    ```javascript
+    {
+      tooltip: {
+        useHTML: true,
+        formatter: function () {
+          return '<div class="custom-tooltip">' +
+            '<img src="icon.png" />' +
+            '<h3>' + this.point.name + '</h3>' +
+            '<p>Value: ' + this.y + '</p>' +
+            '</div>';
+        }
+      }
+    }
+    ```
+  </Step>
+</Steps>
+
+## Data Labels
+
+Data labels display values directly on the chart, making data immediately visible without interaction.
+
+### Basic Data Labels
+
+```javascript
+Highcharts.chart('container', {
+  plotOptions: {
+    series: {
+      dataLabels: {
+        enabled: true,
+        format: '{y}',
+        style: {
+          fontSize: '13px',
+          fontWeight: 'normal',
+          color: '#333'
+        }
+      }
+    }
+  },
+  series: [{
+    name: 'Sales',
+    data: [29.9, 71.5, 106.4, 129.2]
+  }]
+});
+```
+
+### Data Label Positioning
+
+```javascript
+{
+  plotOptions: {
+    column: {
+      dataLabels: {
+        enabled: true,
+        // Position relative to the point
+        align: 'center',
+        verticalAlign: 'top',
+        // Offset from the point
+        x: 0,
+        y: -5,
+        // Rotation
+        rotation: -45
+      }
+    }
+  }
+}
+```
+
+### Custom Data Label Formatting
+
+<CodeGroup>
+```javascript Format String
+{
+  dataLabels: {
+    enabled: true,
+    format: '{point.y:.1f}%',
+    // {point.y:.1f} = one decimal place
+  }
+}
+```
+
+```javascript Formatter Function
+{
+  dataLabels: {
+    enabled: true,
+    formatter: function () {
+      if (this.y > 100) {
+        return '<b>' + this.y + '</b>';
+      }
+      return this.y;
+    },
+    useHTML: true
+  }
+}
+```
+
+```javascript Conditional Labels
+{
+  dataLabels: {
+    enabled: true,
+    formatter: function () {
+      // Only show labels for values above threshold
+      return this.y > 50 ? this.y : null;
+    }
+  }
+}
+```
+</CodeGroup>
+
+### Data Labels Styling
+
+```javascript
+{
+  plotOptions: {
+    series: {
+      dataLabels: {
+        enabled: true,
+        backgroundColor: 'rgba(255, 255, 255, 0.7)',
+        borderRadius: 3,
+        borderWidth: 1,
+        borderColor: '#AAA',
+        padding: 5,
+        style: {
+          color: '#333',
+          fontSize: '11px',
+          fontWeight: 'bold',
+          textOutline: '1px contrast'
+        },
+        shadow: {
+          color: 'rgba(0, 0, 0, 0.3)',
+          offsetX: 1,
+          offsetY: 1,
+          opacity: 0.5,
+          width: 2
+        }
+      }
+    }
+  }
+}
+```
+
+### Data Labels for Specific Points
+
+```javascript
+{
+  series: [{
+    data: [
+      29.9,
+      71.5,
+      {
+        y: 106.4,
+        dataLabels: {
+          enabled: true,
+          format: 'Peak: {y}',
+          style: {
+            color: 'red',
+            fontWeight: 'bold'
+          }
+        }
+      },
+      129.2
+    ]
+  }]
+}
+```
+
+## Tooltip vs Data Labels
+
+| Feature | Tooltips | Data Labels |
+|---------|----------|-------------|
+| **Visibility** | On hover/interaction | Always visible |
+| **Space Usage** | Minimal | Can clutter chart |
+| **Detail Level** | Can show extensive info | Best for key values |
+| **Performance** | Better for large datasets | May impact rendering |
+| **Accessibility** | Requires interaction | Immediately visible |
+
+## Real-World Example
+
+From the drilldown demo (`samples/highcharts/demo/column-drilldown/demo.js:41-44`):
+
+```javascript
+Highcharts.chart('container', {
+  tooltip: {
+    headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
+    pointFormat: '<span style="color:{point.color}">{point.name}</span>: ' +
+      '<b>{point.y:.2f}%</b> of total<br/>'
+  },
+  plotOptions: {
+    series: {
+      dataLabels: {
+        enabled: true,
+        format: '{point.y:.1f}%'
+      }
+    }
+  },
+  series: [{
+    name: 'Browsers',
+    colorByPoint: true,
+    data: [
+      { name: 'Chrome', y: 63.06 },
+      { name: 'Safari', y: 19.84 },
+      { name: 'Firefox', y: 4.18 }
+    ]
+  }]
+});
+```
+
+## Best Practices
+
+<Note>
+**Tooltip Performance**
+- Use `animation: false` for charts with frequent updates
+- Consider `outside: true` for better performance with complex layouts
+- Use format strings instead of formatters when possible for better performance
+</Note>
+
+<Warning>
+**Data Label Considerations**
+- Too many data labels can make charts cluttered and hard to read
+- Use conditional formatting to show only important values
+- Ensure sufficient contrast between labels and background
+- Test on different screen sizes to avoid overlap
+</Warning>
+
+## Related Resources
+
+- [Accessibility Features](/features/accessibility)
+- [Styling and Themes](/features/styling-themes)
+- [Export Functionality](/features/exporting)

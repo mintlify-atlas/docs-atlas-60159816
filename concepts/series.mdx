@@ -1,0 +1,446 @@
+---
+title: Series Types and Data
+description: Understand Highcharts series configuration, data formats, and how to work with different series types.
+---
+
+# Series Types and Data
+
+Series are the heart of any Highcharts chart. They represent the data to be visualized and determine how that data appears on the chart.
+
+## Understanding Series
+
+A series is a collection of data points that share common properties and are visualized together. Each chart can contain multiple series.
+
+```javascript
+series: [{
+    name: 'Series 1',
+    type: 'line',
+    data: [1, 2, 3, 4, 5]
+}, {
+    name: 'Series 2',
+    type: 'column',
+    data: [2, 3, 4, 5, 6]
+}]
+```
+
+## Series Configuration
+
+<Tabs>
+  <Tab title="Basic Configuration">
+    Essential series options from the TypeScript `SeriesOptions` interface:
+
+    ```typescript
+    interface SeriesOptions {
+        type?: string;              // Series type: 'line', 'column', etc.
+        name?: string;              // Series name (appears in legend)
+        data?: Array<number | [number, number] | PointOptions>;
+        color?: ColorType;          // Series color
+        visible?: boolean;          // Initial visibility
+        showInLegend?: boolean;     // Show in legend
+        events?: SeriesEventsOptions;
+        animation?: AnimationOptions;
+        index?: number;             // Display order
+        legendIndex?: number;       // Legend order
+    }
+    ```
+
+    **Example:**
+    ```javascript
+    series: [{
+        name: 'Revenue',
+        type: 'line',
+        color: '#3b82f6',
+        visible: true,
+        showInLegend: true,
+        data: [29.9, 71.5, 106.4, 129.2, 144.0]
+    }]
+    ```
+  </Tab>
+
+  <Tab title="Data Formats">
+    Highcharts supports multiple data formats for flexibility:
+
+    ```javascript
+    // Simple array of values
+    data: [1, 2, 3, 4, 5]
+
+    // Array of [x, y] pairs
+    data: [
+        [0, 1],
+        [1, 2],
+        [2, 3]
+    ]
+
+    // Array of point objects
+    data: [{
+        x: 0,
+        y: 1,
+        name: 'Point 1',
+        color: '#ff0000'
+    }, {
+        x: 1,
+        y: 2,
+        name: 'Point 2',
+        color: '#00ff00'
+    }]
+
+    // Mixed formats
+    data: [1, [2, 5], { y: 3, color: 'red' }, 4]
+    ```
+  </Tab>
+
+  <Tab title="Series Events">
+    React to series interactions with event handlers:
+
+    ```typescript
+    interface SeriesEventsOptions {
+        click?: Function;           // Series click
+        hide?: Function;            // Series hidden
+        show?: Function;            // Series shown
+        mouseOver?: Function;       // Mouse over series
+        mouseOut?: Function;        // Mouse out of series
+        afterAnimate?: Function;    // After initial animation
+    }
+    ```
+
+    **Example:**
+    ```javascript
+    series: [{
+        name: 'Interactive Series',
+        data: [1, 2, 3],
+        events: {
+            click: function(event) {
+                alert('Series clicked at ' + event.point.y);
+            },
+            hide: function() {
+                console.log('Series hidden');
+            },
+            show: function() {
+                console.log('Series shown');
+            }
+        }
+    }]
+    ```
+  </Tab>
+</Tabs>
+
+## Series Types
+
+Highcharts provides numerous series types for different visualization needs:
+
+<CardGroup cols={2}>
+  <Card title="Line Series" icon="chart-line">
+    Display data as connected points
+    ```javascript
+    { type: 'line', data: [1, 2, 3] }
+    ```
+  </Card>
+  <Card title="Column Series" icon="chart-column">
+    Vertical bars for category comparison
+    ```javascript
+    { type: 'column', data: [1, 2, 3] }
+    ```
+  </Card>
+  <Card title="Bar Series" icon="chart-bar">
+    Horizontal bars for rankings
+    ```javascript
+    { type: 'bar', data: [1, 2, 3] }
+    ```
+  </Card>
+  <Card title="Area Series" icon="chart-area">
+    Filled area under line
+    ```javascript
+    { type: 'area', data: [1, 2, 3] }
+    ```
+  </Card>
+  <Card title="Pie Series" icon="chart-pie">
+    Part-to-whole relationships
+    ```javascript
+    { type: 'pie', data: [1, 2, 3] }
+    ```
+  </Card>
+  <Card title="Scatter Series" icon="chart-scatter">
+    Individual points without connection
+    ```javascript
+    { type: 'scatter', data: [[1,2], [3,4]] }
+    ```
+  </Card>
+</CardGroup>
+
+## Point Configuration
+
+Individual points within a series can have custom properties:
+
+```typescript
+interface PointOptions {
+    x?: number;                 // X value
+    y?: number;                 // Y value
+    name?: string;              // Point name
+    color?: ColorType;          // Point color
+    marker?: PointMarkerOptions; // Custom marker
+    dataLabels?: DataLabelOptions; // Custom label
+    events?: PointEventsOptions;   // Point events
+}
+```
+
+<CodeGroup>
+```javascript Custom Points
+series: [{
+    name: 'Temperature',
+    data: [
+        7.0,
+        6.9,
+        {
+            y: 9.5,
+            marker: {
+                symbol: 'url(https://example.com/icon.png)',
+                width: 20,
+                height: 20
+            },
+            name: 'Peak',
+            color: '#ff0000'
+        },
+        14.5,
+        18.2
+    ]
+}]
+```
+
+```javascript Point Events
+series: [{
+    data: [{
+        y: 10,
+        events: {
+            click: function() {
+                alert('Point value: ' + this.y);
+            },
+            mouseOver: function() {
+                this.update({ color: 'red' });
+            }
+        }
+    }]
+}]
+```
+</CodeGroup>
+
+## Series Methods
+
+Manipulate series dynamically after chart creation:
+
+<Tabs>
+  <Tab title="Add & Remove">
+    ```javascript
+    // Add new series
+    chart.addSeries({
+        name: 'New Series',
+        data: [1, 2, 3]
+    });
+
+    // Remove series
+    chart.series[0].remove();
+
+    // Remove with animation disabled
+    chart.series[0].remove(false);
+    ```
+  </Tab>
+
+  <Tab title="Update Data">
+    ```javascript
+    // Update entire series data
+    chart.series[0].setData([5, 6, 7, 8]);
+
+    // Update with animation
+    chart.series[0].setData([5, 6, 7, 8], true);
+
+    // Add a point
+    chart.series[0].addPoint(9);
+
+    // Add point with custom options
+    chart.series[0].addPoint({
+        y: 10,
+        color: 'red'
+    });
+    ```
+  </Tab>
+
+  <Tab title="Visibility">
+    ```javascript
+    // Hide series
+    chart.series[0].hide();
+
+    // Show series
+    chart.series[0].show();
+
+    // Toggle visibility
+    chart.series[0].setVisible(!chart.series[0].visible);
+    ```
+  </Tab>
+
+  <Tab title="Update Options">
+    ```javascript
+    // Update series options
+    chart.series[0].update({
+        name: 'Updated Name',
+        color: '#ff0000',
+        lineWidth: 3
+    });
+
+    // Update without redraw
+    chart.series[0].update({
+        name: 'New Name'
+    }, false);
+    chart.redraw();
+    ```
+  </Tab>
+</Tabs>
+
+## Data Sorting
+
+Control how data is sorted and matched during updates:
+
+```javascript
+series: [{
+    name: 'Sales',
+    dataSorting: {
+        enabled: true,
+        matchByName: true,
+        sortKey: 'y'
+    },
+    data: [
+        { name: 'Product A', y: 100 },
+        { name: 'Product B', y: 200 },
+        { name: 'Product C', y: 150 }
+    ]
+}]
+```
+
+<ParamField path="dataSorting.enabled" type="boolean" default={false}>
+  Enable or disable data sorting for the series.
+</ParamField>
+
+<ParamField path="dataSorting.matchByName" type="boolean" default={false}>
+  Whether to allow matching points by name in an update.
+</ParamField>
+
+<ParamField path="dataSorting.sortKey" type="string" default="y">
+  Determines what data value should be used to sort by.
+</ParamField>
+
+## Real-World Examples
+
+<CodeGroup>
+```javascript Multi-Series Chart
+Highcharts.chart('container', {
+    title: {
+        text: 'Monthly Sales Comparison'
+    },
+    xAxis: {
+        categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']
+    },
+    yAxis: {
+        title: {
+            text: 'Sales ($)'
+        }
+    },
+    series: [{
+        name: '2023',
+        type: 'column',
+        data: [49.9, 71.5, 106.4, 129.2, 144.0, 176.0]
+    }, {
+        name: '2024',
+        type: 'column',
+        data: [83.6, 78.8, 98.5, 93.4, 106.0, 84.5]
+    }, {
+        name: 'Average',
+        type: 'spline',
+        data: [66.75, 75.15, 102.45, 111.3, 125.0, 130.25],
+        marker: {
+            lineWidth: 2,
+            fillColor: 'white'
+        }
+    }]
+});
+```
+
+```javascript Dynamic Data Update
+const chart = Highcharts.chart('container', {
+    series: [{
+        name: 'Real-time Data',
+        data: []
+    }]
+});
+
+// Add points dynamically
+setInterval(function() {
+    const x = (new Date()).getTime();
+    const y = Math.random() * 100;
+    
+    chart.series[0].addPoint([x, y], true, chart.series[0].data.length > 20);
+}, 1000);
+```
+</CodeGroup>
+
+## TypeScript Interface Reference
+
+Key interfaces from `SeriesOptions.ts`:
+
+```typescript
+interface SeriesOptions {
+    type?: string;
+    name?: string;
+    data?: Array<PointShortOptions>;
+    id?: string;
+    index?: number;
+    legendIndex?: number;
+    stack?: string;
+    xAxis?: number | string;
+    yAxis?: number | string;
+    zIndex?: number;
+    visible?: boolean;
+    showInLegend?: boolean;
+    events?: SeriesEventsOptions;
+    animation?: AnimationOptions;
+    color?: ColorType;
+    dataSorting?: SeriesDataSortingOptions;
+}
+
+type PointShortOptions = (
+    number | 
+    [number, number] | 
+    [string, number] | 
+    PointOptions | 
+    null
+);
+```
+
+<Note>
+  All series extend the base `SeriesOptions` interface with type-specific options. For example, pie charts add `slicedOffset` and line charts add `step` options.
+</Note>
+
+## Best Practices
+
+1. **Performance** - For large datasets (>1000 points), use the boost module
+2. **Data Structure** - Use point objects for complex configurations, simple arrays for basic data
+3. **Type Safety** - Leverage TypeScript interfaces for compile-time validation
+4. **Updates** - Use `setData()` for complete replacements, `addPoint()` for incremental updates
+
+<Warning>
+  Avoid mixing data formats within a single series. Choose one format (simple array, coordinate array, or object array) and use it consistently.
+</Warning>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Axes Configuration" icon="ruler" href="/concepts/axes">
+    Configure X and Y axes for your series
+  </Card>
+  <Card title="Data Handling" icon="database" href="/concepts/data">
+    Advanced data loading and processing
+  </Card>
+  <Card title="Chart Types" icon="shapes" href="/chart-types/line-area">
+    Explore all available chart types
+  </Card>
+  <Card title="API Reference" icon="code" href="/api/series">
+    Complete series API documentation
+  </Card>
+</CardGroup>

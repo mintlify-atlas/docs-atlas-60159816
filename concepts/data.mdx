@@ -1,0 +1,548 @@
+---
+title: Data Handling and Formats
+description: Learn how to load, format, and manage data in Highcharts from various sources including CSV, JSON, and external APIs.
+---
+
+# Data Handling and Formats
+
+Highcharts provides flexible data handling capabilities, supporting multiple input formats and external data sources. Understanding these options helps you efficiently integrate data into your visualizations.
+
+## Data Input Methods
+
+<Tabs>
+  <Tab title="Direct Data">
+    The simplest method is to pass data directly in the series configuration:
+
+    ```javascript
+    series: [{
+        name: 'Sales',
+        data: [29.9, 71.5, 106.4, 129.2, 144.0, 176.0]
+    }]
+    ```
+
+    **Multiple formats supported:**
+    ```javascript
+    // Simple numbers
+    data: [1, 2, 3, 4, 5]
+
+    // [x, y] coordinates
+    data: [[0, 1], [1, 2], [2, 3]]
+
+    // [name, y] for categories
+    data: [['Apples', 5], ['Oranges', 3], ['Pears', 4]]
+
+    // Point configuration objects
+    data: [
+        { x: 0, y: 1, name: 'Point 1' },
+        { x: 1, y: 2, name: 'Point 2', color: 'red' }
+    ]
+    ```
+  </Tab>
+
+  <Tab title="Data Module">
+    The Data module enables loading from CSV, HTML tables, and Google Sheets:
+
+    ```javascript
+    // From CSV string
+    Highcharts.chart('container', {
+        data: {
+            csv: `Date,Sales,Expenses
+                  2024-01-01,1000,800
+                  2024-01-02,1200,900
+                  2024-01-03,1100,850`
+        },
+        title: {
+            text: 'Data from CSV'
+        }
+    });
+
+    // From HTML table
+    Highcharts.chart('container', {
+        data: {
+            table: 'datatable'
+        }
+    });
+
+    // From Google Sheets
+    Highcharts.chart('container', {
+        data: {
+            googleSpreadsheetKey: '1U17c4GljMWpgk1bcTvUzIuWT8vdOnlCBHTm5S8Jh8tw',
+            googleSpreadsheetWorksheet: 1
+        }
+    });
+    ```
+  </Tab>
+
+  <Tab title="AJAX/Fetch">
+    Load data from external APIs or files:
+
+    ```javascript
+    // Using Fetch API
+    fetch('https://api.example.com/data')
+        .then(response => response.json())
+        .then(data => {
+            Highcharts.chart('container', {
+                series: [{
+                    name: 'API Data',
+                    data: data.values
+                }]
+            });
+        });
+
+    // Using async/await
+    async function loadChart() {
+        const response = await fetch('data.json');
+        const data = await response.json();
+        
+        Highcharts.chart('container', {
+            series: data.series
+        });
+    }
+    ```
+  </Tab>
+
+  <Tab title="Live Data">
+    Update charts with real-time data:
+
+    ```javascript
+    const chart = Highcharts.chart('container', {
+        chart: {
+            events: {
+                load: function() {
+                    const series = this.series[0];
+                    
+                    setInterval(function() {
+                        const x = (new Date()).getTime();
+                        const y = Math.random() * 100;
+                        
+                        // Add point and shift if more than 20 points
+                        series.addPoint([x, y], true, series.data.length > 20);
+                    }, 1000);
+                }
+            }
+        },
+        series: [{
+            name: 'Live Data',
+            data: []
+        }]
+    });
+    ```
+  </Tab>
+</Tabs>
+
+## Data Formats
+
+Highcharts accepts data in various formats depending on your needs:
+
+### Simple Array Format
+
+Best for basic line, column, and bar charts:
+
+```javascript
+data: [1, 2, 3, 4, 5]
+```
+
+### Coordinate Array Format
+
+For scatter plots or custom X values:
+
+```javascript
+data: [
+    [0, 1],      // [x, y]
+    [1, 2],
+    [2, 5],
+    [3, 3]
+]
+```
+
+### Object Array Format
+
+For full control over point properties:
+
+```javascript
+data: [{
+    x: 0,
+    y: 1,
+    name: 'First Point',
+    color: '#FF0000',
+    marker: {
+        symbol: 'circle',
+        radius: 5
+    },
+    dataLabels: {
+        enabled: true
+    }
+}, {
+    x: 1,
+    y: 2,
+    name: 'Second Point',
+    color: '#00FF00'
+}]
+```
+
+## CSV Data Module
+
+The Data module provides powerful CSV parsing capabilities:
+
+<CodeGroup>
+```javascript CSV from String
+Highcharts.chart('container', {
+    title: {
+        text: 'Temperature Data'
+    },
+    data: {
+        csv: `Date,Temperature,Rainfall
+              2024-01-01,7.0,49.9
+              2024-01-02,6.9,71.5
+              2024-01-03,9.5,106.4
+              2024-01-04,14.5,129.2
+              2024-01-05,18.2,144.0`,
+        // Parse first column as dates
+        parseDate: function(s) {
+            return new Date(s).getTime();
+        }
+    },
+    xAxis: {
+        type: 'datetime'
+    }
+});
+```
+
+```javascript CSV from File
+// HTML
+<pre id="csv" style="display:none">
+Date,Sales,Expenses
+2024-01,1000,800
+2024-02,1200,900
+2024-03,1100,850
+</pre>
+
+// JavaScript
+Highcharts.chart('container', {
+    data: {
+        csv: document.getElementById('csv').innerHTML,
+        startRow: 1,        // Skip header row
+        endRow: 10,         // Only use first 10 rows
+        startColumn: 0,     // Start from first column
+        endColumn: 2        // Use first 3 columns
+    }
+});
+```
+
+```javascript CSV Options
+Highcharts.chart('container', {
+    data: {
+        csv: csvString,
+        itemDelimiter: ',',           // Column separator
+        lineDelimiter: '\n',          // Row separator
+        firstRowAsNames: true,        // Use first row as series names
+        switchRowsAndColumns: false,  // Transpose data
+        dateFormat: 'YYYY-mm-dd',     // Date parsing format
+        decimalPoint: '.'             // Decimal separator
+    }
+});
+```
+</CodeGroup>
+
+## Data Options Reference
+
+<ParamField path="data.csv" type="string">
+  A comma-delimited string to be parsed. Related options are `startRow`, `endRow`, `startColumn`, and `endColumn`.
+</ParamField>
+
+<ParamField path="data.table" type="string | HTMLElement">
+  A HTML table or the ID of such to be parsed. Related options are `startRow`, `endRow`, `startColumn`, and `endColumn`.
+</ParamField>
+
+<ParamField path="data.googleSpreadsheetKey" type="string">
+  The key for a Google Spreadsheet to load. See the module page for instructions.
+</ParamField>
+
+<ParamField path="data.googleSpreadsheetWorksheet" type="number" default={0}>
+  The Google Spreadsheet worksheet to use, starting with 0.
+</ParamField>
+
+<ParamField path="data.firstRowAsNames" type="boolean" default={true}>
+  Use the first row of the data as series names.
+</ParamField>
+
+<ParamField path="data.switchRowsAndColumns" type="boolean" default={false}>
+  Whether to transpose the data by switching rows and columns.
+</ParamField>
+
+<ParamField path="data.parseDate" type="function">
+  A callback function to parse string representations of dates into JavaScript timestamps.
+</ParamField>
+
+## Dynamic Data Updates
+
+Update chart data after initialization:
+
+<Tabs>
+  <Tab title="Update Series Data">
+    ```javascript
+    // Replace all data in a series
+    chart.series[0].setData([1, 2, 3, 4, 5]);
+
+    // Update with animation disabled
+    chart.series[0].setData([1, 2, 3, 4, 5], false);
+    chart.redraw();
+
+    // Update with new point objects
+    chart.series[0].setData([
+        { y: 1, color: 'red' },
+        { y: 2, color: 'blue' },
+        { y: 3, color: 'green' }
+    ]);
+    ```
+  </Tab>
+
+  <Tab title="Add Points">
+    ```javascript
+    // Add a single point
+    chart.series[0].addPoint(5);
+
+    // Add with options
+    chart.series[0].addPoint({
+        y: 6,
+        color: 'red',
+        name: 'Special Point'
+    });
+
+    // Add and shift (remove first point)
+    chart.series[0].addPoint(7, true, true);
+
+    // Add without redrawing
+    chart.series[0].addPoint(8, false);
+    chart.redraw();
+    ```
+  </Tab>
+
+  <Tab title="Update Points">
+    ```javascript
+    // Update a point by index
+    chart.series[0].points[0].update(10);
+
+    // Update with options
+    chart.series[0].points[0].update({
+        y: 15,
+        color: 'orange'
+    });
+
+    // Update multiple points
+    chart.series[0].points.forEach((point, i) => {
+        point.update(i * 2, false);
+    });
+    chart.redraw();
+    ```
+  </Tab>
+
+  <Tab title="Remove Points">
+    ```javascript
+    // Remove a point by reference
+    chart.series[0].points[0].remove();
+
+    // Remove without animation
+    chart.series[0].points[0].remove(false);
+
+    // Remove all points
+    chart.series[0].setData([]);
+    ```
+  </Tab>
+</Tabs>
+
+## Real-World Examples
+
+<CodeGroup>
+```javascript Google Sheets Integration
+Highcharts.chart('container', {
+    title: {
+        text: 'Global Temperature Change'
+    },
+    subtitle: {
+        text: 'Data from Google Sheets'
+    },
+    data: {
+        googleSpreadsheetKey: '1U17c4GljMWpgk1bcTvUzIuWT8vdOnlCBHTm5S8Jh8tw',
+        googleSpreadsheetWorksheet: 1
+    },
+    plotOptions: {
+        series: {
+            marker: {
+                enabled: false
+            }
+        }
+    },
+    series: [{
+        lineWidth: 1
+    }, {
+        type: 'areaspline',
+        color: '#c4392d',
+        negativeColor: '#5679c4',
+        fillOpacity: 0.5
+    }]
+});
+```
+
+```javascript API Data Loading
+async function createChartFromAPI() {
+    try {
+        const response = await fetch('https://api.example.com/analytics');
+        const data = await response.json();
+        
+        Highcharts.chart('container', {
+            title: {
+                text: data.title
+            },
+            xAxis: {
+                categories: data.categories
+            },
+            yAxis: {
+                title: {
+                    text: data.yAxisLabel
+                }
+            },
+            series: data.series.map(s => ({
+                name: s.name,
+                data: s.values
+            }))
+        });
+    } catch (error) {
+        console.error('Failed to load chart data:', error);
+    }
+}
+
+createChartFromAPI();
+```
+
+```javascript WebSocket Live Data
+const socket = new WebSocket('wss://api.example.com/stream');
+
+const chart = Highcharts.chart('container', {
+    chart: {
+        type: 'spline'
+    },
+    title: {
+        text: 'Live Sensor Data'
+    },
+    xAxis: {
+        type: 'datetime',
+        tickPixelInterval: 150
+    },
+    yAxis: {
+        title: {
+            text: 'Value'
+        }
+    },
+    series: [{
+        name: 'Sensor Reading',
+        data: []
+    }]
+});
+
+socket.onmessage = function(event) {
+    const data = JSON.parse(event.data);
+    const point = [
+        data.timestamp,
+        data.value
+    ];
+    
+    chart.series[0].addPoint(point, true, chart.series[0].data.length > 100);
+};
+```
+
+```javascript Batch Updates
+// Efficient batch update of multiple series
+const newData = [
+    [1, 2, 3, 4, 5],
+    [2, 3, 4, 5, 6],
+    [3, 4, 5, 6, 7]
+];
+
+// Disable redraw during updates
+chart.series.forEach((series, index) => {
+    series.setData(newData[index], false);
+});
+
+// Redraw once after all updates
+chart.redraw();
+```
+</CodeGroup>
+
+## Data Transformation
+
+Transform data before visualization:
+
+```javascript
+// Transform raw data
+const rawData = [
+    { date: '2024-01-01', temp: 7.0 },
+    { date: '2024-01-02', temp: 6.9 },
+    { date: '2024-01-03', temp: 9.5 }
+];
+
+// Convert to Highcharts format
+const chartData = rawData.map(item => ([
+    new Date(item.date).getTime(),
+    item.temp
+]));
+
+Highcharts.chart('container', {
+    xAxis: {
+        type: 'datetime'
+    },
+    series: [{
+        name: 'Temperature',
+        data: chartData
+    }]
+});
+```
+
+## Performance Optimization
+
+<Note>
+  For datasets with more than 1,000 points, consider using the Boost module for improved rendering performance.
+</Note>
+
+```javascript
+// Enable boost for large datasets
+Highcharts.chart('container', {
+    boost: {
+        useGPUTranslations: true,
+        usePreallocated: true
+    },
+    series: [{
+        boostThreshold: 1,  // Enable boost for this series
+        data: largeDataArray  // Array with 10,000+ points
+    }]
+});
+```
+
+## Best Practices
+
+1. **Data Validation** - Always validate external data before passing to Highcharts
+2. **Error Handling** - Implement proper error handling for AJAX/fetch requests
+3. **Batch Updates** - Disable redraw during multiple updates, then redraw once
+4. **Memory Management** - Remove old points when streaming data to prevent memory issues
+5. **Data Caching** - Cache API responses to reduce server load
+
+<Warning>
+  When using the Data module with CSV, ensure your data is properly formatted. Malformed CSV can cause parsing errors or incorrect visualizations.
+</Warning>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Series Configuration" icon="chart-line" href="/concepts/series">
+    Learn about series types and options
+  </Card>
+  <Card title="Options" icon="sliders" href="/concepts/options">
+    Explore global configuration options
+  </Card>
+  <Card title="Chart Types" icon="shapes" href="/chart-types/line-area">
+    See all available chart types
+  </Card>
+  <Card title="Examples" icon="code" href="/examples/dynamic-data">
+    Browse data handling examples
+  </Card>
+</CardGroup>

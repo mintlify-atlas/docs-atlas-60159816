@@ -1,0 +1,635 @@
+---
+title: 'Utility Functions'
+description: 'Helper functions and utilities in the Highcharts API'
+---
+
+# Utility Functions
+
+Highcharts provides a collection of utility functions for common operations like formatting, object manipulation, and mathematical calculations.
+
+**Source**: `ts/Core/Utilities.ts` and `ts/Shared/Utilities.js`
+
+## Formatting Functions
+
+### Highcharts.numberFormat()
+
+Format numbers with thousands separators and decimals.
+
+```javascript
+// Format with 2 decimals
+Highcharts.numberFormat(1234.567, 2);
+// "1,234.57"
+
+// Custom decimal separator
+Highcharts.numberFormat(1234.567, 2, ',', ' ');
+// "1 234,57"
+
+// No decimals
+Highcharts.numberFormat(1234567, 0);
+// "1,234,567"
+```
+
+**Parameters**:
+- `number` (Number) - Number to format
+- `decimals` (Number) - Number of decimal places
+- `decimalPoint` (String) - Decimal separator (default: '.')
+- `thousandsSep` (String) - Thousands separator (default: ',')
+
+**Returns**: String
+
+### Highcharts.dateFormat()
+
+Format dates and timestamps.
+
+```javascript
+const timestamp = Date.UTC(2024, 0, 15, 14, 30, 0);
+
+// Date only
+Highcharts.dateFormat('%Y-%m-%d', timestamp);
+// "2024-01-15"
+
+// Date and time
+Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', timestamp);
+// "2024-01-15 14:30:00"
+
+// Custom format
+Highcharts.dateFormat('%b %e, %Y', timestamp);
+// "Jan 15, 2024"
+```
+
+**Format Tokens**:
+- `%Y` - Year (4 digits)
+- `%y` - Year (2 digits)
+- `%m` - Month (01-12)
+- `%b` - Month name (short)
+- `%B` - Month name (full)
+- `%d` - Day of month (01-31)
+- `%e` - Day of month (1-31)
+- `%a` - Weekday (short)
+- `%A` - Weekday (full)
+- `%H` - Hour (00-23)
+- `%I` - Hour (01-12)
+- `%M` - Minute (00-59)
+- `%S` - Second (00-59)
+- `%L` - Milliseconds
+- `%p` - AM/PM
+
+**Parameters**:
+- `format` (String) - Format string
+- `timestamp` (Number) - UTC timestamp
+- `capitalize` (Boolean) - Capitalize first letter
+
+**Returns**: String
+
+### Highcharts.format()
+
+Template string formatting.
+
+```javascript
+// Simple replacement
+Highcharts.format('Hello {name}', { name: 'World' });
+// "Hello World"
+
+// Point formatting
+Highcharts.format(
+  '{point.name}: {point.y}',
+  { point: { name: 'Sales', y: 100 }}
+);
+// "Sales: 100"
+
+// With formatting
+Highcharts.format(
+  'Value: {value:.2f}',
+  { value: 123.456 }
+);
+// "Value: 123.46"
+
+// Nested properties
+Highcharts.format(
+  '{series.name} at {point.x}',
+  { series: { name: 'Data' }, point: { x: 5 }}
+);
+// "Data at 5"
+```
+
+**Format Specifiers**:
+- `:.0f` - Integer (no decimals)
+- `:.2f` - Two decimal places
+- `:.1f` - One decimal place
+
+**Parameters**:
+- `str` (String) - Template string
+- `ctx` (Object) - Context object with values
+- `chart` (Chart) - Chart instance
+
+**Returns**: String
+
+## Object Utilities
+
+### Highcharts.merge()
+
+Deep merge objects.
+
+```javascript
+const obj1 = {
+  a: 1,
+  b: { c: 2 }
+};
+
+const obj2 = {
+  b: { d: 3 },
+  e: 4
+};
+
+const merged = Highcharts.merge(obj1, obj2);
+// { a: 1, b: { c: 2, d: 3 }, e: 4 }
+
+// Multiple objects
+const result = Highcharts.merge(
+  { a: 1 },
+  { b: 2 },
+  { c: 3 }
+);
+// { a: 1, b: 2, c: 3 }
+```
+
+**Parameters**:
+- `...objects` - Objects to merge
+
+**Returns**: Object (merged result)
+
+### Highcharts.extend()
+
+Shallow extend (overwrite properties).
+
+```javascript
+const target = { a: 1, b: 2 };
+const source = { b: 3, c: 4 };
+
+Highcharts.extend(target, source);
+// target is now { a: 1, b: 3, c: 4 }
+```
+
+**Parameters**:
+- `target` (Object) - Target object (modified in place)
+- `source` (Object) - Source object
+
+**Returns**: Object (target)
+
+### Highcharts.pick()
+
+Return first defined value.
+
+```javascript
+Highcharts.pick(undefined, null, 0, 'default');
+// 0
+
+Highcharts.pick(null, undefined, 'fallback');
+// "fallback"
+
+Highcharts.pick(undefined, undefined, undefined);
+// undefined
+```
+
+**Parameters**:
+- `...values` - Values to check
+
+**Returns**: First defined value
+
+### Highcharts.defined()
+
+Check if value is defined.
+
+```javascript
+Highcharts.defined(0);         // true
+Highcharts.defined('');        // true
+Highcharts.defined(null);      // false
+Highcharts.defined(undefined); // false
+```
+
+**Parameters**:
+- `value` - Value to check
+
+**Returns**: Boolean
+
+### Highcharts.isArray()
+
+Check if value is an array.
+
+```javascript
+Highcharts.isArray([1, 2, 3]);      // true
+Highcharts.isArray('string');       // false
+Highcharts.isArray({ a: 1 });       // false
+```
+
+**Parameters**:
+- `value` - Value to check
+
+**Returns**: Boolean
+
+### Highcharts.isObject()
+
+Check if value is an object.
+
+```javascript
+Highcharts.isObject({ a: 1 });      // true
+Highcharts.isObject([1, 2, 3]);     // false (arrays excluded)
+Highcharts.isObject(null);          // false
+```
+
+**Parameters**:
+- `value` - Value to check
+- `strict` (Boolean) - If true, exclude arrays
+
+**Returns**: Boolean
+
+### Highcharts.isString()
+
+Check if value is a string.
+
+```javascript
+Highcharts.isString('hello');       // true
+Highcharts.isString(123);           // false
+```
+
+**Parameters**:
+- `value` - Value to check
+
+**Returns**: Boolean
+
+### Highcharts.isNumber()
+
+Check if value is a number.
+
+```javascript
+Highcharts.isNumber(123);           // true
+Highcharts.isNumber('123');         // false
+Highcharts.isNumber(NaN);           // false
+```
+
+**Parameters**:
+- `value` - Value to check
+
+**Returns**: Boolean
+
+## Array Utilities
+
+### Highcharts.find()
+
+Find first matching element.
+
+```javascript
+const arr = [1, 2, 3, 4, 5];
+
+Highcharts.find(arr, val => val > 3);
+// 4
+
+const points = chart.series[0].points;
+const point = Highcharts.find(points, p => p.y > 100);
+```
+
+**Parameters**:
+- `array` (Array) - Array to search
+- `callback` (Function) - Test function
+
+**Returns**: First matching element or undefined
+
+### Highcharts.grep()
+
+Filter array.
+
+```javascript
+const arr = [1, 2, 3, 4, 5];
+
+Highcharts.grep(arr, val => val > 2);
+// [3, 4, 5]
+
+const visible = Highcharts.grep(
+  chart.series,
+  s => s.visible
+);
+```
+
+**Parameters**:
+- `array` (Array) - Array to filter
+- `callback` (Function) - Test function
+
+**Returns**: Filtered array
+
+### Highcharts.map()
+
+Map array values.
+
+```javascript
+const arr = [1, 2, 3];
+
+Highcharts.map(arr, val => val * 2);
+// [2, 4, 6]
+
+const names = Highcharts.map(
+  chart.series,
+  s => s.name
+);
+```
+
+**Parameters**:
+- `array` (Array) - Array to map
+- `callback` (Function) - Transform function
+
+**Returns**: Mapped array
+
+### Highcharts.reduce()
+
+Reduce array to single value.
+
+```javascript
+const arr = [1, 2, 3, 4];
+
+Highcharts.reduce(
+  arr,
+  (acc, val) => acc + val,
+  0
+);
+// 10
+```
+
+**Parameters**:
+- `array` (Array) - Array to reduce
+- `callback` (Function) - Reducer function
+- `initialValue` - Initial accumulator value
+
+**Returns**: Reduced value
+
+### Highcharts.uniqueKey()
+
+Generate unique ID.
+
+```javascript
+const id = Highcharts.uniqueKey();
+// "highcharts-abc123def"
+
+const id2 = Highcharts.uniqueKey();
+// "highcharts-xyz789ghi"
+```
+
+**Returns**: String (unique ID)
+
+## Math Utilities
+
+### Highcharts.arrayMin() / arrayMax()
+
+Find minimum or maximum in array.
+
+```javascript
+const arr = [5, 2, 8, 1, 9];
+
+Highcharts.arrayMin(arr);  // 1
+Highcharts.arrayMax(arr);  // 9
+
+// With undefined/null values
+const sparse = [5, null, 8, undefined, 9];
+Highcharts.arrayMin(sparse);  // 5
+```
+
+**Parameters**:
+- `array` (Array) - Array of numbers
+
+**Returns**: Number (min or max)
+
+### Highcharts.correctFloat()
+
+Correct floating point errors.
+
+```javascript
+// JavaScript precision issue
+0.1 + 0.2;  // 0.30000000000000004
+
+// Corrected
+Highcharts.correctFloat(0.1 + 0.2);
+// 0.3
+
+Highcharts.correctFloat(0.1 + 0.2, 2);
+// 0.30
+```
+
+**Parameters**:
+- `number` (Number) - Number to correct
+- `precision` (Number) - Decimal precision
+
+**Returns**: Number
+
+### Highcharts.relativeLength()
+
+Convert percentage to pixels.
+
+```javascript
+// 50% of 800px
+Highcharts.relativeLength('50%', 800);
+// 400
+
+// Absolute value
+Highcharts.relativeLength(300, 800);
+// 300
+```
+
+**Parameters**:
+- `value` (String | Number) - Value ('50%' or number)
+- `relativeTo` (Number) - Base value
+
+**Returns**: Number (pixels)
+
+### Highcharts.pad()
+
+Pad number with zeros.
+
+```javascript
+Highcharts.pad(5, 3);
+// "005"
+
+Highcharts.pad(42, 4);
+// "0042"
+```
+
+**Parameters**:
+- `number` (Number) - Number to pad
+- `length` (Number) - Target length
+
+**Returns**: String
+
+## DOM Utilities
+
+### Highcharts.createElement()
+
+Create DOM element.
+
+```javascript
+const div = Highcharts.createElement('div', {
+  className: 'custom-container',
+  id: 'my-element'
+}, {
+  position: 'absolute',
+  top: '10px',
+  left: '10px'
+}, document.body);
+```
+
+**Parameters**:
+- `tag` (String) - Element tag name
+- `attributes` (Object) - Element attributes
+- `styles` (Object) - CSS styles
+- `parent` (HTMLElement) - Parent element
+
+**Returns**: HTMLElement
+
+### Highcharts.css()
+
+Set CSS styles on element.
+
+```javascript
+const element = document.getElementById('my-div');
+
+Highcharts.css(element, {
+  width: '100px',
+  height: '50px',
+  backgroundColor: '#f0f0f0'
+});
+```
+
+**Parameters**:
+- `element` (HTMLElement) - Target element
+- `styles` (Object) - CSS styles
+
+### Highcharts.offset()
+
+Get element offset from document.
+
+```javascript
+const element = document.getElementById('chart');
+const offset = Highcharts.offset(element);
+
+console.log(offset.left, offset.top);
+```
+
+**Parameters**:
+- `element` (HTMLElement) - Element
+
+**Returns**: Object with `left` and `top`
+
+## Error Handling
+
+### Highcharts.error()
+
+Display error message.
+
+**Source**: `ts/Core/Utilities.ts:75`
+
+```javascript
+// Log error
+Highcharts.error(10);  // Error #10 with link to docs
+
+// Throw error
+Highcharts.error('Custom error message', true);
+
+// With chart context
+Highcharts.error(15, false, chart);
+
+// With parameters
+Highcharts.error(17, false, chart, {
+  moduleName: 'export'
+});
+```
+
+**Parameters**:
+- `code` (Number | String) - Error code or message
+- `stop` (Boolean) - Whether to throw error
+- `chart` (Chart) - Chart instance
+- `params` (Object) - Additional parameters
+
+## Complete Example
+
+```javascript
+// Formatting
+const formatted = Highcharts.numberFormat(1234.567, 2);
+console.log(formatted);  // "1,234.57"
+
+const date = Highcharts.dateFormat(
+  '%Y-%m-%d %H:%M',
+  Date.UTC(2024, 0, 15, 14, 30)
+);
+console.log(date);  // "2024-01-15 14:30"
+
+// Object manipulation
+const config = Highcharts.merge(
+  { a: 1, b: { c: 2 }},
+  { b: { d: 3 }, e: 4 }
+);
+console.log(config);  // { a: 1, b: { c: 2, d: 3 }, e: 4 }
+
+// Array utilities
+const data = [29.9, 71.5, 106.4, 129.2, 144.0];
+const min = Highcharts.arrayMin(data);  // 29.9
+const max = Highcharts.arrayMax(data);  // 144.0
+
+const filtered = Highcharts.grep(data, val => val > 100);
+// [106.4, 129.2, 144.0]
+
+const doubled = Highcharts.map(data, val => val * 2);
+// [59.8, 143, 212.8, 258.4, 288]
+
+// Type checking
+if (Highcharts.isArray(data)) {
+  console.log('Is array');
+}
+
+if (Highcharts.isNumber(data[0])) {
+  console.log('First element is number');
+}
+
+// Math utilities
+const corrected = Highcharts.correctFloat(0.1 + 0.2);
+console.log(corrected);  // 0.3
+
+const percentage = Highcharts.relativeLength('50%', 800);
+console.log(percentage);  // 400
+
+// Template formatting
+const message = Highcharts.format(
+  '{point.name}: {point.y:.1f}',
+  { point: { name: 'Sales', y: 123.456 }}
+);
+console.log(message);  // "Sales: 123.5"
+
+// Generate unique ID
+const id = Highcharts.uniqueKey();
+console.log(id);  // "highcharts-abc123"
+
+// Find in array
+const chart = Highcharts.chart('container', {
+  series: [
+    { name: 'Series 1', data: [1, 2, 3] },
+    { name: 'Series 2', data: [4, 5, 6] }
+  ]
+});
+
+const series = Highcharts.find(
+  chart.series,
+  s => s.name === 'Series 2'
+);
+console.log(series.data);  // Series 2 data
+
+// Pick first defined value
+const value = Highcharts.pick(
+  undefined,
+  null,
+  0,
+  'default'
+);
+console.log(value);  // 0
+```
+
+## See Also
+
+- [Methods API](/api/methods) - Chart manipulation methods
+- [Chart Class](/api/chart) - Chart instance
+- [Events API](/api/events) - Event handling
+- [Chart Options](/api/chart-options) - Configuration

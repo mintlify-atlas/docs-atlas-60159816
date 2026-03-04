@@ -1,0 +1,656 @@
+---
+title: 'API Methods'
+description: 'Complete reference for Highcharts API methods'
+---
+
+# API Methods
+
+Highcharts provides a comprehensive set of methods for manipulating charts, series, axes, and points at runtime.
+
+## Global Methods
+
+### Highcharts.chart()
+
+Create a new chart instance.
+
+```javascript
+const chart = Highcharts.chart('container', {
+  title: { text: 'My Chart' },
+  series: [{ data: [1, 2, 3] }]
+});
+
+// With callback
+Highcharts.chart('container', options, function(chart) {
+  console.log('Chart created:', chart);
+});
+```
+
+**Parameters**:
+- `renderTo` (string | HTMLElement) - Container element or ID
+- `options` (Object) - Chart configuration
+- `callback` (Function) - Optional callback after chart load
+
+**Returns**: `Highcharts.Chart`
+
+### Highcharts.stockChart()
+
+Create a Highstock chart (requires Highstock).
+
+```javascript
+const stockChart = Highcharts.stockChart('container', {
+  rangeSelector: { selected: 1 },
+  series: [{ data: timeSeriesData }]
+});
+```
+
+### Highcharts.mapChart()
+
+Create a Highmaps chart (requires Highmaps).
+
+```javascript
+const mapChart = Highcharts.mapChart('container', {
+  chart: { map: topology },
+  series: [{ data: mapData }]
+});
+```
+
+### Highcharts.ganttChart()
+
+Create a Gantt chart (requires Gantt module).
+
+```javascript
+const ganttChart = Highcharts.ganttChart('container', {
+  series: [{ data: tasks }]
+});
+```
+
+## Chart Methods
+
+Methods available on the chart instance.
+
+### chart.addSeries()
+
+Add a new series to the chart.
+
+```javascript
+const series = chart.addSeries({
+  name: 'New Series',
+  data: [1, 2, 3, 4, 5]
+});
+
+// Without redraw
+chart.addSeries({ data: [5, 4, 3] }, false);
+chart.addSeries({ data: [2, 3, 4] }, false);
+chart.redraw();
+```
+
+**Parameters**:
+- `options` (Object) - Series configuration
+- `redraw` (Boolean) - Whether to redraw (default: true)
+- `animation` (Boolean | Object) - Animation options
+
+**Returns**: `Highcharts.Series`
+
+### chart.addAxis()
+
+Add a new axis to the chart.
+
+```javascript
+const yAxis = chart.addAxis({
+  id: 'secondary',
+  title: { text: 'Secondary Axis' },
+  opposite: true
+}, false, true);
+```
+
+**Parameters**:
+- `options` (Object) - Axis configuration
+- `isX` (Boolean) - True for X axis, false for Y axis
+- `redraw` (Boolean) - Whether to redraw
+- `animation` (Boolean | Object) - Animation options
+
+**Returns**: `Highcharts.Axis`
+
+### chart.get()
+
+Get an axis, series, or point by ID.
+
+```javascript
+const series = chart.get('my-series');
+const axis = chart.get('my-axis');
+const point = chart.get('point-1');
+```
+
+**Parameters**:
+- `id` (String) - ID of the element
+
+**Returns**: `Highcharts.Axis | Highcharts.Series | Highcharts.Point | undefined`
+
+### chart.update()
+
+Update chart options.
+
+```javascript
+chart.update({
+  title: { text: 'Updated Title' },
+  chart: { backgroundColor: '#f0f0f0' },
+  plotOptions: {
+    series: { animation: false }
+  }
+});
+
+// One-to-one update (replace arrays instead of merge)
+chart.update({
+  xAxis: [{ categories: ['A', 'B', 'C'] }]
+}, true, true);
+```
+
+**Parameters**:
+- `options` (Object) - Options to update
+- `redraw` (Boolean) - Whether to redraw (default: true)
+- `oneToOne` (Boolean) - One-to-one update mode (default: false)
+- `animation` (Boolean | Object) - Animation options
+
+### chart.redraw()
+
+Redraw the chart.
+
+```javascript
+chart.redraw();
+
+// With animation
+chart.redraw({ duration: 1000 });
+```
+
+**Parameters**:
+- `animation` (Boolean | Object) - Animation options
+
+### chart.reflow()
+
+Reflow the chart to fit container.
+
+```javascript
+// After container resize
+window.addEventListener('resize', () => {
+  chart.reflow();
+});
+```
+
+### chart.setSize()
+
+Resize the chart.
+
+```javascript
+// Set width and height
+chart.setSize(800, 600);
+
+// Only change width
+chart.setSize(1000, null);
+
+// With animation
+chart.setSize(800, 400, { duration: 500 });
+```
+
+**Parameters**:
+- `width` (Number | null) - New width in pixels
+- `height` (Number | null) - New height in pixels
+- `animation` (Boolean | Object) - Animation options
+
+### chart.setTitle()
+
+Update title and subtitle.
+
+```javascript
+chart.setTitle(
+  { text: 'New Title' },
+  { text: 'New Subtitle' }
+);
+
+// Without redraw
+chart.setTitle({ text: 'Title' }, null, false);
+```
+
+**Parameters**:
+- `title` (Object) - Title options
+- `subtitle` (Object) - Subtitle options
+- `redraw` (Boolean) - Whether to redraw (default: true)
+
+### chart.showLoading() / hideLoading()
+
+Show or hide loading indicator.
+
+```javascript
+chart.showLoading('Loading data...');
+
+fetch('/api/data')
+  .then(res => res.json())
+  .then(data => {
+    chart.series[0].setData(data);
+    chart.hideLoading();
+  });
+```
+
+**Parameters** (showLoading):
+- `message` (String) - Loading message
+
+### chart.destroy()
+
+Destroy the chart and free resources.
+
+```javascript
+chart.destroy();
+```
+
+### chart.exportChart()
+
+Export the chart (requires exporting module).
+
+```javascript
+// Export as PNG
+chart.exportChart({ type: 'image/png' });
+
+// Export as SVG with custom filename
+chart.exportChart({
+  type: 'image/svg+xml',
+  filename: 'my-chart'
+});
+```
+
+**Parameters**:
+- `options` (Object) - Export options
+- `chartOptions` (Object) - Temporary chart options for export
+
+### chart.print()
+
+Print the chart.
+
+```javascript
+chart.print();
+```
+
+### chart.getSVG()
+
+Get SVG string of the chart.
+
+```javascript
+const svg = chart.getSVG();
+console.log(svg);
+
+// With custom options
+const svg = chart.getSVG({
+  chart: { width: 1000, height: 600 }
+});
+```
+
+**Parameters**:
+- `options` (Object) - Temporary chart options
+
+**Returns**: String (SVG markup)
+
+## Series Methods
+
+### series.addPoint()
+
+Add a point to the series.
+
+```javascript
+// Simple value
+series.addPoint(42);
+
+// [x, y] tuple
+series.addPoint([10, 42]);
+
+// Point configuration
+series.addPoint({
+  x: 10,
+  y: 42,
+  color: 'red',
+  name: 'Special'
+});
+
+// Add and shift (for real-time data)
+series.addPoint([Date.now(), value], true, true);
+
+// Without redraw
+series.addPoint(42, false);
+```
+
+**Parameters**:
+- `options` (Number | Array | Object) - Point data
+- `redraw` (Boolean) - Whether to redraw (default: true)
+- `shift` (Boolean) - Remove first point (default: false)
+- `animation` (Boolean | Object) - Animation options
+
+### series.removePoint()
+
+Remove a point by index.
+
+```javascript
+series.removePoint(0);  // Remove first point
+series.removePoint(5, false);  // Without redraw
+```
+
+**Parameters**:
+- `index` (Number) - Point index
+- `redraw` (Boolean) - Whether to redraw (default: true)
+- `animation` (Boolean | Object) - Animation options
+
+### series.setData()
+
+Replace all series data.
+
+```javascript
+// Simple values
+series.setData([1, 2, 3, 4, 5]);
+
+// Point configurations
+series.setData([
+  { y: 10, color: 'red' },
+  { y: 20, color: 'blue' },
+  { y: 15, color: 'green' }
+]);
+
+// Without animation
+series.setData(newData, true, false);
+```
+
+**Parameters**:
+- `data` (Array) - New data array
+- `redraw` (Boolean) - Whether to redraw (default: true)
+- `animation` (Boolean | Object) - Animation options
+- `updatePoints` (Boolean) - Update existing points (default: true)
+
+### series.update()
+
+Update series options.
+
+```javascript
+series.update({
+  name: 'Updated Name',
+  color: '#ff0000',
+  lineWidth: 3
+});
+
+// Update type
+series.update({ type: 'column' });
+```
+
+**Parameters**:
+- `options` (Object) - Options to update
+- `redraw` (Boolean) - Whether to redraw (default: true)
+
+### series.remove()
+
+Remove the series.
+
+```javascript
+series.remove();
+
+// Without redraw
+series.remove(false);
+
+// With animation
+series.remove(true, { duration: 500 });
+```
+
+**Parameters**:
+- `redraw` (Boolean) - Whether to redraw (default: true)
+- `animation` (Boolean | Object) - Animation options
+
+### series.show() / hide()
+
+Show or hide the series.
+
+```javascript
+series.show();
+series.hide();
+
+// Toggle
+if (series.visible) {
+  series.hide();
+} else {
+  series.show();
+}
+```
+
+### series.setVisible()
+
+Set series visibility.
+
+```javascript
+series.setVisible(true);   // Show
+series.setVisible(false);  // Hide
+
+// Without redraw
+series.setVisible(true, false);
+```
+
+**Parameters**:
+- `visible` (Boolean) - Visibility state
+- `redraw` (Boolean) - Whether to redraw (default: true)
+
+## Axis Methods
+
+### axis.setExtremes()
+
+Set axis range.
+
+```javascript
+axis.setExtremes(0, 100);
+
+// Auto-calculate max
+axis.setExtremes(0, null);
+
+// With animation
+axis.setExtremes(0, 100, true, { duration: 1000 });
+
+// Without redraw
+xAxis.setExtremes(0, 50, false);
+yAxis.setExtremes(0, 100, false);
+chart.redraw();
+```
+
+**Parameters**:
+- `min` (Number | null) - New minimum
+- `max` (Number | null) - New maximum
+- `redraw` (Boolean) - Whether to redraw (default: true)
+- `animation` (Boolean | Object) - Animation options
+- `eventArguments` (Object) - Custom event data
+
+### axis.update()
+
+Update axis options.
+
+```javascript
+axis.update({
+  title: { text: 'New Title' },
+  min: 0,
+  max: 100,
+  gridLineWidth: 2
+});
+```
+
+**Parameters**:
+- `options` (Object) - Options to update
+- `redraw` (Boolean) - Whether to redraw (default: true)
+
+### axis.setTitle()
+
+Set axis title.
+
+```javascript
+axis.setTitle({ text: 'Temperature (°C)' });
+
+axis.setTitle({
+  text: 'Value',
+  style: { color: '#ff0000' }
+});
+```
+
+**Parameters**:
+- `title` (Object) - Title options
+- `redraw` (Boolean) - Whether to redraw (default: true)
+
+### axis.setCategories()
+
+Set axis categories.
+
+```javascript
+axis.setCategories(['Q1', 'Q2', 'Q3', 'Q4']);
+
+// Without redraw
+axis.setCategories(['Jan', 'Feb', 'Mar'], false);
+```
+
+**Parameters**:
+- `categories` (Array) - Category names
+- `redraw` (Boolean) - Whether to redraw (default: true)
+
+### axis.addPlotLine() / addPlotBand()
+
+Add plot line or band.
+
+```javascript
+// Add plot line
+axis.addPlotLine({
+  value: 50,
+  color: 'red',
+  width: 2,
+  id: 'threshold',
+  label: { text: 'Threshold' }
+});
+
+// Add plot band
+axis.addPlotBand({
+  from: 20,
+  to: 80,
+  color: 'rgba(0, 255, 0, 0.1)',
+  id: 'normal-range'
+});
+```
+
+**Parameters**:
+- `options` (Object) - Plot line/band options
+
+**Returns**: `Highcharts.PlotLineOrBand`
+
+### axis.removePlotLine() / removePlotBand()
+
+Remove plot line or band by ID.
+
+```javascript
+axis.removePlotLine('threshold');
+axis.removePlotBand('normal-range');
+```
+
+**Parameters**:
+- `id` (String) - Plot line/band ID
+
+### axis.toValue() / toPixels()
+
+Convert between axis values and pixel positions.
+
+```javascript
+// Value to pixels
+const pixel = axis.toPixels(50);
+console.log('50 is at pixel:', pixel);
+
+// Pixels to value
+const value = axis.toValue(200);
+console.log('200px is value:', value);
+
+// Use in click handler
+chart.container.addEventListener('click', (e) => {
+  const value = xAxis.toValue(e.offsetX);
+  console.log('Clicked value:', value);
+});
+```
+
+**Parameters**:
+- `value` or `pixel` (Number) - Value to convert
+- `paneCoordinates` (Boolean) - Pane-relative coordinates
+
+**Returns**: Number
+
+### axis.remove()
+
+Remove the axis.
+
+```javascript
+axis.remove();
+```
+
+**Parameters**:
+- `redraw` (Boolean) - Whether to redraw (default: true)
+
+## Point Methods
+
+### point.update()
+
+Update point data.
+
+```javascript
+// Update value
+point.update(42);
+
+// Update with options
+point.update({
+  y: 42,
+  color: 'red',
+  name: 'Updated'
+});
+
+// Without redraw
+point.update(50, false);
+```
+
+**Parameters**:
+- `options` (Number | Object) - New value or options
+- `redraw` (Boolean) - Whether to redraw (default: true)
+- `animation` (Boolean | Object) - Animation options
+
+### point.remove()
+
+Remove the point.
+
+```javascript
+point.remove();
+
+// Without redraw
+point.remove(false);
+```
+
+**Parameters**:
+- `redraw` (Boolean) - Whether to redraw (default: true)
+- `animation` (Boolean | Object) - Animation options
+
+### point.select()
+
+Select or deselect the point.
+
+```javascript
+// Toggle selection
+point.select();
+
+// Explicit select
+point.select(true);
+
+// Deselect
+point.select(false);
+
+// Multiple selection
+point1.select(true, true);  // accumulate
+point2.select(true, true);
+```
+
+**Parameters**:
+- `selected` (Boolean) - Selection state
+- `accumulate` (Boolean) - Add to selection (default: false)
+
+## See Also
+
+- [Chart Class](/api/chart) - Chart properties and events
+- [Series Class](/api/series) - Series properties
+- [Axis Class](/api/axis) - Axis properties
+- [Point Class](/api/point) - Point properties
+- [Events API](/api/events) - Event handling

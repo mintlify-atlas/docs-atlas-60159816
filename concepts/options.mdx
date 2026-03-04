@@ -1,0 +1,701 @@
+---
+title: Configuration Options
+description: Comprehensive guide to Highcharts global options, setOptions, and configuration patterns for customizing charts.
+---
+
+# Configuration Options
+
+Highcharts provides a powerful and flexible options system that allows you to customize every aspect of your charts. Understanding how to structure and apply options is key to creating professional visualizations.
+
+## Options Structure
+
+Highcharts options are organized hierarchically in a configuration object:
+
+```javascript
+Highcharts.chart('container', {
+    // Chart-level options
+    chart: { /* chart configuration */ },
+    title: { /* title configuration */ },
+    subtitle: { /* subtitle configuration */ },
+    
+    // Axes
+    xAxis: { /* x-axis configuration */ },
+    yAxis: { /* y-axis configuration */ },
+    
+    // Series data
+    series: [{ /* series configuration */ }],
+    
+    // Feature modules
+    tooltip: { /* tooltip configuration */ },
+    legend: { /* legend configuration */ },
+    plotOptions: { /* series type defaults */ },
+    
+    // Accessibility
+    accessibility: { /* accessibility options */ },
+    
+    // Export/print
+    exporting: { /* export configuration */ },
+    
+    // Responsive
+    responsive: { /* responsive rules */ }
+});
+```
+
+## Global Options
+
+Set global options that apply to all charts using `Highcharts.setOptions()`:
+
+<Tabs>
+  <Tab title="Basic Usage">
+    ```javascript
+    // Set global options once
+    Highcharts.setOptions({
+        lang: {
+            loading: 'Loading...',
+            months: ['January', 'February', 'March', 'April', 'May', 'June',
+                     'July', 'August', 'September', 'October', 'November', 'December'],
+            weekdays: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 
+                       'Thursday', 'Friday', 'Saturday'],
+            numericSymbols: ['k', 'M', 'G', 'T', 'P', 'E']
+        },
+        colors: ['#058DC7', '#50B432', '#ED561B', '#DDDF00', '#24CBE5',
+                 '#64E572', '#FF9655', '#FFF263', '#6AF9C4'],
+        chart: {
+            backgroundColor: '#f9f9f9',
+            style: {
+                fontFamily: 'Arial, sans-serif'
+            }
+        },
+        credits: {
+            enabled: false
+        }
+    });
+
+    // All charts created after will use these defaults
+    Highcharts.chart('container1', { /* ... */ });
+    Highcharts.chart('container2', { /* ... */ });
+    ```
+  </Tab>
+
+  <Tab title="Language Options">
+    ```javascript
+    Highcharts.setOptions({
+        lang: {
+            // Localization
+            locale: 'en-US',
+            
+            // Date/time
+            months: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                     'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+            shortMonths: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
+                          'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+            weekdays: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 
+                       'Jueves', 'Viernes', 'Sábado'],
+            
+            // UI strings
+            loading: 'Cargando...',
+            resetZoom: 'Restablecer zoom',
+            resetZoomTitle: 'Restablecer nivel de zoom 1:1',
+            
+            // Number formatting
+            decimalPoint: ',',
+            thousandsSep: '.',
+            numericSymbols: ['k', 'M', 'G', 'T', 'P', 'E'],
+            numericSymbolMagnitude: 1000
+        }
+    });
+    ```
+  </Tab>
+
+  <Tab title="Global Theme">
+    ```javascript
+    // Custom theme
+    Highcharts.setOptions({
+        colors: ['#2b908f', '#90ee7e', '#f45b5b', '#7798BF', 
+                 '#aaeeee', '#ff0066', '#eeaaee', '#55BF3B',
+                 '#DF5353', '#7798BF', '#aaeeee'],
+        chart: {
+            backgroundColor: {
+                linearGradient: { x1: 0, y1: 0, x2: 1, y2: 1 },
+                stops: [
+                    [0, '#2a2a2b'],
+                    [1, '#3e3e40']
+                ]
+            },
+            style: {
+                fontFamily: '\'Unica One\', sans-serif'
+            },
+            plotBorderColor: '#606063'
+        },
+        title: {
+            style: {
+                color: '#E0E0E3',
+                fontSize: '20px'
+            }
+        },
+        xAxis: {
+            gridLineColor: '#707073',
+            labels: {
+                style: {
+                    color: '#E0E0E3'
+                }
+            },
+            lineColor: '#707073',
+            tickColor: '#707073',
+            title: {
+                style: {
+                    color: '#A0A0A3'
+                }
+            }
+        },
+        yAxis: {
+            gridLineColor: '#707073',
+            labels: {
+                style: {
+                    color: '#E0E0E3'
+                }
+            },
+            lineColor: '#707073',
+            tickColor: '#707073',
+            title: {
+                style: {
+                    color: '#A0A0A3'
+                }
+            }
+        },
+        legend: {
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            itemStyle: {
+                color: '#E0E0E3'
+            }
+        }
+    });
+    ```
+  </Tab>
+</Tabs>
+
+## PlotOptions
+
+Define default options for each series type using `plotOptions`:
+
+```javascript
+Highcharts.chart('container', {
+    plotOptions: {
+        // Options for all series types
+        series: {
+            animation: true,
+            dataLabels: {
+                enabled: false
+            },
+            enableMouseTracking: true,
+            events: {
+                // Global series events
+            }
+        },
+        
+        // Options specific to line charts
+        line: {
+            lineWidth: 2,
+            marker: {
+                enabled: false
+            },
+            shadow: false
+        },
+        
+        // Options specific to column charts
+        column: {
+            borderWidth: 0,
+            pointPadding: 0.1,
+            groupPadding: 0.1,
+            dataLabels: {
+                enabled: true
+            }
+        },
+        
+        // Options specific to pie charts
+        pie: {
+            allowPointSelect: true,
+            cursor: 'pointer',
+            dataLabels: {
+                enabled: true,
+                format: '{point.name}: {point.percentage:.1f}%'
+            },
+            showInLegend: true
+        }
+    },
+    series: [{
+        type: 'line',
+        data: [1, 2, 3, 4, 5]
+        // Inherits plotOptions.line and plotOptions.series
+    }]
+});
+```
+
+## Options Hierarchy
+
+Understand how options are merged and prioritized:
+
+<CodeGroup>
+```javascript Priority Order
+// 1. Global defaults (Highcharts.defaultOptions)
+// 2. Global setOptions
+Highcharts.setOptions({
+    colors: ['#FF0000', '#00FF00']
+});
+
+// 3. Chart-level options
+Highcharts.chart('container', {
+    // 4. PlotOptions for series type
+    plotOptions: {
+        line: {
+            color: '#0000FF'  // Overrides global colors for lines
+        }
+    },
+    
+    // 5. Individual series options (highest priority)
+    series: [{
+        type: 'line',
+        color: '#FFFF00'  // Overrides plotOptions.line.color
+    }]
+});
+```
+
+```javascript Merging Behavior
+// Options are deep merged
+Highcharts.setOptions({
+    tooltip: {
+        backgroundColor: '#fff',
+        borderWidth: 1
+    }
+});
+
+Highcharts.chart('container', {
+    tooltip: {
+        borderWidth: 2  // Only overrides borderWidth
+        // backgroundColor: '#fff' is preserved
+    }
+});
+```
+</CodeGroup>
+
+## Options Interface
+
+TypeScript interface from `Options.ts`:
+
+```typescript
+interface Options {
+    chart?: ChartOptions;
+    title?: TitleOptions;
+    subtitle?: SubtitleOptions;
+    xAxis?: XAxisOptions | Array<XAxisOptions>;
+    yAxis?: YAxisOptions | Array<YAxisOptions>;
+    series?: Array<SeriesTypeOptions>;
+    plotOptions?: SeriesTypePlotOptions;
+    tooltip?: TooltipOptions;
+    legend?: LegendOptions;
+    credits?: CreditsOptions;
+    exporting?: ExportingOptions;
+    navigation?: NavigationOptions;
+    responsive?: ResponsiveOptions;
+    lang?: LangOptions;
+    colors?: Array<ColorString>;
+    accessibility?: AccessibilityOptions;
+}
+
+interface GlobalOptions {
+    buttonTheme?: ButtonThemeObject;
+    timezone?: string;
+    timezoneOffset?: number;
+    useUTC?: boolean;
+}
+
+interface LangOptions {
+    loading?: string;
+    months?: Array<string>;
+    shortMonths?: Array<string>;
+    weekdays?: Array<string>;
+    decimalPoint?: string;
+    thousandsSep?: string;
+    resetZoom?: string;
+    resetZoomTitle?: string;
+    numericSymbols?: Array<string>;
+    numericSymbolMagnitude?: number;
+    locale?: string;
+}
+```
+
+## Common Configuration Patterns
+
+<Tabs>
+  <Tab title="Color Customization">
+    ```javascript
+    // Global color palette
+    Highcharts.setOptions({
+        colors: ['#058DC7', '#50B432', '#ED561B', '#DDDF00', '#24CBE5']
+    });
+
+    // Per-chart colors
+    Highcharts.chart('container', {
+        colors: ['#FF0000', '#00FF00', '#0000FF'],
+        series: [{
+            data: [1, 2, 3]
+        }]
+    });
+
+    // Per-series color
+    series: [{
+        color: '#FF6600',
+        data: [1, 2, 3]
+    }]
+
+    // Per-point colors
+    series: [{
+        data: [
+            { y: 1, color: '#FF0000' },
+            { y: 2, color: '#00FF00' },
+            { y: 3, color: '#0000FF' }
+        ]
+    }]
+    ```
+  </Tab>
+
+  <Tab title="Tooltip Configuration">
+    ```javascript
+    Highcharts.chart('container', {
+        tooltip: {
+            enabled: true,
+            shared: true,
+            crosshairs: true,
+            backgroundColor: 'rgba(255, 255, 255, 0.85)',
+            borderWidth: 1,
+            borderColor: '#AAA',
+            shadow: true,
+            
+            // Custom formatting
+            formatter: function() {
+                let s = '<b>' + this.x + '</b>';
+                
+                this.points.forEach(function(point) {
+                    s += '<br/>' + point.series.name + ': ' + point.y;
+                });
+                
+                return s;
+            },
+            
+            // Or use format string
+            pointFormat: '<span style="color:{point.color}">●</span> {series.name}: <b>{point.y}</b><br/>',
+            
+            // Value formatting
+            valueDecimals: 2,
+            valuePrefix: '$',
+            valueSuffix: ' USD'
+        }
+    });
+    ```
+  </Tab>
+
+  <Tab title="Legend Configuration">
+    ```javascript
+    Highcharts.chart('container', {
+        legend: {
+            enabled: true,
+            align: 'right',
+            verticalAlign: 'middle',
+            layout: 'vertical',
+            
+            backgroundColor: '#FCFFC5',
+            borderColor: '#C98657',
+            borderWidth: 1,
+            borderRadius: 5,
+            
+            itemStyle: {
+                fontSize: '12px',
+                fontWeight: 'bold',
+                color: '#333'
+            },
+            
+            itemHoverStyle: {
+                color: '#000'
+            },
+            
+            itemHiddenStyle: {
+                color: '#CCC'
+            },
+            
+            // Custom symbol
+            symbolHeight: 12,
+            symbolWidth: 12,
+            symbolRadius: 6,
+            
+            // Navigation for long legends
+            navigation: {
+                enabled: true,
+                activeColor: '#3E576F',
+                inactiveColor: '#CCC'
+            }
+        }
+    });
+    ```
+  </Tab>
+
+  <Tab title="Credits & Exporting">
+    ```javascript
+    Highcharts.chart('container', {
+        // Disable Highcharts.com link
+        credits: {
+            enabled: false
+            // Or customize:
+            // text: 'My Company',
+            // href: 'https://example.com'
+        },
+        
+        // Export configuration
+        exporting: {
+            enabled: true,
+            buttons: {
+                contextButton: {
+                    menuItems: [
+                        'viewFullscreen',
+                        'printChart',
+                        'separator',
+                        'downloadPNG',
+                        'downloadJPEG',
+                        'downloadPDF',
+                        'downloadSVG',
+                        'separator',
+                        'downloadCSV',
+                        'downloadXLS'
+                    ]
+                }
+            },
+            filename: 'my-chart',
+            chartOptions: {
+                // Options for exported chart
+                title: {
+                    text: 'Exported Chart'
+                }
+            }
+        }
+    });
+    ```
+  </Tab>
+</Tabs>
+
+## Option Parameters Reference
+
+<ParamField path="colors" type="string[]">
+  Default colors for the chart's series. Array of color strings (hex, rgb, rgba).
+</ParamField>
+
+<ParamField path="lang" type="LangOptions">
+  Language strings and settings for localization.
+</ParamField>
+
+<ParamField path="plotOptions" type="SeriesTypePlotOptions">
+  Default plotting options for all series types and specific series types.
+</ParamField>
+
+<ParamField path="tooltip" type="TooltipOptions">
+  Options for the tooltip that appears when the user hovers over a series or point.
+</ParamField>
+
+<ParamField path="legend" type="LegendOptions">
+  The legend is a box containing a symbol and name for each series item or point item in the chart.
+</ParamField>
+
+<ParamField path="credits" type="CreditsOptions">
+  Highcharts by default puts a credits label in the lower right corner of the chart.
+</ParamField>
+
+<ParamField path="exporting" type="ExportingOptions">
+  Options for the exporting module. Requires the exporting module to be loaded.
+</ParamField>
+
+## Real-World Examples
+
+<CodeGroup>
+```javascript Corporate Theme
+Highcharts.setOptions({
+    colors: ['#004990', '#0072CE', '#00A4E4', '#41B6E6', '#7ED3F7'],
+    chart: {
+        backgroundColor: '#FFFFFF',
+        style: {
+            fontFamily: 'Roboto, sans-serif'
+        },
+        borderRadius: 8,
+        plotBorderWidth: 1,
+        plotBorderColor: '#E5E5E5'
+    },
+    title: {
+        style: {
+            color: '#333333',
+            fontSize: '18px',
+            fontWeight: '600'
+        },
+        align: 'left'
+    },
+    subtitle: {
+        style: {
+            color: '#666666',
+            fontSize: '14px'
+        },
+        align: 'left'
+    },
+    legend: {
+        itemStyle: {
+            fontSize: '12px',
+            color: '#333333'
+        },
+        itemHoverStyle: {
+            color: '#004990'
+        }
+    },
+    credits: {
+        enabled: false
+    },
+    plotOptions: {
+        series: {
+            animation: {
+                duration: 1000
+            },
+            dataLabels: {
+                style: {
+                    fontSize: '11px',
+                    fontWeight: '400'
+                }
+            }
+        }
+    }
+});
+```
+
+```javascript Localization
+// French localization
+Highcharts.setOptions({
+    lang: {
+        months: [
+            'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+            'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
+        ],
+        shortMonths: [
+            'Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin',
+            'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'
+        ],
+        weekdays: [
+            'Dimanche', 'Lundi', 'Mardi', 'Mercredi', 
+            'Jeudi', 'Vendredi', 'Samedi'
+        ],
+        loading: 'Chargement...',
+        resetZoom: 'Réinitialiser le zoom',
+        resetZoomTitle: 'Réinitialiser le zoom au niveau 1:1',
+        decimalPoint: ',',
+        thousandsSep: ' ',
+        numericSymbols: ['k', 'M', 'G', 'T', 'P', 'E']
+    }
+});
+```
+
+```javascript Accessibility First
+Highcharts.chart('container', {
+    accessibility: {
+        enabled: true,
+        description: 'Sales performance chart showing quarterly results',
+        keyboardNavigation: {
+            enabled: true
+        },
+        announceNewData: {
+            enabled: true
+        },
+        screenReaderSection: {
+            beforeChartFormat: '<h3>{chartTitle}</h3><div>{chartSubtitle}</div>'
+        }
+    },
+    title: {
+        text: 'Quarterly Sales Performance'
+    },
+    subtitle: {
+        text: 'Q1-Q4 2024'
+    },
+    xAxis: {
+        categories: ['Q1', 'Q2', 'Q3', 'Q4'],
+        accessibility: {
+            description: 'Quarters of the year'
+        }
+    },
+    yAxis: {
+        title: {
+            text: 'Sales (USD)'
+        },
+        accessibility: {
+            description: 'Sales in US Dollars'
+        }
+    },
+    series: [{
+        name: 'Revenue',
+        data: [29.9, 71.5, 106.4, 129.2],
+        accessibility: {
+            description: 'Revenue trend across quarters'
+        }
+    }]
+});
+```
+</CodeGroup>
+
+## Dynamic Options Updates
+
+Update chart options after initialization:
+
+```javascript
+const chart = Highcharts.chart('container', { /* initial options */ });
+
+// Update entire chart configuration
+chart.update({
+    title: {
+        text: 'Updated Title'
+    },
+    colors: ['#FF0000', '#00FF00']
+});
+
+// Update with specific merge behavior
+chart.update({
+    plotOptions: {
+        series: {
+            animation: false
+        }
+    }
+}, true, true, false);
+// (options, redraw, oneToOne, animation)
+```
+
+## Best Practices
+
+<Note>
+  Use `Highcharts.setOptions()` for options that should apply to all charts in your application. This ensures consistency and reduces code duplication.
+</Note>
+
+1. **Global Defaults** - Set common options globally with `setOptions()`
+2. **Type Safety** - Use TypeScript interfaces for better IDE support
+3. **Performance** - Disable animations for charts with frequent updates
+4. **Accessibility** - Always include accessibility options for better UX
+5. **Theming** - Create reusable themes with `setOptions()`
+
+<Warning>
+  Be careful when using `Highcharts.setOptions()` as it affects all charts created after the call. If you need chart-specific options, pass them in the chart constructor instead.
+</Warning>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Chart Configuration" icon="chart-mixed" href="/concepts/charts">
+    Learn about chart-specific options
+  </Card>
+  <Card title="Responsive Charts" icon="mobile" href="/concepts/responsive">
+    Make charts adapt to screen size
+  </Card>
+  <Card title="Themes" icon="palette" href="/examples/basic-charts">
+    Explore pre-built themes
+  </Card>
+  <Card title="API Reference" icon="code" href="/api/chart-options">
+    Complete options API documentation
+  </Card>
+</CardGroup>

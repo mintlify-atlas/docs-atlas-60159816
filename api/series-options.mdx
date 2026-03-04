@@ -1,0 +1,648 @@
+---
+title: 'Series Configuration Options'
+description: 'Complete reference for Highcharts series configuration options'
+---
+
+# Series Configuration Options
+
+Series options control the data, appearance, and behavior of individual data series within a chart.
+
+**Source**: `ts/Core/Series/SeriesOptions.ts`
+
+## Basic Configuration
+
+```javascript
+Highcharts.chart('container', {
+  series: [{
+    type: 'line',
+    name: 'Sales',
+    data: [1, 3, 2, 4, 5],
+    color: '#7cb5ec'
+  }]
+});
+```
+
+## Core Options
+
+### type
+
+<ParamField path="type" type="string" required>
+  The series type (line, column, bar, pie, scatter, etc.)
+</ParamField>
+
+```javascript
+series: [{
+  type: 'column',
+  data: [1, 2, 3]
+}]
+```
+
+### name
+
+<ParamField path="name" type="string">
+  The name of the series as shown in the legend and tooltip
+</ParamField>
+
+```javascript
+series: [{
+  name: 'Monthly Sales',
+  data: [29.9, 71.5, 106.4]
+}]
+```
+
+### data
+
+<ParamField path="data" type="Array<number | [number, number] | PointOptions>" required>
+  The series data points
+</ParamField>
+
+```javascript
+series: [{
+  // Simple values
+  data: [1, 2, 3, 4, 5]
+}]
+
+series: [{
+  // [x, y] tuples
+  data: [[0, 1], [1, 3], [2, 2]]
+}]
+
+series: [{
+  // Point configurations
+  data: [
+    { y: 10, name: 'Point 1', color: 'red' },
+    { y: 20, marker: { enabled: true }},
+    { x: 5, y: 15, id: 'special' }
+  ]
+}]
+```
+
+### id
+
+<ParamField path="id" type="string">
+  Unique identifier for the series, used with chart.get()
+</ParamField>
+
+```javascript
+series: [{
+  id: 'main-series',
+  data: [1, 2, 3]
+}]
+
+// Later access
+const series = chart.get('main-series');
+```
+
+## Appearance Options
+
+### color
+
+<ParamField path="color" type="ColorType">
+  The main color of the series
+</ParamField>
+
+```javascript
+series: [{
+  color: '#ff0000',  // Hex color
+  data: [1, 2, 3]
+}]
+
+series: [{
+  color: 'rgba(255, 0, 0, 0.5)',  // RGBA
+  data: [1, 2, 3]
+}]
+
+series: [{
+  color: {  // Gradient
+    linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+    stops: [
+      [0, '#ff0000'],
+      [1, '#0000ff']
+    ]
+  },
+  data: [1, 2, 3]
+}]
+```
+
+### colorIndex
+
+<ParamField path="colorIndex" type="number">
+  Index into the default colors array (for styled mode)
+</ParamField>
+
+```javascript
+series: [{
+  colorIndex: 3,  // Use 4th color from palette
+  data: [1, 2, 3]
+}]
+```
+
+### lineWidth
+
+<ParamField path="lineWidth" type="number" default="2">
+  Width of the line graph in pixels
+</ParamField>
+
+```javascript
+series: [{
+  type: 'line',
+  lineWidth: 3,
+  data: [1, 2, 3]
+}]
+```
+
+### dashStyle
+
+<ParamField path="dashStyle" type="string" default="Solid">
+  Dash style for the graph line
+</ParamField>
+
+```javascript
+series: [{
+  type: 'line',
+  dashStyle: 'Dash',  // 'Solid', 'ShortDash', 'Dot', etc.
+  data: [1, 2, 3]
+}]
+```
+
+### opacity
+
+<ParamField path="opacity" type="number" default="1">
+  Opacity of the series (0-1)
+</ParamField>
+
+```javascript
+series: [{
+  opacity: 0.5,
+  data: [1, 2, 3]
+}]
+```
+
+### visible
+
+<ParamField path="visible" type="boolean" default="true">
+  Whether the series should be initially visible
+</ParamField>
+
+```javascript
+series: [{
+  name: 'Hidden Series',
+  visible: false,
+  data: [1, 2, 3]
+}]
+```
+
+### showInLegend
+
+<ParamField path="showInLegend" type="boolean" default="true">
+  Whether to show the series in the legend
+</ParamField>
+
+```javascript
+series: [{
+  name: 'Helper Series',
+  showInLegend: false,
+  data: [1, 2, 3]
+}]
+```
+
+## Marker Options
+
+### marker
+
+<ParamField path="marker" type="object">
+  Options for point markers
+</ParamField>
+
+```javascript
+series: [{
+  marker: {
+    enabled: true,
+    symbol: 'circle',  // 'circle', 'square', 'diamond', 'triangle'
+    radius: 5,
+    fillColor: '#ffffff',
+    lineColor: null,  // Inherits from series.color
+    lineWidth: 2,
+    states: {
+      hover: {
+        enabled: true,
+        radius: 7
+      }
+    }
+  },
+  data: [1, 2, 3]
+}]
+```
+
+## Data Labels
+
+### dataLabels
+
+<ParamField path="dataLabels" type="object">
+  Options for data labels on points
+</ParamField>
+
+```javascript
+series: [{
+  dataLabels: {
+    enabled: true,
+    format: '{point.y}',
+    style: {
+      fontSize: '12px',
+      fontWeight: 'bold',
+      color: '#000000'
+    },
+    align: 'center',
+    verticalAlign: 'top',
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    borderWidth: 1,
+    borderRadius: 3,
+    padding: 5
+  },
+  data: [1, 2, 3]
+}]
+```
+
+**Source**: Referenced in `ts/Core/Series/DataLabelOptions.ts`
+
+## Axis Assignment
+
+### xAxis
+
+<ParamField path="xAxis" type="number | string">
+  Index or ID of the X axis to use
+</ParamField>
+
+```javascript
+series: [{
+  xAxis: 0,  // Use first X axis
+  data: [[1, 10], [2, 20]]
+}]
+
+series: [{
+  xAxis: 'primary-x',  // Use axis with id 'primary-x'
+  data: [[1, 10], [2, 20]]
+}]
+```
+
+### yAxis
+
+<ParamField path="yAxis" type="number | string">
+  Index or ID of the Y axis to use
+</ParamField>
+
+```javascript
+yAxis: [{
+  id: 'temperature',
+  title: { text: 'Temperature' }
+}, {
+  id: 'rainfall',
+  title: { text: 'Rainfall' },
+  opposite: true
+}],
+
+series: [{
+  name: 'Temperature',
+  yAxis: 'temperature',
+  data: [7, 9, 12, 15]
+}, {
+  name: 'Rainfall',
+  yAxis: 'rainfall',
+  data: [50, 45, 40, 35]
+}]
+```
+
+## Stacking
+
+### stack
+
+<ParamField path="stack" type="string | number">
+  Stack identifier for grouping series
+</ParamField>
+
+```javascript
+plotOptions: {
+  column: {
+    stacking: 'normal'  // or 'percent'
+  }
+},
+
+series: [{
+  name: 'Series 1',
+  stack: 'male',
+  data: [5, 3, 4]
+}, {
+  name: 'Series 2',
+  stack: 'male',
+  data: [3, 4, 4]
+}, {
+  name: 'Series 3',
+  stack: 'female',
+  data: [2, 5, 6]
+}]
+```
+
+### stacking
+
+<ParamField path="stacking" type="string">
+  Stacking type: 'normal', 'percent', or undefined
+</ParamField>
+
+```javascript
+series: [{
+  type: 'column',
+  stacking: 'normal',
+  data: [1, 2, 3]
+}]
+```
+
+## Sorting & Grouping
+
+### dataSorting
+
+<ParamField path="dataSorting" type="object">
+  Data sorting configuration
+</ParamField>
+
+```javascript
+series: [{
+  dataSorting: {
+    enabled: true,
+    matchByName: true,
+    sortKey: 'y'
+  },
+  data: [
+    { name: 'A', y: 3 },
+    { name: 'B', y: 1 },
+    { name: 'C', y: 2 }
+  ]
+}]
+```
+
+**Source**: `ts/Core/Series/SeriesOptions.ts:63`
+
+## Events
+
+### events
+
+<ParamField path="events" type="object">
+  Event handlers for series events
+</ParamField>
+
+```javascript
+series: [{
+  events: {
+    click: function(event) {
+      console.log('Series clicked:', this.name);
+    },
+    hide: function() {
+      console.log('Series hidden');
+    },
+    show: function() {
+      console.log('Series shown');
+    },
+    afterAnimate: function() {
+      console.log('Animation complete');
+    },
+    legendItemClick: function() {
+      return false; // Prevent hide/show on legend click
+    }
+  },
+  data: [1, 2, 3]
+}]
+```
+
+**Source**: `ts/Core/Series/SeriesOptions.ts:111`
+
+## Animation
+
+### animation
+
+<ParamField path="animation" type="boolean | AnimationOptions" default="true">
+  Animation configuration for this series
+</ParamField>
+
+```javascript
+series: [{
+  animation: false,  // Disable animation
+  data: [1, 2, 3]
+}]
+
+series: [{
+  animation: {
+    duration: 2000,
+    easing: 'easeOutBounce'
+  },
+  data: [1, 2, 3]
+}]
+```
+
+## Threshold & Zones
+
+### threshold
+
+<ParamField path="threshold" type="number" default="0">
+  The Y value threshold for negative color
+</ParamField>
+
+```javascript
+series: [{
+  type: 'line',
+  threshold: 50,
+  negativeColor: '#ff0000',
+  data: [10, 60, 30, 70, 40]
+}]
+```
+
+**Source**: Referenced in `ts/Core/Series/SeriesOptions.ts:148`
+
+### zones
+
+<ParamField path="zones" type="Array<object>">
+  Zone definitions for coloring parts of the series
+</ParamField>
+
+```javascript
+series: [{
+  type: 'line',
+  zones: [
+    { value: 30, color: '#ff0000' },  // Red below 30
+    { value: 70, color: '#ffff00' },  // Yellow 30-70
+    { color: '#00ff00' }              // Green above 70
+  ],
+  data: [10, 40, 60, 80, 50]
+}]
+```
+
+## States
+
+### states
+
+<ParamField path="states" type="object">
+  Visual states for hover, select, and inactive
+</ParamField>
+
+```javascript
+series: [{
+  states: {
+    hover: {
+      enabled: true,
+      lineWidth: 4,
+      halo: {
+        size: 10,
+        opacity: 0.5
+      }
+    },
+    select: {
+      color: '#ff0000',
+      borderColor: '#000000'
+    },
+    inactive: {
+      opacity: 0.2
+    }
+  },
+  data: [1, 2, 3]
+}]
+```
+
+## Point Options
+
+### point
+
+<ParamField path="point" type="object">
+  Options for all points in the series
+</ParamField>
+
+```javascript
+series: [{
+  point: {
+    events: {
+      click: function() {
+        console.log('Point clicked:', this.y);
+      },
+      mouseOver: function() {
+        this.update({ color: 'red' });
+      }
+    }
+  },
+  data: [1, 2, 3]
+}]
+```
+
+## Complete Example
+
+```javascript
+Highcharts.chart('container', {
+  chart: {
+    type: 'line'
+  },
+  
+  title: {
+    text: 'Comprehensive Series Configuration'
+  },
+  
+  xAxis: {
+    categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May']
+  },
+  
+  yAxis: {
+    title: { text: 'Value' }
+  },
+  
+  series: [{
+    // Identity
+    id: 'main-series',
+    name: 'Primary Data',
+    
+    // Data
+    data: [
+      { y: 29.9, marker: { enabled: true }},
+      71.5,
+      { y: 106.4, color: 'red', dataLabels: { enabled: true }},
+      129.2,
+      144.0
+    ],
+    
+    // Appearance
+    color: '#7cb5ec',
+    lineWidth: 3,
+    dashStyle: 'Solid',
+    opacity: 1,
+    
+    // Markers
+    marker: {
+      enabled: false,
+      symbol: 'circle',
+      radius: 4,
+      states: {
+        hover: {
+          enabled: true,
+          radius: 6
+        }
+      }
+    },
+    
+    // Data Labels
+    dataLabels: {
+      enabled: false,
+      format: '{point.y:.1f}',
+      style: { fontSize: '10px' }
+    },
+    
+    // Threshold & Zones
+    threshold: 100,
+    zones: [
+      { value: 50, color: '#ff0000' },
+      { value: 100, color: '#ffaa00' },
+      { color: '#00ff00' }
+    ],
+    
+    // States
+    states: {
+      hover: {
+        lineWidth: 4,
+        halo: {
+          size: 8,
+          opacity: 0.25
+        }
+      }
+    },
+    
+    // Events
+    events: {
+      click: function() {
+        alert('Series clicked: ' + this.name);
+      },
+      mouseOver: function() {
+        console.log('Mouse over:', this.name);
+      },
+      afterAnimate: function() {
+        console.log('Animation complete');
+      }
+    },
+    
+    // Point configuration
+    point: {
+      events: {
+        click: function() {
+          alert('Point clicked: ' + this.y);
+        }
+      }
+    },
+    
+    // Behavior
+    visible: true,
+    showInLegend: true,
+    animation: {
+      duration: 1000
+    }
+  }]
+});
+```
+
+## See Also
+
+- [Series Class API](/api/series) - Series methods and properties
+- [Point Options](/api/point) - Individual point configuration
+- [Plot Options](/api/plot-options) - Global series defaults
+- [Events API](/api/events) - Series events

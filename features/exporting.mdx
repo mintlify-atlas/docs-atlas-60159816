@@ -1,0 +1,624 @@
+---
+title: Export Functionality
+description: Enable users to download charts as images, PDFs, or print them directly from your application
+---
+
+# Export Functionality
+
+The Highcharts Exporting module provides built-in functionality to export charts as images (PNG, JPEG, SVG), PDF files, or print them directly.
+
+## Setup
+
+Include the exporting module in your project:
+
+```javascript
+import Highcharts from 'highcharts';
+import Exporting from 'highcharts/modules/exporting';
+
+Exporting(Highcharts);
+
+Highcharts.chart('container', {
+  // Chart configuration
+});
+```
+
+## Basic Export Configuration
+
+By default, a context menu with export options appears when hovering over the chart.
+
+### Enable/Disable Exporting
+
+```javascript
+{
+  exporting: {
+    enabled: true  // true by default when module is loaded
+  }
+}
+```
+
+### Default Export Buttons
+
+The default configuration includes a hamburger menu with export options:
+
+```javascript
+{
+  exporting: {
+    buttons: {
+      contextButton: {
+        menuItems: [
+          'viewFullscreen',
+          'printChart',
+          'separator',
+          'downloadPNG',
+          'downloadJPEG',
+          'downloadPDF',
+          'downloadSVG'
+        ]
+      }
+    }
+  }
+}
+```
+
+## Export Formats
+
+### Image Exports (PNG, JPEG)
+
+<CodeGroup>
+```javascript PNG Export
+{
+  exporting: {
+    type: 'image/png',
+    filename: 'my-chart',
+    sourceWidth: 1200,
+    sourceHeight: 600,
+    scale: 2  // For retina displays
+  }
+}
+```
+
+```javascript JPEG Export
+{
+  exporting: {
+    type: 'image/jpeg',
+    filename: 'my-chart',
+    // JPEG doesn't support transparency
+    backgroundColor: '#ffffff'
+  }
+}
+```
+
+```javascript Custom Size
+{
+  exporting: {
+    sourceWidth: 1920,
+    sourceHeight: 1080,
+    scale: 1,
+    chartOptions: {
+      // Override chart options for export
+      chart: {
+        backgroundColor: '#ffffff'
+      },
+      title: {
+        style: {
+          fontSize: '24px'
+        }
+      }
+    }
+  }
+}
+```
+</CodeGroup>
+
+### Vector Exports (SVG, PDF)
+
+```javascript
+{
+  exporting: {
+    type: 'application/pdf',
+    // Or 'image/svg+xml' for SVG
+    
+    // PDF/SVG options
+    allowHTML: false,  // HTML not supported in PDF
+    
+    // For better quality
+    fallbackToExportServer: true
+  }
+}
+```
+
+## Export Button Customization
+
+### Button Position and Styling
+
+```javascript
+{
+  exporting: {
+    buttons: {
+      contextButton: {
+        align: 'right',
+        verticalAlign: 'top',
+        x: -10,
+        y: 10,
+        symbolFill: '#666666',
+        symbolStroke: '#666666',
+        symbolStrokeWidth: 2,
+        theme: {
+          fill: '#ffffff',
+          stroke: '#cccccc',
+          r: 3,
+          states: {
+            hover: {
+              fill: '#f5f5f5'
+            },
+            select: {
+              fill: '#e6e6e6',
+              stroke: '#999999'
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+### Custom Menu Items
+
+<Steps>
+  <Step title="Add Custom Menu Item">
+    Create a custom export action:
+    
+    ```javascript
+    {
+      exporting: {
+        buttons: {
+          contextButton: {
+            menuItems: [
+              'downloadPNG',
+              'downloadSVG',
+              'separator',
+              {
+                text: 'Export to Excel',
+                onclick: function () {
+                  // Export data to Excel
+                  this.downloadXLS();
+                }
+              },
+              {
+                text: 'Copy to Clipboard',
+                onclick: function () {
+                  // Custom copy action
+                  const svg = this.getSVG();
+                  navigator.clipboard.writeText(svg);
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+    ```
+  </Step>
+  
+  <Step title="Multiple Export Buttons">
+    Add additional export buttons:
+    
+    ```javascript
+    {
+      exporting: {
+        buttons: {
+          contextButton: {
+            // Default menu button
+          },
+          printButton: {
+            text: 'Print',
+            symbol: 'printIcon',
+            x: -60,
+            onclick: function () {
+              this.print();
+            }
+          },
+          downloadButton: {
+            text: 'Download',
+            x: -110,
+            onclick: function () {
+              this.exportChart();
+            }
+          }
+        }
+      }
+    }
+    ```
+  </Step>
+</Steps>
+
+## Export Methods (from `ts/Extensions/Exporting/Exporting.ts:148-184`)
+
+Trigger exports programmatically:
+
+### Export Chart
+
+```javascript
+// Get chart instance
+const chart = Highcharts.chart('container', { /* ... */ });
+
+// Export as PNG (default)
+chart.exportChart();
+
+// Export with custom options
+chart.exportChart({
+  type: 'image/jpeg',
+  filename: 'my-custom-chart'
+}, {
+  // Override chart options for export
+  title: {
+    text: 'Exported Chart'
+  }
+});
+```
+
+### Get SVG
+
+```javascript
+// Get SVG string
+const svg = chart.getSVG();
+
+// Get SVG with custom options
+const svg = chart.getSVG({
+  chart: {
+    backgroundColor: '#ffffff'
+  },
+  credits: {
+    enabled: false
+  }
+});
+
+// Use the SVG
+console.log(svg);
+// Or send to server
+fetch('/api/save-chart', {
+  method: 'POST',
+  body: JSON.stringify({ svg: svg })
+});
+```
+
+### Print Chart
+
+```javascript
+// Print the chart
+chart.print();
+
+// With custom options
+chart.print({
+  title: {
+    text: 'Printed Chart'
+  }
+});
+```
+
+## Offline Exporting
+
+For client-side exporting without an external server:
+
+```javascript
+import Highcharts from 'highcharts';
+import Exporting from 'highcharts/modules/exporting';
+import OfflineExporting from 'highcharts/modules/offline-exporting';
+
+Exporting(Highcharts);
+OfflineExporting(Highcharts);
+
+Highcharts.chart('container', {
+  exporting: {
+    fallbackToExportServer: false  // Don't use external server
+  },
+  // Chart configuration
+});
+```
+
+<Note>
+**Offline Export Limitations**
+- PDF export requires an external library (jsPDF)
+- Some browsers may have limitations
+- Image quality may vary compared to server-side rendering
+</Note>
+
+## Export Server Configuration
+
+### Using Highcharts Export Server
+
+```javascript
+{
+  exporting: {
+    url: 'https://export.highcharts.com/',
+    // Or your own server
+    // url: 'https://your-server.com/export',
+    
+    // Error handling
+    error: function (options, error) {
+      console.error('Export failed:', error);
+      alert('Export failed. Please try again.');
+    }
+  }
+}
+```
+
+### Custom Export Server
+
+```javascript
+{
+  exporting: {
+    url: '/api/export',
+    
+    // Custom data to send to server
+    fetchOptions: {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json'
+      }
+    }
+  }
+}
+```
+
+## Exporting with Chart Modifications
+
+### Add Watermark or Logo
+
+```javascript
+{
+  exporting: {
+    chartOptions: {
+      chart: {
+        events: {
+          load: function () {
+            // Add logo to exported chart
+            this.renderer.image(
+              'https://example.com/logo.png',
+              this.plotLeft,
+              this.plotTop,
+              100,
+              50
+            ).add();
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+### Different Styling for Export
+
+```javascript
+{
+  exporting: {
+    chartOptions: {
+      chart: {
+        backgroundColor: '#ffffff'  // White background for export
+      },
+      title: {
+        style: {
+          color: '#000000',
+          fontSize: '18px'
+        }
+      },
+      credits: {
+        enabled: true,
+        text: 'Copyright © 2024 My Company'
+      }
+    }
+  }
+}
+```
+
+## Export Events
+
+Handle export lifecycle with events (from `ts/Extensions/Exporting/Exporting.ts:189-200`):
+
+```javascript
+{
+  chart: {
+    events: {
+      beforePrint: function () {
+        console.log('About to print');
+        // Modify chart before printing
+        this.update({
+          chart: {
+            backgroundColor: '#ffffff'
+          }
+        });
+      },
+      afterPrint: function () {
+        console.log('Print completed');
+        // Restore original settings
+        this.update({
+          chart: {
+            backgroundColor: null
+          }
+        });
+      }
+    }
+  },
+  exporting: {
+    buttons: {
+      contextButton: {
+        onclick: function () {
+          console.log('Export button clicked');
+        }
+      }
+    }
+  }
+}
+```
+
+## Fullscreen Mode
+
+The exporting module also provides fullscreen functionality:
+
+```javascript
+import Fullscreen from 'highcharts/modules/full-screen';
+
+Fullscreen(Highcharts);
+
+Highcharts.chart('container', {
+  exporting: {
+    buttons: {
+      contextButton: {
+        menuItems: [
+          'viewFullscreen',  // Fullscreen option
+          'separator',
+          'downloadPNG',
+          'downloadSVG'
+        ]
+      }
+    }
+  },
+  // Chart configuration
+});
+
+// Programmatically toggle fullscreen
+chart.fullscreen.toggle();
+```
+
+## Export Data Module
+
+Export the underlying chart data:
+
+```javascript
+import ExportData from 'highcharts/modules/export-data';
+
+ExportData(Highcharts);
+
+Highcharts.chart('container', {
+  exporting: {
+    buttons: {
+      contextButton: {
+        menuItems: [
+          'downloadPNG',
+          'separator',
+          'downloadCSV',    // Export as CSV
+          'downloadXLS',    // Export as Excel
+          'viewData'        // View data table
+        ]
+      }
+    },
+    csv: {
+      dateFormat: '%Y-%m-%d',
+      itemDelimiter: ',',
+      lineDelimiter: '\n'
+    }
+  },
+  // Chart configuration
+});
+
+// Programmatically get data
+const csv = chart.getCSV();
+const table = chart.getTable();
+```
+
+## Best Practices
+
+<Note>
+**Export Quality Tips**
+- Use `sourceWidth` and `sourceHeight` for high-resolution exports
+- Set `scale: 2` for retina displays
+- Use white background for printed charts
+- Include credits and proper attribution
+- Test exports across different file formats
+- Consider using offline exporting for better privacy
+</Note>
+
+<Warning>
+**Important Considerations**
+- External export server sends chart data to Highcharts servers
+- For sensitive data, use offline exporting or your own server
+- Large or complex charts may take time to export
+- PDF export requires additional dependencies
+- Some features (like HTML labels) may not work in all export formats
+- Browser popup blockers may prevent download dialogs
+</Warning>
+
+## Complete Example
+
+```javascript
+import Highcharts from 'highcharts';
+import Exporting from 'highcharts/modules/exporting';
+import OfflineExporting from 'highcharts/modules/offline-exporting';
+import ExportData from 'highcharts/modules/export-data';
+
+Exporting(Highcharts);
+OfflineExporting(Highcharts);
+ExportData(Highcharts);
+
+const chart = Highcharts.chart('container', {
+  chart: {
+    type: 'column',
+    events: {
+      beforePrint: function () {
+        this.update({ chart: { backgroundColor: '#ffffff' } });
+      },
+      afterPrint: function () {
+        this.update({ chart: { backgroundColor: null } });
+      }
+    }
+  },
+  title: {
+    text: 'Exportable Chart'
+  },
+  exporting: {
+    enabled: true,
+    fallbackToExportServer: false,
+    buttons: {
+      contextButton: {
+        align: 'right',
+        verticalAlign: 'top',
+        x: -10,
+        y: 10,
+        menuItems: [
+          'viewFullscreen',
+          'separator',
+          'downloadPNG',
+          'downloadJPEG',
+          'downloadPDF',
+          'downloadSVG',
+          'separator',
+          'downloadCSV',
+          'downloadXLS',
+          'viewData'
+        ]
+      }
+    },
+    chartOptions: {
+      chart: {
+        backgroundColor: '#ffffff'
+      },
+      credits: {
+        enabled: true
+      }
+    },
+    sourceWidth: 1200,
+    sourceHeight: 600,
+    scale: 2
+  },
+  series: [{
+    name: 'Sales',
+    data: [29.9, 71.5, 106.4, 129.2, 144.0, 176.0]
+  }]
+});
+
+// Programmatic export
+document.getElementById('export-btn').addEventListener('click', () => {
+  chart.exportChart({
+    type: 'image/png',
+    filename: 'my-chart-' + Date.now()
+  });
+});
+```
+
+## Related Resources
+
+- [Accessibility Features](/features/accessibility)
+- [Drilldown Functionality](/features/drilldown)
+- [Tooltips and Data Labels](/features/tooltips-labels)

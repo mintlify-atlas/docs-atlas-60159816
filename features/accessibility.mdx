@@ -1,0 +1,575 @@
+---
+title: Accessibility Features
+description: Make your charts accessible to all users, including those using assistive technologies
+---
+
+# Accessibility Features
+
+Highcharts includes comprehensive accessibility features to ensure your charts can be understood and navigated by users with disabilities, including those using screen readers, keyboard navigation, and other assistive technologies.
+
+## Overview
+
+The Accessibility module (from `ts/Accessibility/Accessibility.ts:84-96`) provides:
+- Screen reader support
+- Keyboard navigation
+- High contrast mode
+- Sonification (audio representation)
+- WCAG 2.1 compliance features
+
+## Setup
+
+The accessibility module is included by default in Highcharts. No additional imports are needed:
+
+```javascript
+Highcharts.chart('container', {
+  accessibility: {
+    enabled: true  // Enabled by default
+  },
+  // Chart configuration
+});
+```
+
+## Screen Reader Support
+
+### Basic Configuration
+
+From the accessibility sample (`samples/highcharts/accessibility/accessible-bar/demo.js:1-52`):
+
+```javascript
+Highcharts.chart('container', {
+  chart: {
+    type: 'bar'
+  },
+  title: {
+    text: 'Desktop screen readers'
+  },
+  caption: {
+    text: 'Basic bar chart demo'
+  },
+  xAxis: {
+    type: 'category'
+  },
+  series: [{
+    name: 'Percentage usage',
+    data: [
+      {
+        name: 'JAWS',
+        y: 30.2,
+        accessibility: {
+          description: 'This is the most used desktop screen reader'
+        }
+      },
+      {
+        name: 'NVDA',
+        y: 14.6
+      },
+      {
+        name: 'VoiceOver',
+        y: 7.6
+      }
+    ]
+  }]
+});
+```
+
+### Chart Description
+
+Provide context for screen reader users:
+
+```javascript
+{
+  accessibility: {
+    description: 'A detailed chart showing quarterly sales data for 2024, ' +
+                 'with significant growth in Q3 reaching $2.5 million.',
+    
+    screenReaderSection: {
+      beforeChartFormat: '<div>Chart showing {chartTitle}</div>',
+      afterChartFormat: '<div>End of interactive chart. {/div}',
+      beforeRegionLabel: 'Chart region',
+      afterRegionLabel: ''
+    }
+  }
+}
+```
+
+### Point Descriptions
+
+Add detailed descriptions to individual data points:
+
+```javascript
+{
+  series: [{
+    data: [
+      {
+        y: 100,
+        name: 'Q1',
+        accessibility: {
+          description: 'First quarter showed strong performance with ' +
+                       '15% growth over previous year'
+        }
+      },
+      {
+        y: 150,
+        name: 'Q2',
+        accessibility: {
+          description: 'Second quarter exceeded expectations'
+        }
+      }
+    ]
+  }]
+}
+```
+
+### Series Descriptions
+
+```javascript
+{
+  series: [
+    {
+      name: 'Revenue',
+      accessibility: {
+        description: 'Total revenue across all product lines',
+        exposeAsGroupOnly: false,
+        keyboardNavigation: {
+          enabled: true
+        }
+      },
+      data: [29.9, 71.5, 106.4]
+    },
+    {
+      name: 'Costs',
+      accessibility: {
+        description: 'Operating costs including overhead'
+      },
+      data: [20, 45, 70]
+    }
+  ]
+}
+```
+
+## Keyboard Navigation
+
+### Enable and Configure
+
+<Steps>
+  <Step title="Basic Keyboard Navigation">
+    Enable keyboard navigation:
+    
+    ```javascript
+    {
+      accessibility: {
+        keyboardNavigation: {
+          enabled: true,
+          focusBorder: {
+            enabled: true,
+            hideBrowserFocusOutline: true,
+            style: {
+              color: '#335cad',
+              lineWidth: 2,
+              borderRadius: 3
+            },
+            margin: 2
+          }
+        }
+      }
+    }
+    ```
+  </Step>
+  
+  <Step title="Navigation Order">
+    Control the order of keyboard navigation:
+    
+    ```javascript
+    {
+      accessibility: {
+        keyboardNavigation: {
+          order: [
+            'series',
+            'zoom',
+            'rangeSelector',
+            'legend',
+            'chartMenu'
+          ],
+          wrapAround: true  // Wrap to start after reaching end
+        }
+      }
+    }
+    ```
+  </Step>
+  
+  <Step title="Series Navigation">
+    Configure how users navigate between series:
+    
+    ```javascript
+    {
+      accessibility: {
+        keyboardNavigation: {
+          seriesNavigation: {
+            mode: 'normal',  // or 'serialize', 'smart'
+            skipNullPoints: true,
+            pointNavigationEnabledThreshold: 500
+          }
+        }
+      }
+    }
+    ```
+  </Step>
+</Steps>
+
+### Keyboard Shortcuts
+
+Default keyboard navigation:
+- **Tab**: Navigate between chart elements
+- **Arrow keys**: Navigate between data points
+- **Enter/Space**: Activate drilldown or click events
+- **Esc**: Reset zoom or exit drilldown
+- **Page Up/Down**: Navigate between series
+
+## High Contrast Mode
+
+### Automatic High Contrast Detection
+
+Highcharts automatically detects Windows High Contrast Mode:
+
+```javascript
+{
+  accessibility: {
+    highContrastMode: 'auto'  // or true, false
+  }
+}
+```
+
+### High Contrast Theme
+
+Apply a pre-built high contrast theme:
+
+```javascript
+import HighContrastLight from 'highcharts/themes/high-contrast-light';
+import HighContrastDark from 'highcharts/themes/high-contrast-dark';
+
+// Apply theme
+HighContrastLight(Highcharts);
+
+Highcharts.chart('container', {
+  // Chart configuration
+});
+```
+
+## Announcements for Dynamic Updates
+
+### Live Region Announcements
+
+```javascript
+{
+  accessibility: {
+    announceNewData: {
+      enabled: true,
+      minAnnounceInterval: 1000,
+      interruptUser: false,
+      announcementFormatter: function (allSeries, newSeries, newPoint) {
+        if (newPoint) {
+          return 'New data point: ' + newPoint.category + ', ' + newPoint.y;
+        }
+        if (newSeries) {
+          return 'New series added: ' + newSeries.name + ' with ' +
+                 newSeries.points.length + ' data points.';
+        }
+        return 'Chart updated.';
+      }
+    }
+  }
+}
+```
+
+## Accessibility Language Options
+
+### Customize Screen Reader Text
+
+```javascript
+{
+  lang: {
+    accessibility: {
+      chartContainerLabel: 'Interactive chart. {title}',
+      chartTypes: {
+        barSingle: 'Bar chart with {numPoints} bar',
+        barMultiple: 'Bar chart with {numSeries} series',
+        lineSingle: 'Line chart with {numPoints} data points',
+        lineMultiple: 'Line chart with {numSeries} lines'
+      },
+      axis: {
+        xAxisDescriptionSingular: 'The chart has 1 X axis displaying {names}.',
+        yAxisDescriptionSingular: 'The chart has 1 Y axis displaying {names}.',
+        timeRangeDays: '{range} days',
+        timeRangeHours: '{range} hours'
+      },
+      series: {
+        summary: {
+          'default': '{name}, series {ix} of {numSeries} with {numPoints} data points.',
+          'line': '{name}, line {ix} of {numSeries} with {numPoints} data points.',
+          'pie': '{name}, pie {ix} of {numSeries} with {numPoints} slices.'
+        }
+      },
+      drillUpButton: '{buttonText}',
+      legend: {
+        legendLabel: 'Chart legend: {legendTitle}',
+        legendItem: 'Show {itemName}'
+      }
+    }
+  }
+}
+```
+
+## Linked Descriptions
+
+Link to external descriptions:
+
+```html
+<div id="chart-description">
+  <h3>Chart Summary</h3>
+  <p>This chart shows revenue trends over the past year...</p>
+</div>
+
+<div id="container"></div>
+```
+
+```javascript
+{
+  accessibility: {
+    linkedDescription: '*[data-description]',
+    // Or use element ID
+    // linkedDescription: '#chart-description'
+  }
+}
+```
+
+## Components
+
+The accessibility module includes several components (from `ts/Accessibility/Accessibility.ts:166-193`):
+
+```javascript
+{
+  accessibility: {
+    // Container component
+    landmarkVerbosity: 'all',  // or 'one', 'disabled'
+    
+    // Series component
+    point: {
+      descriptionFormatter: function (point) {
+        return point.name + ': ' + point.y;
+      },
+      valueDecimals: 2,
+      valuePrefix: '$',
+      valueSuffix: ' USD'
+    },
+    
+    // Zoom component
+    rangeDescription: 'Range: {range}',
+    
+    // Legend component  
+    legend: {
+      enabled: true
+    }
+  }
+}
+```
+
+## ARIA Attributes
+
+Highcharts automatically adds appropriate ARIA attributes:
+
+```javascript
+{
+  accessibility: {
+    // SVG element gets role="img"
+    typeDescription: 'Interactive chart',
+    
+    // Custom ARIA labels
+    point: {
+      descriptionFormatter: function (point) {
+        return point.name + ', ' + point.y + ' units';
+      }
+    }
+  }
+}
+```
+
+## Testing Accessibility
+
+### Screen Reader Testing
+
+<Note>
+**Recommended Screen Readers**
+- **Windows**: NVDA (free), JAWS
+- **macOS**: VoiceOver (built-in)
+- **Linux**: Orca
+- **Mobile**: TalkBack (Android), VoiceOver (iOS)
+</Note>
+
+### Keyboard Testing
+
+```javascript
+// Test keyboard navigation
+{
+  accessibility: {
+    keyboardNavigation: {
+      enabled: true
+    }
+  }
+}
+```
+
+Test checklist:
+- Can you reach all interactive elements with Tab?
+- Can you navigate data points with arrow keys?
+- Can you activate drilldown with Enter/Space?
+- Does Esc reset zoom or exit drilldown?
+
+## Compliance
+
+### WCAG 2.1 Level AA
+
+Highcharts aims for WCAG 2.1 Level AA compliance:
+
+```javascript
+{
+  accessibility: {
+    enabled: true,
+    
+    // Keyboard accessible
+    keyboardNavigation: {
+      enabled: true
+    },
+    
+    // Perceivable
+    description: 'Detailed chart description',
+    
+    // Sufficient color contrast
+    highContrastMode: 'auto'
+  },
+  
+  // Color contrast for text
+  chart: {
+    style: {
+      color: '#333',  // Ensure 4.5:1 contrast ratio
+      fontSize: '16px'  // Minimum readable size
+    }
+  }
+}
+```
+
+## Best Practices
+
+<Note>
+**Accessibility Guidelines**
+- Always provide meaningful chart titles and descriptions
+- Use descriptive axis labels
+- Ensure sufficient color contrast (4.5:1 minimum)
+- Don't rely solely on color to convey information
+- Add point descriptions for complex data
+- Test with actual screen readers
+- Enable keyboard navigation
+- Consider sonification for data trends
+- Provide data tables as alternative format
+</Note>
+
+<Warning>
+**Common Pitfalls**
+- Missing or vague chart descriptions
+- Insufficient color contrast
+- Disabled keyboard navigation
+- Too many data points without grouping
+- Complex charts without additional context
+- Interactive features not keyboard accessible
+- No alternative text for images in tooltips
+</Warning>
+
+## Complete Accessible Chart Example
+
+```javascript
+Highcharts.chart('container', {
+  accessibility: {
+    enabled: true,
+    description: 'Bar chart showing desktop screen reader usage, ' +
+                 'with JAWS being the most popular at 30.2%',
+    keyboardNavigation: {
+      enabled: true,
+      focusBorder: {
+        enabled: true,
+        style: {
+          color: '#335cad',
+          lineWidth: 2
+        }
+      }
+    },
+    announceNewData: {
+      enabled: true
+    },
+    point: {
+      valueDecimals: 1,
+      valueSuffix: '%'
+    },
+    landmarkVerbosity: 'all'
+  },
+  chart: {
+    type: 'bar'
+  },
+  title: {
+    text: 'Desktop Screen Reader Usage',
+    style: {
+      fontSize: '18px',
+      color: '#333'
+    }
+  },
+  caption: {
+    text: 'Source: WebAIM Screen Reader Survey'
+  },
+  xAxis: {
+    type: 'category',
+    title: {
+      text: 'Screen Reader'
+    }
+  },
+  yAxis: {
+    title: {
+      text: 'Percentage of Users'
+    }
+  },
+  series: [{
+    name: 'Percentage usage',
+    colorByPoint: true,
+    accessibility: {
+      description: 'Percentage of users for each screen reader'
+    },
+    data: [
+      {
+        name: 'JAWS',
+        y: 30.2,
+        accessibility: {
+          description: 'JAWS: 30.2%, most widely used'
+        }
+      },
+      {
+        name: 'NVDA',
+        y: 14.6,
+        accessibility: {
+          description: 'NVDA: 14.6%, popular free option'
+        }
+      },
+      {
+        name: 'VoiceOver',
+        y: 7.6,
+        accessibility: {
+          description: 'VoiceOver: 7.6%, built into macOS'
+        }
+      }
+    ]
+  }]
+});
+```
+
+## Related Resources
+
+- [Sonification](/features/sonification)
+- [Keyboard Navigation Documentation](https://www.highcharts.com/docs/accessibility/accessibility-module)
+- [WCAG 2.1 Guidelines](https://www.w3.org/WAI/WCAG21/quickref/)
+- [Tooltips and Data Labels](/features/tooltips-labels)

@@ -1,0 +1,549 @@
+---
+title: Performance Optimization
+description: Techniques and best practices for optimizing Highcharts performance with large datasets
+---
+
+Performance is critical when working with large datasets or multiple charts. Highcharts provides several optimization techniques to ensure smooth rendering and interaction.
+
+## Performance Bottlenecks
+
+Understand common performance issues:
+
+1. **Large datasets** - Thousands of data points
+2. **Multiple series** - Many series in one chart
+3. **Complex calculations** - Heavy data processing
+4. **Frequent updates** - Real-time data streaming
+5. **Animations** - Complex animation effects
+6. **Markers and labels** - Too many visual elements
+
+## Boost Module
+
+The Boost module dramatically improves performance for large datasets by using WebGL rendering.
+
+### Installation
+
+<CodeGroup>
+
+```javascript CDN
+<script src="https://code.highcharts.com/modules/boost.js"></script>
+```
+
+```javascript npm
+import Highcharts from 'highcharts';
+import boost from 'highcharts/modules/boost';
+
+boost(Highcharts);
+```
+
+```typescript ES Modules
+import Highcharts from 'highcharts/es-modules/masters/highcharts.src.js';
+import 'highcharts/es-modules/masters/modules/boost.src.js';
+```
+
+</CodeGroup>
+
+### Configuration
+
+```javascript
+Highcharts.chart('container', {
+    boost: {
+        useGPUTranslations: true,
+        usePreallocated: true,
+        seriesThreshold: 1,      // Enable for >= 1 series
+        pixelRatio: 1            // Adjust for high DPI displays
+    },
+    plotOptions: {
+        series: {
+            boostThreshold: 5000,    // Enable boost at 5000 points
+            turboThreshold: 0        // Disable turbo mode
+        }
+    },
+    series: [{
+        data: largeDataArray      // Can handle millions of points
+    }]
+});
+```
+
+### When to Use Boost
+
+<Note>
+Use the Boost module when you have:
+- More than 5,000 data points per series
+- Multiple series with thousands of points each
+- Real-time data streaming
+- Performance issues with standard rendering
+</Note>
+
+### Boost Limitations
+
+<Warning>
+The Boost module has some limitations:
+- No support for markers (they're hidden automatically)
+- Limited animation support
+- Some interactive features may be reduced
+- Not compatible with all series types
+</Warning>
+
+## Data Grouping
+
+Data grouping reduces the number of points by combining them into groups.
+
+```javascript
+Highcharts.stockChart('container', {
+    plotOptions: {
+        series: {
+            dataGrouping: {
+                enabled: true,
+                approximation: 'average',  // or 'sum', 'open', 'high', 'low', 'close'
+                groupPixelWidth: 10,       // Target pixel width
+                units: [
+                    ['millisecond', [1, 2, 5, 10, 20, 25, 50, 100, 200, 500]],
+                    ['second', [1, 2, 5, 10, 15, 30]],
+                    ['minute', [1, 2, 5, 10, 15, 30]],
+                    ['hour', [1, 2, 3, 4, 6, 8, 12]],
+                    ['day', [1]],
+                    ['week', [1]],
+                    ['month', [1, 3, 6]],
+                    ['year', null]
+                ]
+            }
+        }
+    },
+    series: [{
+        data: timeSeriesData
+    }]
+});
+```
+
+## Turbo Mode
+
+Turbo mode skips expensive calculations for very large datasets:
+
+```javascript
+Highcharts.chart('container', {
+    plotOptions: {
+        series: {
+            turboThreshold: 1000  // Enable turbo at 1000 points
+        }
+    }
+});
+```
+
+<Note>
+Turbo mode disables some data validation and extremes calculation. Set to `0` to disable for critical applications.
+</Note>
+
+## Disable Animations
+
+Animations consume CPU cycles:
+
+```javascript
+Highcharts.chart('container', {
+    chart: {
+        animation: false
+    },
+    plotOptions: {
+        series: {
+            animation: false,
+            states: {
+                hover: {
+                    animation: false
+                }
+            }
+        }
+    },
+    tooltip: {
+        animation: false
+    }
+});
+```
+
+## Optimize Markers
+
+### Disable Markers
+
+```javascript
+plotOptions: {
+    series: {
+        marker: {
+            enabled: false,
+            states: {
+                hover: {
+                    enabled: true,
+                    radius: 3
+                }
+            }
+        }
+    }
+}
+```
+
+### Use Smaller Markers
+
+```javascript
+marker: {
+    radius: 2,           // Smaller radius
+    symbol: 'circle'     // Simple shape
+}
+```
+
+## Reduce Shadow Effects
+
+Shadows are expensive to render:
+
+```javascript
+plotOptions: {
+    series: {
+        shadow: false
+    },
+    column: {
+        shadow: false
+    }
+}
+```
+
+## Optimize Tooltips
+
+### Shared Tooltips
+
+```javascript
+tooltip: {
+    shared: true,         // One tooltip for all series
+    crosshairs: true,
+    animation: false,
+    useHTML: false,       // SVG is faster than HTML
+    hideDelay: 0
+}
+```
+
+### Throttle Tooltip Updates
+
+```javascript
+(function (H) {
+    let tooltipTimeout;
+    
+    H.wrap(H.Tooltip.prototype, 'refresh', function (proceed, point) {
+        clearTimeout(tooltipTimeout);
+        
+        tooltipTimeout = setTimeout(() => {
+            proceed.call(this, point);
+        }, 50);  // 50ms throttle
+    });
+}(Highcharts));
+```
+
+## Efficient Data Updates
+
+### Update Single Points
+
+```javascript
+// Efficient - update one point
+chart.series[0].points[10].update(newValue, false);
+chart.redraw();
+
+// Inefficient - updates entire series
+chart.series[0].setData(newData);
+```
+
+### Batch Updates
+
+```javascript
+// Disable redraw during updates
+chart.series.forEach((series, i) => {
+    series.setData(newDataArray[i], false);
+});
+
+// Redraw once
+chart.redraw();
+```
+
+### Streaming Data
+
+```javascript
+// Add point without redrawing
+series.addPoint([x, y], false, true);
+
+// Redraw every 10 points
+if (pointCount % 10 === 0) {
+    chart.redraw();
+}
+```
+
+## Memory Management
+
+### Destroy Unused Charts
+
+```javascript
+if (chart) {
+    chart.destroy();
+    chart = null;
+}
+```
+
+### Clean Up Event Listeners
+
+```javascript
+const eventHandler = function() { /* ... */ };
+
+// Add event
+const unbind = Highcharts.addEvent(chart, 'redraw', eventHandler);
+
+// Remove event later
+unbind();
+```
+
+### Limit Chart History
+
+```javascript
+series.addPoint([x, y], true, data.length > 1000);
+```
+
+## Reduce Reflows
+
+### Minimize DOM Access
+
+```javascript
+// Bad - multiple reflows
+chart.setTitle({ text: 'New Title' });
+chart.setSize(800, 600);
+chart.redraw();
+
+// Good - single reflow
+chart.update({
+    title: { text: 'New Title' },
+    chart: { width: 800, height: 600 }
+}, true, true);
+```
+
+### Use `redraw: false`
+
+```javascript
+chart.update(options, false);  // Don't redraw yet
+chart.addSeries(series, false);
+chart.redraw();  // Single redraw
+```
+
+## Optimize CSS
+
+### Use Styled Mode
+
+```javascript
+Highcharts.chart('container', {
+    chart: {
+        styledMode: true  // Use CSS instead of inline styles
+    }
+});
+```
+
+```css
+.highcharts-series-0 {
+    stroke: #7cb5ec;
+    fill: none;
+}
+
+.highcharts-marker {
+    display: none;  /* Hide all markers */
+}
+```
+
+## Lazy Loading
+
+Load chart modules only when needed:
+
+```javascript
+// Load boost module on demand
+function loadBoost() {
+    return import('highcharts/modules/boost').then(boost => {
+        boost.default(Highcharts);
+    });
+}
+
+// Use when needed
+if (dataPoints > 5000) {
+    await loadBoost();
+}
+```
+
+## Web Workers
+
+Offload data processing to web workers:
+
+```javascript
+// worker.js
+self.addEventListener('message', function(e) {
+    const data = e.data;
+    
+    // Process data
+    const processed = data.map(point => ({
+        x: point.timestamp,
+        y: point.value * 2
+    }));
+    
+    self.postMessage(processed);
+});
+
+// main.js
+const worker = new Worker('worker.js');
+
+worker.addEventListener('message', function(e) {
+    chart.series[0].setData(e.data);
+});
+
+worker.postMessage(rawData);
+```
+
+## Performance Monitoring
+
+```javascript
+Highcharts.chart('container', {
+    chart: {
+        events: {
+            load: function() {
+                console.time('chart-render');
+            },
+            render: function() {
+                console.timeEnd('chart-render');
+            }
+        }
+    }
+});
+```
+
+### Measure Redraw Time
+
+```javascript
+const start = performance.now();
+chart.redraw();
+const duration = performance.now() - start;
+console.log(`Redraw took ${duration}ms`);
+```
+
+## Performance Checklist
+
+<Steps>
+
+<Step title="Enable Boost Module">
+
+For datasets > 5,000 points:
+
+```javascript
+boost: {
+    useGPUTranslations: true,
+    seriesThreshold: 1
+}
+```
+
+</Step>
+
+<Step title="Disable Unnecessary Features">
+
+```javascript
+animation: false,
+marker: { enabled: false },
+shadow: false
+```
+
+</Step>
+
+<Step title="Use Data Grouping">
+
+For time series data:
+
+```javascript
+dataGrouping: {
+    enabled: true
+}
+```
+
+</Step>
+
+<Step title="Batch Updates">
+
+```javascript
+series.setData(newData, false);
+chart.redraw();
+```
+
+</Step>
+
+<Step title="Monitor Performance">
+
+```javascript
+console.time('operation');
+// ... operation ...
+console.timeEnd('operation');
+```
+
+</Step>
+
+</Steps>
+
+## Real-World Example
+
+Optimized chart for 100,000 points:
+
+```javascript
+Highcharts.chart('container', {
+    boost: {
+        useGPUTranslations: true,
+        usePreallocated: true
+    },
+    chart: {
+        animation: false,
+        ignoreHiddenSeries: true
+    },
+    plotOptions: {
+        series: {
+            boostThreshold: 1,
+            turboThreshold: 0,
+            animation: false,
+            marker: {
+                enabled: false
+            },
+            shadow: false,
+            states: {
+                hover: {
+                    animation: false,
+                    lineWidthPlus: 0
+                }
+            }
+        }
+    },
+    tooltip: {
+        animation: false,
+        hideDelay: 0,
+        shared: true
+    },
+    series: [{
+        data: largeDataset,  // 100,000 points
+        lineWidth: 1
+    }]
+});
+```
+
+<Note>
+This configuration can handle 100,000+ points at 60 FPS on modern hardware.
+</Note>
+
+## Troubleshooting
+
+### Chart Freezes on Large Data
+
+1. Enable Boost module
+2. Increase `boostThreshold`
+3. Use data grouping
+4. Reduce point density
+
+### Slow Updates
+
+1. Use `setData(data, false)` and manual `redraw()`
+2. Update only changed points
+3. Batch multiple updates
+4. Disable animations
+
+### High Memory Usage
+
+1. Destroy unused charts
+2. Limit data history
+3. Remove event listeners
+4. Clear references

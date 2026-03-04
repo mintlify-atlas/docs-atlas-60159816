@@ -1,0 +1,668 @@
+---
+title: Highcharts Dashboards
+description: Build interactive data dashboards with synchronized components, real-time updates, and flexible layouts
+---
+
+Highcharts Dashboards is a comprehensive framework for building interactive data dashboards that combine multiple visualization components. It enables seamless integration of charts, data grids, KPIs, and custom HTML elements with synchronized data updates and flexible layouts.
+
+## Overview
+
+Highcharts Dashboards provides a complete solution for dashboard development:
+
+- **Multiple Components**: Charts, grids, KPIs, HTML, and custom components
+- **Data Synchronization**: Share data between components with automatic updates
+- **Flexible Layouts**: Responsive grid system with rows and cells
+- **Data Connectors**: Load data from JSON, CSV, Google Sheets, and more
+- **Edit Mode**: Built-in UI for customizing dashboards at runtime
+- **Modular Architecture**: Load only the components you need
+
+## Installation
+
+<CodeGroup>
+```bash npm
+npm install @highcharts/dashboards
+```
+
+```bash yarn
+yarn add @highcharts/dashboards
+```
+
+```html CDN
+<link rel="stylesheet" href="https://code.highcharts.com/dashboards/css/dashboards.css">
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/dashboards/dashboards.js"></script>
+<script src="https://code.highcharts.com/dashboards/modules/layout.js"></script>
+```
+</CodeGroup>
+
+### ES6 Module Import
+
+```javascript
+import Dashboards from '@highcharts/dashboards';
+import DataGrid from '@highcharts/dashboards/datagrid';
+import '@highcharts/dashboards/css/dashboards.css';
+```
+
+## Getting Started
+
+<Steps>
+  <Step title="Create a container element">
+    ```html
+    <div id="container"></div>
+    ```
+  </Step>
+  
+  <Step title="Include required CSS">
+    ```css
+    @import url("https://code.highcharts.com/dashboards/css/dashboards.css");
+    ```
+  </Step>
+  
+  <Step title="Create your first dashboard">
+    ```javascript
+    Dashboards.board('container', {
+      gui: {
+        layouts: [{
+          id: 'layout-1',
+          rows: [{
+            cells: [{
+              id: 'dashboard-col-0'
+            }, {
+              id: 'dashboard-col-1'
+            }]
+          }]
+        }]
+      },
+      components: [{
+        type: 'HTML',
+        renderTo: 'dashboard-col-0',
+        elements: [{
+          tagName: 'h1',
+          textContent: 'Your First Dashboard'
+        }]
+      }, {
+        type: 'Highcharts',
+        renderTo: 'dashboard-col-1',
+        chartOptions: {
+          series: [{
+            data: [1, 2, 3, 4, 5]
+          }]
+        }
+      }]
+    });
+    ```
+  </Step>
+</Steps>
+
+## Dashboard Components
+
+Dashboards support multiple component types that can be combined in flexible layouts.
+
+<CardGroup cols={2}>
+  <Card title="Highcharts Component" icon="chart-line">
+    Embed any Highcharts chart or map
+  </Card>
+  <Card title="Grid Component" icon="table">
+    Display and edit tabular data
+  </Card>
+  <Card title="KPI Component" icon="gauge">
+    Show key performance indicators with thresholds
+  </Card>
+  <Card title="HTML Component" icon="code">
+    Add custom HTML content
+  </Card>
+</CardGroup>
+
+### Highcharts Component
+
+Embed charts and maps in your dashboard:
+
+```javascript
+components: [{
+  type: 'Highcharts',
+  renderTo: 'dashboard-col-0',
+  chartOptions: {
+    chart: {
+      type: 'line'
+    },
+    title: {
+      text: 'Monthly Sales'
+    },
+    series: [{
+      name: 'Revenue',
+      data: [29.9, 71.5, 106.4, 129.2, 144.0, 176.0]
+    }]
+  }
+}]
+```
+
+### Grid Component
+
+Display tabular data with editing capabilities:
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/@highcharts/grid-pro/grid-pro.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highcharts/grid-pro/css/grid-pro.css">
+```
+
+```javascript
+components: [{
+  type: 'Grid',
+  renderTo: 'dashboard-col-0',
+  dataTable: {
+    columns: {
+      product: ['Apples', 'Pears', 'Plums', 'Bananas'],
+      weight: [100, 40, 0.5, 200],
+      price: [1.5, 2.53, 5, 4.5],
+      metaData: ['a', 'b', 'c', 'd']
+    }
+  }
+}]
+```
+
+### KPI Component
+
+Display key metrics with threshold-based styling:
+
+```javascript
+components: [{
+  type: 'KPI',
+  renderTo: 'dashboard-col-0',
+  title: 'Revenue',
+  value: 12500,
+  valueFormat: '${value}',
+  threshold: [10000, 15000],
+  thresholdColors: ['#f45b5b', '#f7a35c', '#90ed7d'],
+  chartOptions: {
+    chart: {
+      type: 'spline'
+    },
+    series: [{
+      data: [8000, 9000, 10500, 11200, 12500]
+    }]
+  }
+}]
+```
+
+### HTML Component
+
+Add custom HTML content:
+
+```javascript
+components: [{
+  type: 'HTML',
+  renderTo: 'dashboard-col-0',
+  elements: [{
+    tagName: 'div',
+    attributes: {
+      className: 'custom-header'
+    },
+    children: [{
+      tagName: 'h2',
+      textContent: 'Dashboard Title'
+    }, {
+      tagName: 'p',
+      textContent: 'Welcome to your dashboard'
+    }]
+  }]
+}]
+
+// Or use HTML string
+components: [{
+  type: 'HTML',
+  renderTo: 'dashboard-col-0',
+  html: '<div class="custom-header"><h2>Dashboard Title</h2></div>'
+}]
+```
+
+## Layout System
+
+Create flexible, responsive layouts with rows and cells:
+
+```javascript
+gui: {
+  layouts: [{
+    id: 'layout-1',
+    rows: [{
+      // First row with 3 equal columns
+      cells: [{
+        id: 'cell-1',
+        width: '33.33%'
+      }, {
+        id: 'cell-2',
+        width: '33.33%'
+      }, {
+        id: 'cell-3',
+        width: '33.33%'
+      }]
+    }, {
+      // Second row with 2 columns
+      cells: [{
+        id: 'cell-4',
+        width: '66.66%'
+      }, {
+        id: 'cell-5',
+        width: '33.33%'
+      }]
+    }]
+  }]
+}
+```
+
+### Responsive Layouts
+
+```javascript
+gui: {
+  layouts: [{
+    id: 'layout-1',
+    rows: [{
+      cells: [{
+        id: 'cell-1',
+        // Responsive width based on viewport
+        responsive: {
+          small: { width: '100%' },
+          medium: { width: '50%' },
+          large: { width: '33.33%' }
+        }
+      }]
+    }]
+  }]
+}
+```
+
+## Data Management
+
+Dashboards provides powerful data management with connectors and synchronization.
+
+### Data Connectors
+
+Load data from various sources:
+
+<CardGroup cols={2}>
+  <Card title="JSON" icon="brackets-curly">
+    Load data from JSON objects or files
+  </Card>
+  <Card title="CSV" icon="file-csv">
+    Import CSV data with auto-parsing
+  </Card>
+  <Card title="Google Sheets" icon="table">
+    Connect to Google Sheets
+  </Card>
+  <Card title="HTML Table" icon="table-list">
+    Extract data from HTML tables
+  </Card>
+</CardGroup>
+
+#### JSON Connector
+
+```javascript
+dataPool: {
+  connectors: [{
+    id: 'sales-data',
+    type: 'JSON',
+    options: {
+      data: [
+        ['Month', 'Sales', 'Expenses'],
+        ['January', 10000, 8000],
+        ['February', 12000, 9000],
+        ['March', 15000, 10000]
+      ]
+    }
+  }]
+}
+```
+
+#### CSV Connector
+
+```javascript
+dataPool: {
+  connectors: [{
+    id: 'csv-data',
+    type: 'CSV',
+    options: {
+      csv: `Month,Sales,Expenses
+January,10000,8000
+February,12000,9000
+March,15000,10000`,
+      firstRowAsNames: true
+    }
+  }]
+}
+```
+
+#### Google Sheets Connector
+
+```javascript
+dataPool: {
+  connectors: [{
+    id: 'google-data',
+    type: 'GoogleSheets',
+    options: {
+      googleSpreadsheetKey: 'YOUR_SPREADSHEET_KEY',
+      worksheet: 1
+    }
+  }]
+}
+```
+
+### Using Data Connectors
+
+Connect components to shared data:
+
+```javascript
+dataPool: {
+  connectors: [{
+    id: 'company-data',
+    type: 'JSON',
+    options: {
+      data: [
+        ['Product', 'Q1', 'Q2', 'Q3', 'Q4'],
+        ['Product A', 100, 120, 140, 160],
+        ['Product B', 80, 90, 95, 100]
+      ]
+    }
+  }]
+},
+components: [{
+  type: 'Highcharts',
+  renderTo: 'chart-cell',
+  connector: {
+    id: 'company-data',
+    columnAssignment: [{
+      seriesId: 'Q1 Sales',
+      data: ['Product', 'Q1']
+    }]
+  }
+}, {
+  type: 'Grid',
+  renderTo: 'grid-cell',
+  connector: {
+    id: 'company-data'
+  }
+}]
+```
+
+## Component Synchronization
+
+Synchronize interactions between components:
+
+```javascript
+components: [{
+  type: 'Highcharts',
+  renderTo: 'chart-1',
+  connector: {
+    id: 'shared-data'
+  },
+  sync: {
+    visibility: true,
+    highlight: true,
+    extremes: true
+  }
+}, {
+  type: 'Highcharts',
+  renderTo: 'chart-2',
+  connector: {
+    id: 'shared-data'
+  },
+  sync: {
+    visibility: true,
+    highlight: true,
+    extremes: true
+  }
+}]
+```
+
+### Sync Options
+
+- **visibility**: Sync series show/hide
+- **highlight**: Sync point hover states
+- **extremes**: Sync axis ranges
+- **crossfilter**: Filter data across components
+
+## Edit Mode
+
+Enable runtime dashboard customization:
+
+```html
+<script src="https://code.highcharts.com/dashboards/modules/layout.js"></script>
+<script src="https://code.highcharts.com/dashboards/modules/dashboards-plugin.js"></script>
+```
+
+```javascript
+Dashboards.board('container', {
+  editMode: {
+    enabled: true,
+    contextMenu: {
+      enabled: true
+    },
+    tools: {
+      addComponentBtn: { enabled: true },
+      removeComponentBtn: { enabled: true }
+    }
+  },
+  // ... rest of configuration
+});
+```
+
+Edit Mode features:
+- Add/remove components
+- Resize cells
+- Reorder components
+- Edit component settings
+- Export/import dashboard configuration
+
+## Data Modifiers
+
+Transform data before visualization:
+
+```javascript
+dataPool: {
+  connectors: [{
+    id: 'sales-data',
+    type: 'JSON',
+    options: {
+      data: salesData
+    }
+  }]
+},
+components: [{
+  type: 'Highcharts',
+  renderTo: 'chart-cell',
+  connector: {
+    id: 'sales-data',
+    modifiers: [{
+      type: 'Math',
+      columnFormulas: [{
+        column: 'total',
+        formula: 'B1+C1' // Sum columns
+      }]
+    }, {
+      type: 'Range',
+      ranges: [{
+        column: 'month',
+        minValue: 3,
+        maxValue: 6
+      }]
+    }]
+  }
+}]
+```
+
+## Advanced Example
+
+Comprehensive dashboard with multiple components:
+
+```javascript
+Dashboards.board('container', {
+  dataPool: {
+    connectors: [{
+      id: 'revenue-data',
+      type: 'JSON',
+      options: {
+        data: [
+          ['Month', 'Revenue', 'Expenses', 'Profit'],
+          ['Jan', 50000, 35000, 15000],
+          ['Feb', 55000, 38000, 17000],
+          ['Mar', 60000, 40000, 20000],
+          ['Apr', 58000, 39000, 19000],
+          ['May', 65000, 42000, 23000],
+          ['Jun', 70000, 45000, 25000]
+        ]
+      }
+    }]
+  },
+  
+  gui: {
+    layouts: [{
+      id: 'main-layout',
+      rows: [{
+        cells: [{
+          id: 'kpi-1',
+          width: '25%'
+        }, {
+          id: 'kpi-2',
+          width: '25%'
+        }, {
+          id: 'kpi-3',
+          width: '25%'
+        }, {
+          id: 'kpi-4',
+          width: '25%'
+        }]
+      }, {
+        cells: [{
+          id: 'chart-cell',
+          width: '66%'
+        }, {
+          id: 'grid-cell',
+          width: '34%'
+        }]
+      }]
+    }]
+  },
+  
+  components: [{
+    type: 'KPI',
+    renderTo: 'kpi-1',
+    title: 'Total Revenue',
+    value: 358000,
+    valueFormat: '${value}'
+  }, {
+    type: 'KPI',
+    renderTo: 'kpi-2',
+    title: 'Total Expenses',
+    value: 239000,
+    valueFormat: '${value}'
+  }, {
+    type: 'KPI',
+    renderTo: 'kpi-3',
+    title: 'Net Profit',
+    value: 119000,
+    valueFormat: '${value}',
+    threshold: [100000, 150000],
+    thresholdColors: ['#f45b5b', '#f7a35c', '#90ed7d']
+  }, {
+    type: 'KPI',
+    renderTo: 'kpi-4',
+    title: 'Profit Margin',
+    value: 33.2,
+    valueFormat: '{value}%'
+  }, {
+    type: 'Highcharts',
+    renderTo: 'chart-cell',
+    connector: {
+      id: 'revenue-data',
+      columnAssignment: [{
+        seriesId: 'Revenue',
+        data: ['Month', 'Revenue']
+      }, {
+        seriesId: 'Expenses',
+        data: ['Month', 'Expenses']
+      }, {
+        seriesId: 'Profit',
+        data: ['Month', 'Profit']
+      }]
+    },
+    sync: {
+      highlight: true
+    },
+    chartOptions: {
+      chart: {
+        type: 'column'
+      },
+      title: {
+        text: 'Monthly Financial Overview'
+      },
+      yAxis: {
+        title: {
+          text: 'Amount ($)'
+        }
+      }
+    }
+  }, {
+    type: 'Grid',
+    renderTo: 'grid-cell',
+    connector: {
+      id: 'revenue-data'
+    },
+    sync: {
+      highlight: true
+    }
+  }]
+});
+```
+
+## Theming
+
+Customize dashboard appearance:
+
+```css
+/* Custom dashboard styles */
+.highcharts-dashboards-wrapper {
+  background: #f5f5f5;
+}
+
+.highcharts-dashboards-component {
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.highcharts-dashboards-component-kpi-value {
+  font-size: 2em;
+  color: #2c3e50;
+}
+```
+
+## Performance Tips
+
+<Card title="Optimize Dashboard Performance" icon="gauge-high">
+  - Use data connectors for shared data instead of duplicating
+  - Enable only necessary sync options
+  - Lazy load components when possible
+  - Use data modifiers efficiently
+  - Limit the number of visible components
+</Card>
+
+## Related Resources
+
+<CardGroup cols={2}>
+  <Card title="API Reference" icon="code" href="https://api.highcharts.com/dashboards/">
+    Complete Dashboards API documentation
+  </Card>
+  <Card title="Live Demos" icon="flask" href="https://www.highcharts.com/demo/dashboards">
+    Interactive examples and demos
+  </Card>
+  <Card title="Data Connectors">
+    Learn about loading data from various sources
+  </Card>
+  <Card title="Component Sync">
+    Synchronize interactions between components
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+- Explore [Component Types](/products/dashboards#dashboard-components) for different visualizations
+- Learn about [Data Connectors](/products/dashboards#data-connectors) for loading external data
+- Try [Component Synchronization](/products/dashboards#component-synchronization) for interactive dashboards
+- Enable [Edit Mode](/products/dashboards#edit-mode) for runtime customization

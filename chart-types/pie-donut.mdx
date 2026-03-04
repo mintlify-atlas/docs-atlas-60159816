@@ -1,0 +1,366 @@
+---
+title: Pie and Donut Charts
+description: Create pie and donut charts to visualize proportional data and part-to-whole relationships
+---
+
+Pie charts are circular graphics divided into slices to illustrate numerical proportions. Donut charts are pie charts with a hollow center.
+
+## Pie Charts
+
+A pie chart displays data as slices of a circle, where each slice represents a proportion of the whole.
+
+### Basic Pie Chart
+
+<CodeGroup>
+```javascript Simple Pie
+Highcharts.chart('container', {
+  chart: {
+    type: 'pie'
+  },
+  title: {
+    text: 'Market Share'
+  },
+  series: [{
+    name: 'Share',
+    data: [
+      { name: 'Chrome', y: 61.41 },
+      { name: 'Internet Explorer', y: 11.84 },
+      { name: 'Firefox', y: 10.85 },
+      { name: 'Edge', y: 4.67 },
+      { name: 'Safari', y: 4.18 },
+      { name: 'Other', y: 7.05 }
+    ]
+  }]
+});
+```
+
+```javascript With Sliced Point
+Highcharts.chart('container', {
+  chart: {
+    type: 'pie'
+  },
+  series: [{
+    data: [
+      { name: 'Chrome', y: 61.41, sliced: true, selected: true },
+      { name: 'Internet Explorer', y: 11.84 },
+      { name: 'Firefox', y: 10.85 },
+      { name: 'Edge', y: 4.67 },
+      { name: 'Safari', y: 4.18 }
+    ]
+  }]
+});
+```
+</CodeGroup>
+
+### Pie Chart Configuration
+
+Key configuration options from `~/workspace/source/ts/Series/Pie/PieSeriesDefaults.ts:52-641`:
+
+<ParamField path="center" type="array" default="[null, null]">
+  The center of the pie chart relative to the plot area. Can be percentages or pixel values.
+  ```javascript
+  plotOptions: {
+    pie: {
+      center: ['50%', '50%'] // Center the pie
+    }
+  }
+  ```
+</ParamField>
+
+<ParamField path="size" type="number | string" default="null">
+  The diameter of the pie relative to the plot area. Can be a percentage or pixel value.
+  ```javascript
+  plotOptions: {
+    pie: {
+      size: '75%' // 75% of plot area
+    }
+  }
+  ```
+</ParamField>
+
+<ParamField path="innerSize" type="number | string" default="0">
+  The size of the inner diameter for the pie. A size greater than 0 renders a donut chart.
+  ```javascript
+  plotOptions: {
+    pie: {
+      innerSize: '50%' // Creates a donut chart
+    }
+  }
+  ```
+</ParamField>
+
+<ParamField path="startAngle" type="number" default="0">
+  The start angle of the pie slices in degrees where 0 is top and 90 is right.
+  ```javascript
+  plotOptions: {
+    pie: {
+      startAngle: -90 // Start from top
+    }
+  }
+  ```
+</ParamField>
+
+<ParamField path="endAngle" type="number">
+  The end angle of the pie in degrees. Defaults to startAngle plus 360.
+  ```javascript
+  plotOptions: {
+    pie: {
+      startAngle: 0,
+      endAngle: 180 // Semi-circle
+    }
+  }
+  ```
+</ParamField>
+
+<ParamField path="slicedOffset" type="number" default="10">
+  If a point is sliced, how many pixels should it be moved from the center.
+</ParamField>
+
+<ParamField path="borderRadius" type="number | string" default="3">
+  The corner radius of the border surrounding each slice.
+</ParamField>
+
+<ParamField path="ignoreHiddenPoint" type="boolean" default="true">
+  Whether to redraw the pie as if hidden points were null.
+</ParamField>
+
+## Data Labels
+
+Pie charts have extensive data label options:
+
+```javascript
+Highcharts.chart('container', {
+  chart: {
+    type: 'pie'
+  },
+  plotOptions: {
+    pie: {
+      dataLabels: {
+        enabled: true,
+        distance: 30,
+        format: '{point.name}: {point.percentage:.1f}%',
+        connectorColor: 'silver',
+        connectorWidth: 1,
+        connectorShape: 'crookedLine'
+      }
+    }
+  },
+  series: [{
+    data: [29, 71, 106, 129, 144, 176]
+  }]
+});
+```
+
+<AccordionGroup>
+  <Accordion title="Data Label Alignment">
+    Control how data labels align:
+    ```javascript
+    dataLabels: {
+      alignTo: 'connectors', // or 'plotEdges'
+      distance: 30,
+      connectorPadding: 5
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="Connector Shape">
+    Choose from built-in connector shapes:
+    - `'crookedLine'` (default)
+    - `'fixedOffset'`
+    - `'straight'`
+    ```javascript
+    dataLabels: {
+      connectorShape: 'straight',
+      connectorWidth: 2
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="Custom Formatter">
+    ```javascript
+    dataLabels: {
+      formatter: function() {
+        return this.point.name + ': ' + this.y;
+      }
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Donut Charts
+
+Donut charts are pie charts with a hollow center, created by setting `innerSize`.
+
+### Basic Donut Chart
+
+```javascript
+Highcharts.chart('container', {
+  chart: {
+    type: 'pie'
+  },
+  title: {
+    text: 'Browser Market Share',
+    align: 'center'
+  },
+  plotOptions: {
+    pie: {
+      innerSize: '60%',
+      depth: 45
+    }
+  },
+  series: [{
+    name: 'Share',
+    data: [
+      ['Chrome', 61.41],
+      ['Internet Explorer', 11.84],
+      ['Firefox', 10.85],
+      ['Edge', 4.67],
+      ['Safari', 4.18],
+      ['Other', 7.05]
+    ]
+  }]
+});
+```
+
+### Donut with Custom Center Text
+
+```javascript
+Highcharts.chart('container', {
+  chart: {
+    type: 'pie',
+    events: {
+      load: function() {
+        const chart = this;
+        chart.renderer.text('Total<br/>1000', 100, 120)
+          .css({
+            fontSize: '20px',
+            textAlign: 'center'
+          })
+          .add();
+      }
+    }
+  },
+  plotOptions: {
+    pie: {
+      innerSize: '70%'
+    }
+  },
+  series: [{
+    data: [400, 300, 200, 100]
+  }]
+});
+```
+
+## Semi-Circle Donut
+
+Create a gauge-like visualization:
+
+```javascript
+Highcharts.chart('container', {
+  chart: {
+    type: 'pie'
+  },
+  plotOptions: {
+    pie: {
+      startAngle: -90,
+      endAngle: 90,
+      innerSize: '50%',
+      center: ['50%', '75%']
+    }
+  },
+  series: [{
+    data: [
+      ['Low', 30],
+      ['Medium', 40],
+      ['High', 30]
+    ]
+  }]
+});
+```
+
+## Variable Pie
+
+Variable pie charts allow each slice to have a different radius based on a z-value:
+
+```javascript
+Highcharts.chart('container', {
+  chart: {
+    type: 'variablepie'
+  },
+  series: [{
+    minPointSize: 10,
+    innerSize: '20%',
+    zMin: 0,
+    data: [{
+      name: 'Chrome',
+      y: 61.41,
+      z: 100
+    }, {
+      name: 'Firefox',
+      y: 10.85,
+      z: 50
+    }, {
+      name: 'Safari',
+      y: 4.18,
+      z: 30
+    }]
+  }]
+});
+```
+
+## Styling and Colors
+
+```javascript
+Highcharts.chart('container', {
+  chart: {
+    type: 'pie'
+  },
+  plotOptions: {
+    pie: {
+      colors: ['#4CAF50', '#2196F3', '#FFC107', '#F44336', '#9C27B0'],
+      borderWidth: 2,
+      borderColor: '#FFFFFF',
+      states: {
+        hover: {
+          brightness: 0.1
+        }
+      }
+    }
+  },
+  series: [{
+    data: [29, 71, 106, 129, 144]
+  }]
+});
+```
+
+## Use Cases
+
+<CardGroup cols={2}>
+  <Card title="Pie Charts" icon="chart-pie">
+    - Showing market share
+    - Budget allocation
+    - Survey results
+    - Composition of a whole
+  </Card>
+  <Card title="Donut Charts" icon="circle-notch">
+    - Multiple data series
+    - Emphasizing total value
+    - Cleaner appearance
+    - Adding center labels
+  </Card>
+</CardGroup>
+
+## Data Formats
+
+Pie charts support two main data formats:
+
+1. **Array of numbers**: `data: [29, 71, 106, 129]`
+2. **Array of objects**: `data: [{name: 'Chrome', y: 61.41}, {name: 'Firefox', y: 10.85}]`
+
+<Warning>
+  Pie charts are not suitable for comparing more than 5-7 slices, as they become hard to read.
+</Warning>
+
+<Note>
+  Pie charts always use `colorByPoint: true` by default, giving each slice a different color.
+</Note>

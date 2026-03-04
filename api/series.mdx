@@ -1,0 +1,569 @@
+---
+title: 'Series Class API'
+description: 'Complete reference for the Highcharts Series class'
+---
+
+# Series Class
+
+The Series class represents data visualizations within a chart. All series types (line, column, pie, etc.) inherit from this base class.
+
+**Source**: `ts/Core/Series/Series.ts:255`
+
+## Overview
+
+Series objects can be accessed in multiple ways:
+
+```javascript
+// From chart.series array
+chart.series[0].update({ color: 'red' });
+
+// From point.series reference
+point.series.hide();
+
+// From axis.series reference
+chart.yAxis[0].series.forEach(s => console.log(s.name));
+
+// By ID using chart.get()
+const series = chart.get('my-series-id');
+```
+
+## Constructor
+
+Series are typically created via chart configuration or `chart.addSeries()`, not directly instantiated.
+
+```javascript
+// Via chart options
+Highcharts.chart('container', {
+  series: [{
+    type: 'line',
+    name: 'Sales',
+    data: [1, 3, 2, 4]
+  }]
+});
+
+// Via addSeries method
+chart.addSeries({
+  type: 'column',
+  name: 'Revenue',
+  data: [5, 7, 6, 8]
+});
+```
+
+## Static Properties
+
+### Series.types
+
+<ResponseField name="types" type="Dictionary<typeof Series>" required>
+  Registry of all available series types
+</ResponseField>
+
+```javascript
+// Check available series types
+console.log(Object.keys(Highcharts.Series.types));
+// ['line', 'column', 'bar', 'pie', 'scatter', ...]
+
+// Access specific series constructor
+const LineSeries = Highcharts.Series.types.line;
+```
+
+**Source**: `ts/Core/Series/Series.ts:272`
+
+### Series.registerType()
+
+<ResponseField name="registerType" type="Function" required>
+  Registers a custom series type
+</ResponseField>
+
+```javascript
+// Register custom series type
+class CustomSeries extends Highcharts.Series {
+  // Custom implementation
+}
+
+Highcharts.Series.registerType('custom', CustomSeries);
+```
+
+**Source**: `ts/Core/Series/Series.ts:292`
+
+## Properties
+
+### series.chart
+
+<ResponseField name="chart" type="Highcharts.Chart" required>
+  The chart instance this series belongs to
+</ResponseField>
+
+```javascript
+const chart = series.chart;
+chart.setTitle({ text: 'Updated' });
+```
+
+**Source**: `ts/Core/Series/Series.ts:373`
+
+### series.data
+
+<ResponseField name="data" type="Array<Highcharts.Point>" required>
+  Currently visible point objects. May not contain all points if cropped or grouped.
+</ResponseField>
+
+```javascript
+// Iterate visible points
+series.data.forEach(point => {
+  console.log(point.x, point.y);
+});
+
+// Find point by value
+const point = series.data.find(p => p.y > 100);
+```
+
+**Source**: `ts/Core/Series/Series.ts:407`
+
+### series.points
+
+<ResponseField name="points" type="Array<Highcharts.Point>">
+  All currently visible point objects
+</ResponseField>
+
+```javascript
+// Access all visible points
+series.points.forEach(point => {
+  point.update({ marker: { enabled: true }});
+});
+```
+
+### series.options
+
+<ResponseField name="options" type="SeriesOptions" required>
+  The series configuration options
+</ResponseField>
+
+```javascript
+console.log(series.options.type); // 'line'
+console.log(series.options.name); // 'Sales'
+```
+
+### series.name
+
+<ResponseField name="name" type="string">
+  The series name as shown in the legend and tooltip
+</ResponseField>
+
+```javascript
+console.log(series.name); // 'Sales Data'
+```
+
+### series.index
+
+<ResponseField name="index" type="number" required>
+  Position in the chart.series array
+</ResponseField>
+
+```javascript
+console.log(series.index); // 0, 1, 2...
+```
+
+**Source**: `ts/Core/Series/Series.ts:471`
+
+### series.visible
+
+<ResponseField name="visible" type="boolean">
+  Whether the series is currently visible
+</ResponseField>
+
+```javascript
+if (series.visible) {
+  series.hide();
+} else {
+  series.show();
+}
+```
+
+### series.color
+
+<ResponseField name="color" type="ColorType">
+  The series color used by the legend and visualization
+</ResponseField>
+
+```javascript
+console.log(series.color); // '#7cb5ec'
+```
+
+**Source**: `ts/Core/Series/Series.ts:384`
+
+### series.xAxis
+
+<ResponseField name="xAxis" type="Highcharts.Axis">
+  The X axis the series is associated with
+</ResponseField>
+
+```javascript
+series.xAxis.setExtremes(0, 100);
+```
+
+### series.yAxis
+
+<ResponseField name="yAxis" type="Highcharts.Axis">
+  The Y axis the series is associated with
+</ResponseField>
+
+```javascript
+series.yAxis.setTitle({ text: 'Values' });
+```
+
+### series.dataMin
+
+<ResponseField name="dataMin" type="number">
+  Minimum value of the series data points
+</ResponseField>
+
+```javascript
+console.log(series.dataMin); // 0
+```
+
+**Source**: `ts/Core/Series/Series.ts:425`
+
+### series.dataMax
+
+<ResponseField name="dataMax" type="number">
+  Maximum value of the series data points
+</ResponseField>
+
+```javascript
+console.log(series.dataMax); // 100
+```
+
+**Source**: `ts/Core/Series/Series.ts:416`
+
+## Methods
+
+### series.addPoint()
+
+Add a point to the series after render time.
+
+<ParamField path="options" type="PointOptions | number | [number, number]" required>
+  Point configuration, y-value, or [x, y] tuple
+</ParamField>
+
+<ParamField path="redraw" type="boolean" default="true">
+  Whether to redraw the chart
+</ParamField>
+
+<ParamField path="shift" type="boolean" default="false">
+  If true, remove the first point when adding (maintains constant length)
+</ParamField>
+
+<ParamField path="animation" type="boolean | AnimationOptions">
+  Animation options
+</ParamField>
+
+```javascript
+// Add simple point
+series.addPoint(42);
+
+// Add point with x-value
+series.addPoint([10, 42]);
+
+// Add configured point
+series.addPoint({
+  x: 10,
+  y: 42,
+  color: 'red',
+  name: 'Special Point'
+});
+
+// Add and shift (for real-time data)
+series.addPoint([Date.now(), value], true, true);
+
+// Add multiple without redraw
+series.addPoint([1, 10], false);
+series.addPoint([2, 20], false);
+series.addPoint([3, 30], true); // Redraw once
+```
+
+### series.removePoint()
+
+Remove a point from the series.
+
+<ParamField path="index" type="number" required>
+  Index of the point to remove
+</ParamField>
+
+<ParamField path="redraw" type="boolean" default="true">
+  Whether to redraw the chart
+</ParamField>
+
+<ParamField path="animation" type="boolean | AnimationOptions">
+  Animation options
+</ParamField>
+
+```javascript
+// Remove first point
+series.removePoint(0);
+
+// Remove without redraw
+series.removePoint(5, false);
+```
+
+### series.setData()
+
+Apply a new set of data to the series.
+
+<ParamField path="data" type="Array<PointOptions | number | [number, number]>" required>
+  New data array
+</ParamField>
+
+<ParamField path="redraw" type="boolean" default="true">
+  Whether to redraw the chart
+</ParamField>
+
+<ParamField path="animation" type="boolean | AnimationOptions">
+  Animation options
+</ParamField>
+
+<ParamField path="updatePoints" type="boolean" default="true">
+  Whether to update existing points or recreate all
+</ParamField>
+
+```javascript
+// Replace all data
+series.setData([1, 2, 3, 4, 5]);
+
+// With point configurations
+series.setData([
+  { y: 10, color: 'red' },
+  { y: 20, color: 'blue' },
+  { y: 15, color: 'green' }
+]);
+
+// Time series data
+series.setData([
+  [Date.UTC(2024, 0, 1), 10],
+  [Date.UTC(2024, 0, 2), 15],
+  [Date.UTC(2024, 0, 3), 12]
+]);
+
+// Without animation
+series.setData(newData, true, false);
+```
+
+### series.update()
+
+Update the series with new options.
+
+<ParamField path="options" type="SeriesOptions" required>
+  New series options to merge
+</ParamField>
+
+<ParamField path="redraw" type="boolean" default="true">
+  Whether to redraw the chart
+</ParamField>
+
+```javascript
+// Update series type and color
+series.update({
+  type: 'column',
+  color: '#ff0000'
+});
+
+// Update multiple options
+series.update({
+  name: 'Updated Series',
+  lineWidth: 3,
+  marker: {
+    enabled: true,
+    radius: 5
+  }
+});
+```
+
+### series.remove()
+
+Remove the series from the chart.
+
+<ParamField path="redraw" type="boolean" default="true">
+  Whether to redraw the chart
+</ParamField>
+
+<ParamField path="animation" type="boolean | AnimationOptions">
+  Animation options
+</ParamField>
+
+```javascript
+// Remove series
+series.remove();
+
+// Remove without redraw
+series.remove(false);
+
+// Remove with animation
+series.remove(true, { duration: 1000 });
+```
+
+### series.show()
+
+Show the series if hidden.
+
+```javascript
+series.show();
+```
+
+### series.hide()
+
+Hide the series.
+
+```javascript
+series.hide();
+```
+
+### series.select()
+
+Select or unselect the series.
+
+<ParamField path="selected" type="boolean" default="true">
+  Whether to select or unselect
+</ParamField>
+
+```javascript
+// Select series
+series.select();
+
+// Unselect series
+series.select(false);
+```
+
+### series.setVisible()
+
+Set the visibility of the series.
+
+<ParamField path="visible" type="boolean" required>
+  Whether to show or hide
+</ParamField>
+
+<ParamField path="redraw" type="boolean" default="true">
+  Whether to redraw
+</ParamField>
+
+```javascript
+// Toggle visibility
+series.setVisible(!series.visible);
+
+// Show without redraw
+series.setVisible(true, false);
+```
+
+### series.drawGraph()
+
+Draw the series graph (used internally).
+
+```javascript
+// Typically called by the chart
+series.drawGraph();
+```
+
+### series.getColumn()
+
+Get a data column from the series data table.
+
+<ParamField path="columnName" type="string" required>
+  Name of the column to retrieve
+</ParamField>
+
+```javascript
+// Get y-values column
+const yValues = series.getColumn('y');
+console.log(yValues); // [1, 2, 3, 4, 5]
+```
+
+**Source**: Referenced in `ts/Core/Series/Series.ts:233`
+
+## Events
+
+Series events are configured in the `plotOptions.series.events` or individual series `events` option:
+
+```javascript
+Highcharts.chart('container', {
+  plotOptions: {
+    series: {
+      events: {
+        click: function(event) {
+          console.log('Series clicked:', this.name);
+        },
+        hide: function() {
+          console.log('Series hidden:', this.name);
+        },
+        show: function() {
+          console.log('Series shown:', this.name);
+        },
+        afterAnimate: function() {
+          console.log('Animation complete:', this.name);
+        }
+      }
+    }
+  },
+  series: [{
+    name: 'Sales',
+    data: [1, 2, 3],
+    events: {
+      // Series-specific events
+      mouseOver: function() {
+        this.update({ color: 'red' });
+      },
+      mouseOut: function() {
+        this.update({ color: null });
+      }
+    }
+  }]
+});
+```
+
+See [Events API](/api/events#series-events) for complete event documentation.
+
+## Example: Dynamic Series Management
+
+```javascript
+const chart = Highcharts.chart('container', {
+  chart: { type: 'line' },
+  title: { text: 'Dynamic Series Example' },
+  xAxis: { type: 'datetime' },
+  series: []
+});
+
+// Add initial series
+const series = chart.addSeries({
+  name: 'Real-time Data',
+  data: []
+});
+
+// Simulate real-time data
+let time = Date.now();
+setInterval(() => {
+  const value = Math.random() * 100;
+  series.addPoint([time, value], true, series.data.length > 20);
+  time += 1000;
+}, 1000);
+
+// Update series style after 5 seconds
+setTimeout(() => {
+  series.update({
+    color: '#ff0000',
+    lineWidth: 3,
+    marker: { enabled: true }
+  });
+}, 5000);
+
+// Replace data after 10 seconds
+setTimeout(() => {
+  const newData = Array.from({ length: 10 }, (_, i) => [
+    Date.now() + i * 1000,
+    Math.random() * 100
+  ]);
+  series.setData(newData);
+}, 10000);
+```
+
+## See Also
+
+- [Point Class](/api/point) - Individual data points
+- [Series Options](/api/series-options) - Configuration reference
+- [Chart Class](/api/chart) - Chart management
+- [Plot Options](/api/plot-options) - Global series defaults

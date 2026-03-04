@@ -1,0 +1,794 @@
+---
+title: 'Axis Configuration Options'
+description: 'Complete reference for Highcharts axis configuration options'
+---
+
+# Axis Configuration Options
+
+Axis options control the behavior, appearance, and scale of chart axes (xAxis, yAxis, colorAxis, etc.).
+
+**Source**: `ts/Core/Axis/AxisOptions.ts`
+
+## Basic Configuration
+
+```javascript
+Highcharts.chart('container', {
+  xAxis: {
+    type: 'datetime',
+    title: { text: 'Time' }
+  },
+  yAxis: {
+    title: { text: 'Value' },
+    min: 0,
+    max: 100
+  }
+});
+```
+
+## Core Options
+
+### type
+
+<ParamField path="type" type="string" default="linear">
+  The axis type: 'linear', 'logarithmic', 'datetime', or 'category'
+</ParamField>
+
+```javascript
+xAxis: {
+  type: 'datetime'  // For time series
+}
+
+yAxis: {
+  type: 'logarithmic'  // For log scale
+}
+
+xAxis: {
+  type: 'category',  // For categorical data
+  categories: ['Jan', 'Feb', 'Mar']
+}
+```
+
+### categories
+
+<ParamField path="categories" type="Array<string>">
+  Category names for categorical axes
+</ParamField>
+
+```javascript
+xAxis: {
+  categories: ['Apples', 'Bananas', 'Oranges', 'Grapes']
+}
+```
+
+### title
+
+<ParamField path="title" type="object">
+  Axis title configuration
+</ParamField>
+
+```javascript
+yAxis: {
+  title: {
+    text: 'Temperature (°C)',
+    align: 'high',
+    rotation: 0,
+    offset: 0,
+    y: -10,
+    style: {
+      fontSize: '14px',
+      fontWeight: 'bold',
+      color: '#333'
+    }
+  }
+}
+```
+
+**Source**: Referenced in `ts/Core/Axis/AxisOptions.ts:30`
+
+## Scale Options
+
+### min
+
+<ParamField path="min" type="number | null">
+  Minimum value of the axis. If null, automatically calculated.
+</ParamField>
+
+```javascript
+yAxis: {
+  min: 0  // Force axis to start at 0
+}
+
+xAxis: {
+  type: 'datetime',
+  min: Date.UTC(2024, 0, 1)  // Start date
+}
+```
+
+### max
+
+<ParamField path="max" type="number | null">
+  Maximum value of the axis. If null, automatically calculated.
+</ParamField>
+
+```javascript
+yAxis: {
+  max: 100  // Force axis to end at 100
+}
+```
+
+### minPadding
+
+<ParamField path="minPadding" type="number" default="0.01">
+  Padding below the minimum value (fraction of axis range)
+</ParamField>
+
+```javascript
+yAxis: {
+  minPadding: 0.05  // 5% padding below min
+}
+```
+
+### maxPadding
+
+<ParamField path="maxPadding" type="number" default="0.01">
+  Padding above the maximum value (fraction of axis range)
+</ParamField>
+
+```javascript
+yAxis: {
+  maxPadding: 0.1  // 10% padding above max
+}
+```
+
+### startOnTick
+
+<ParamField path="startOnTick" type="boolean" default="true">
+  Whether to force the axis to start on a tick
+</ParamField>
+
+```javascript
+yAxis: {
+  startOnTick: false,
+  min: 5  // Will start exactly at 5
+}
+```
+
+### endOnTick
+
+<ParamField path="endOnTick" type="boolean" default="true">
+  Whether to force the axis to end on a tick
+</ParamField>
+
+```javascript
+yAxis: {
+  endOnTick: false,
+  max: 95  // Will end exactly at 95
+}
+```
+
+### tickInterval
+
+<ParamField path="tickInterval" type="number">
+  The interval between ticks
+</ParamField>
+
+```javascript
+xAxis: {
+  tickInterval: 24 * 3600 * 1000  // One day for datetime axis
+}
+
+yAxis: {
+  tickInterval: 10  // Ticks every 10 units
+}
+```
+
+### tickAmount
+
+<ParamField path="tickAmount" type="number">
+  Approximate number of ticks to show
+</ParamField>
+
+```javascript
+yAxis: {
+  tickAmount: 6  // Aim for 6 ticks
+}
+```
+
+## Appearance Options
+
+### lineColor
+
+<ParamField path="lineColor" type="ColorType" default="#ccd6eb">
+  Color of the axis line
+</ParamField>
+
+```javascript
+xAxis: {
+  lineColor: '#333',
+  lineWidth: 2
+}
+```
+
+### lineWidth
+
+<ParamField path="lineWidth" type="number" default="1">
+  Width of the axis line in pixels
+</ParamField>
+
+### gridLineColor
+
+<ParamField path="gridLineColor" type="ColorType" default="#e6e6e6">
+  Color of the grid lines
+</ParamField>
+
+```javascript
+yAxis: {
+  gridLineColor: '#e0e0e0',
+  gridLineWidth: 1,
+  gridLineDashStyle: 'Dot'
+}
+```
+
+### gridLineWidth
+
+<ParamField path="gridLineWidth" type="number" default="1">
+  Width of the grid lines
+</ParamField>
+
+### gridLineDashStyle
+
+<ParamField path="gridLineDashStyle" type="string" default="Solid">
+  Dash style of the grid lines
+</ParamField>
+
+```javascript
+yAxis: {
+  gridLineDashStyle: 'Dash'  // 'Solid', 'Dot', 'Dash', etc.
+}
+```
+
+### minorGridLineColor
+
+<ParamField path="minorGridLineColor" type="ColorType" default="#f2f2f2">
+  Color of minor grid lines
+</ParamField>
+
+### minorGridLineWidth
+
+<ParamField path="minorGridLineWidth" type="number" default="1">
+  Width of minor grid lines
+</ParamField>
+
+### minorTickInterval
+
+<ParamField path="minorTickInterval" type="number | 'auto'">
+  Interval for minor ticks
+</ParamField>
+
+```javascript
+yAxis: {
+  minorTickInterval: 'auto',
+  minorGridLineWidth: 1,
+  minorGridLineColor: '#f0f0f0'
+}
+```
+
+## Label Options
+
+### labels
+
+<ParamField path="labels" type="object">
+  Axis label configuration
+</ParamField>
+
+```javascript
+yAxis: {
+  labels: {
+    enabled: true,
+    align: 'right',
+    x: -10,
+    y: 5,
+    format: '{value} °C',
+    formatter: function() {
+      return this.value + ' units';
+    },
+    style: {
+      fontSize: '12px',
+      color: '#666'
+    },
+    rotation: 0,
+    overflow: 'justify'
+  }
+}
+
+xAxis: {
+  labels: {
+    format: '{value:%b %e}',  // For datetime: "Jan 1"
+    rotation: -45,
+    align: 'right'
+  }
+}
+```
+
+**Source**: Referenced in `ts/Core/Axis/AxisOptions.ts:26-27`
+
+## Tick Options
+
+### tickColor
+
+<ParamField path="tickColor" type="ColorType" default="#ccd6eb">
+  Color of the tick marks
+</ParamField>
+
+### tickWidth
+
+<ParamField path="tickWidth" type="number" default="1">
+  Width of the tick marks in pixels
+</ParamField>
+
+### tickLength
+
+<ParamField path="tickLength" type="number" default="10">
+  Length of the tick marks in pixels
+</ParamField>
+
+### tickPosition
+
+<ParamField path="tickPosition" type="string" default="outside">
+  Position of tick marks: 'inside' or 'outside'
+</ParamField>
+
+```javascript
+xAxis: {
+  tickColor: '#333',
+  tickWidth: 2,
+  tickLength: 5,
+  tickPosition: 'inside'
+}
+```
+
+### tickPositions
+
+<ParamField path="tickPositions" type="Array<number>">
+  Explicit tick positions
+</ParamField>
+
+```javascript
+yAxis: {
+  tickPositions: [0, 25, 50, 75, 100]  // Explicit ticks
+}
+```
+
+## Crosshair
+
+### crosshair
+
+<ParamField path="crosshair" type="boolean | object" default="false">
+  Crosshair configuration for highlighting axis values
+</ParamField>
+
+```javascript
+xAxis: {
+  crosshair: true  // Simple crosshair
+}
+
+xAxis: {
+  crosshair: {
+    width: 2,
+    color: '#ff0000',
+    dashStyle: 'Dash',
+    snap: true,
+    label: {
+      enabled: true,
+      format: '{value:%b %e, %Y}'
+    }
+  }
+}
+```
+
+**Source**: Referenced in `ts/Core/Axis/AxisOptions.ts:25`
+
+## Plot Lines & Bands
+
+### plotLines
+
+<ParamField path="plotLines" type="Array<object>">
+  Array of plot lines to draw on the axis
+</ParamField>
+
+```javascript
+yAxis: {
+  plotLines: [{
+    value: 50,
+    color: 'red',
+    width: 2,
+    id: 'threshold',
+    dashStyle: 'Dash',
+    label: {
+      text: 'Threshold',
+      align: 'right',
+      style: {
+        color: 'red'
+      }
+    },
+    zIndex: 5
+  }]
+}
+```
+
+### plotBands
+
+<ParamField path="plotBands" type="Array<object>">
+  Array of plot bands to highlight ranges
+</ParamField>
+
+```javascript
+xAxis: {
+  plotBands: [{
+    from: Date.UTC(2024, 0, 1),
+    to: Date.UTC(2024, 0, 7),
+    color: 'rgba(68, 170, 213, 0.2)',
+    id: 'week1',
+    label: {
+      text: 'Week 1',
+      align: 'center'
+    }
+  }]
+}
+
+yAxis: {
+  plotBands: [{
+    from: 20,
+    to: 80,
+    color: 'rgba(0, 255, 0, 0.1)',
+    label: { text: 'Normal Range' }
+  }]
+}
+```
+
+## Positioning
+
+### opposite
+
+<ParamField path="opposite" type="boolean" default="false">
+  Whether to display the axis on the opposite side
+</ParamField>
+
+```javascript
+yAxis: [{
+  title: { text: 'Primary' }
+}, {
+  title: { text: 'Secondary' },
+  opposite: true  // Right side for Y axis
+}]
+```
+
+### offset
+
+<ParamField path="offset" type="number" default="0">
+  Distance in pixels to offset the axis from the default position
+</ParamField>
+
+```javascript
+yAxis: {
+  offset: 20  // Move 20px away from plot area
+}
+```
+
+### width
+
+<ParamField path="width" type="number | string">
+  Width of the axis in pixels or percentage
+</ParamField>
+
+```javascript
+xAxis: [{
+  width: '48%',
+  offset: 0
+}, {
+  width: '48%',
+  left: '52%'
+}]
+```
+
+### height
+
+<ParamField path="height" type="number | string">
+  Height of the axis in pixels or percentage
+</ParamField>
+
+```javascript
+yAxis: [{
+  height: '48%'
+}, {
+  height: '48%',
+  top: '52%'
+}]
+```
+
+### left
+
+<ParamField path="left" type="number | string">
+  Left position of the axis
+</ParamField>
+
+### top
+
+<ParamField path="top" type="number | string">
+  Top position of the axis
+</ParamField>
+
+## Breaks
+
+### breaks
+
+<ParamField path="breaks" type="Array<object>">
+  Axis breaks for skipping ranges
+</ParamField>
+
+```javascript
+xAxis: {
+  breaks: [{
+    from: Date.UTC(2024, 0, 5),
+    to: Date.UTC(2024, 0, 10),
+    breakSize: 0  // Gap size
+  }]
+}
+
+yAxis: {
+  breaks: [{
+    from: 5,
+    to: 10,
+    breakSize: 1
+  }, {
+    from: 20,
+    to: 30,
+    breakSize: 1
+  }]
+}
+```
+
+## Events
+
+### events
+
+<ParamField path="events" type="object">
+  Event handlers for axis events
+</ParamField>
+
+```javascript
+xAxis: {
+  events: {
+    afterSetExtremes: function(e) {
+      console.log('Extremes set:', e.min, e.max);
+    },
+    setExtremes: function(e) {
+      console.log('Setting extremes:', e.min, e.max);
+      // Return false to prevent
+      if (e.min < 0) return false;
+    },
+    afterBreaks: function() {
+      console.log('Breaks recalculated');
+    },
+    pointBreak: function(e) {
+      console.log('Point broken:', e.point.name);
+    }
+  }
+}
+```
+
+**Source**: Referenced in chart events
+
+## Datetime Options
+
+### dateTimeLabelFormats
+
+<ParamField path="dateTimeLabelFormats" type="object">
+  Format strings for datetime labels
+</ParamField>
+
+```javascript
+xAxis: {
+  type: 'datetime',
+  dateTimeLabelFormats: {
+    millisecond: '%H:%M:%S.%L',
+    second: '%H:%M:%S',
+    minute: '%H:%M',
+    hour: '%H:%M',
+    day: '%e %b',
+    week: '%e %b',
+    month: '%b \'%y',
+    year: '%Y'
+  }
+}
+```
+
+### minRange
+
+<ParamField path="minRange" type="number">
+  Minimum range to display (prevents zooming too far in)
+</ParamField>
+
+```javascript
+xAxis: {
+  type: 'datetime',
+  minRange: 24 * 3600 * 1000  // At least one day
+}
+```
+
+## Advanced Options
+
+### reversed
+
+<ParamField path="reversed" type="boolean" default="false">
+  Whether to reverse the axis direction
+</ParamField>
+
+```javascript
+yAxis: {
+  reversed: true  // High values at bottom
+}
+```
+
+### alignTicks
+
+<ParamField path="alignTicks" type="boolean" default="true">
+  Whether to align ticks with other axes
+</ParamField>
+
+### allowDecimals
+
+<ParamField path="allowDecimals" type="boolean" default="true">
+  Whether to allow decimals in the axis values
+</ParamField>
+
+```javascript
+yAxis: {
+  allowDecimals: false  // Integer values only
+}
+```
+
+### softMin / softMax
+
+<ParamField path="softMin" type="number">
+  Soft minimum - only applied if no data is below this value
+</ParamField>
+
+<ParamField path="softMax" type="number">
+  Soft maximum - only applied if no data is above this value
+</ParamField>
+
+```javascript
+yAxis: {
+  softMin: 0,    // Prefer 0 as min if data allows
+  softMax: 100   // Prefer 100 as max if data allows
+}
+```
+
+### visible
+
+<ParamField path="visible" type="boolean" default="true">
+  Whether the axis is visible
+</ParamField>
+
+```javascript
+xAxis: {
+  visible: false  // Hide axis completely
+}
+```
+
+## Complete Example
+
+```javascript
+Highcharts.chart('container', {
+  xAxis: {
+    // Type
+    type: 'datetime',
+    
+    // Scale
+    min: Date.UTC(2024, 0, 1),
+    max: Date.UTC(2024, 11, 31),
+    minRange: 7 * 24 * 3600 * 1000,  // One week
+    
+    // Title
+    title: {
+      text: 'Time Period',
+      style: { fontSize: '14px' }
+    },
+    
+    // Labels
+    labels: {
+      format: '{value:%b %e}',
+      rotation: -45,
+      align: 'right',
+      style: { fontSize: '11px' }
+    },
+    
+    // Appearance
+    lineColor: '#333',
+    lineWidth: 1,
+    gridLineWidth: 1,
+    gridLineColor: '#e6e6e6',
+    
+    // Ticks
+    tickInterval: 30 * 24 * 3600 * 1000,  // Monthly
+    tickWidth: 1,
+    tickLength: 5,
+    tickColor: '#333',
+    
+    // Crosshair
+    crosshair: {
+      width: 1,
+      color: '#999',
+      dashStyle: 'Dash'
+    },
+    
+    // Plot bands
+    plotBands: [{
+      from: Date.UTC(2024, 5, 1),
+      to: Date.UTC(2024, 7, 31),
+      color: 'rgba(255, 200, 0, 0.1)',
+      label: { text: 'Summer' }
+    }],
+    
+    // Events
+    events: {
+      afterSetExtremes: function(e) {
+        console.log('Date range:', 
+          new Date(e.min).toISOString(),
+          new Date(e.max).toISOString()
+        );
+      }
+    }
+  },
+  
+  yAxis: {
+    // Scale
+    min: 0,
+    softMax: 100,
+    
+    // Title
+    title: {
+      text: 'Temperature (°C)',
+      rotation: 0,
+      align: 'high',
+      offset: 0,
+      y: -10
+    },
+    
+    // Labels
+    labels: {
+      format: '{value}°',
+      align: 'right',
+      x: -10
+    },
+    
+    // Appearance
+    gridLineWidth: 1,
+    gridLineDashStyle: 'Dot',
+    
+    // Minor ticks
+    minorTickInterval: 'auto',
+    minorGridLineWidth: 1,
+    
+    // Plot lines
+    plotLines: [{
+      value: 32,
+      color: '#0000ff',
+      width: 2,
+      label: { text: 'Freezing Point' }
+    }]
+  },
+  
+  series: [{
+    data: generateTimeSeriesData()
+  }]
+});
+```
+
+## See Also
+
+- [Axis Class API](/api/axis) - Axis methods and properties
+- [Chart Options](/api/chart-options) - Chart configuration
+- [Plot Options](/api/plot-options) - Series defaults
+- [Events API](/api/events) - Axis events

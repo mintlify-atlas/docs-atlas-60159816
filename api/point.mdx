@@ -1,0 +1,602 @@
+---
+title: 'Point Class API'
+description: 'Complete reference for the Highcharts Point class'
+---
+
+# Point Class
+
+The Point class represents individual data points in a series. Points are generated from the `series.data` configuration and can be accessed from the `series.points` array.
+
+**Source**: `ts/Core/Series/Point.ts:120`
+
+## Overview
+
+Points can be accessed in multiple ways:
+
+```javascript
+// From series.data or series.points
+const point = series.data[0];
+const point = series.points[5];
+
+// In event handlers
+Highcharts.chart('container', {
+  plotOptions: {
+    series: {
+      point: {
+        events: {
+          click: function() {
+            console.log('Point clicked:', this.y);
+          }
+        }
+      }
+    }
+  }
+});
+
+// By ID
+const point = chart.get('point-id');
+```
+
+## Constructor
+
+Points are typically created automatically from series data, not instantiated directly.
+
+```javascript
+// Points created from data array
+Highcharts.chart('container', {
+  series: [{
+    data: [1, 2, 3, 4, 5]  // Simple points
+  }]
+});
+
+// Points with configurations
+Highcharts.chart('container', {
+  series: [{
+    data: [
+      { y: 10, name: 'Point 1', color: 'red' },
+      { y: 20, name: 'Point 2', marker: { enabled: true }},
+      { x: 5, y: 15, id: 'special-point' }
+    ]
+  }]
+});
+```
+
+**Constructor Signature** (Source: `ts/Core/Series/Point.ts:128`):
+
+```typescript
+constructor(
+  series: Series,
+  options: PointOptions | PointShortOptions,
+  x?: number
+)
+```
+
+## Properties
+
+### point.series
+
+<ResponseField name="series" type="Highcharts.Series" required>
+  The series this point belongs to
+</ResponseField>
+
+```javascript
+const series = point.series;
+console.log(series.name);
+```
+
+### point.x
+
+<ResponseField name="x" type="number" required>
+  The x-value of the point
+</ResponseField>
+
+```javascript
+console.log('X:', point.x); // 5
+```
+
+### point.y
+
+<ResponseField name="y" type="number">
+  The y-value of the point
+</ResponseField>
+
+```javascript
+console.log('Y:', point.y); // 42
+```
+
+### point.category
+
+<ResponseField name="category" type="string | number" required>
+  For categorical axes, the category name. For other axes, same as x.
+</ResponseField>
+
+```javascript
+console.log(point.category); // 'January'
+```
+
+**Source**: `ts/Core/Series/Point.ts:167`
+
+### point.name
+
+<ResponseField name="name" type="string">
+  The name of the point
+</ResponseField>
+
+```javascript
+console.log(point.name); // 'Special Point'
+```
+
+### point.color
+
+<ResponseField name="color" type="ColorType">
+  The point's current color
+</ResponseField>
+
+```javascript
+console.log(point.color); // '#7cb5ec'
+```
+
+**Source**: `ts/Core/Series/Point.ts:172`
+
+### point.colorIndex
+
+<ResponseField name="colorIndex" type="number">
+  Color index for styled mode
+</ResponseField>
+
+**Source**: `ts/Core/Series/Point.ts:178`
+
+### point.index
+
+<ResponseField name="index" type="number" required>
+  Index in the series.points array
+</ResponseField>
+
+```javascript
+console.log('Point index:', point.index); // 0, 1, 2...
+```
+
+**Source**: Referenced in `ts/Core/Series/PointBase.ts:140`
+
+### point.selected
+
+<ResponseField name="selected" type="boolean">
+  Whether the point is currently selected
+</ResponseField>
+
+```javascript
+if (point.selected) {
+  point.select(false); // Deselect
+}
+```
+
+### point.plotX
+
+<ResponseField name="plotX" type="number">
+  Translated X position in pixels relative to the plot area
+</ResponseField>
+
+```javascript
+console.log('Pixel X:', point.plotX);
+```
+
+**Source**: Referenced in `ts/Core/Series/PointBase.ts:154`
+
+### point.plotY
+
+<ResponseField name="plotY" type="number">
+  Translated Y position in pixels relative to the plot area
+</ResponseField>
+
+```javascript
+console.log('Pixel Y:', point.plotY);
+```
+
+**Source**: Referenced in `ts/Core/Series/PointBase.ts:168`
+
+### point.graphic
+
+<ResponseField name="graphic" type="SVGElement">
+  SVG element representing the point in the chart
+</ResponseField>
+
+```javascript
+if (point.graphic) {
+  point.graphic.attr({ fill: 'red' });
+}
+```
+
+**Source**: Referenced in `ts/Core/Series/Point.ts:196`
+
+### point.options
+
+<ResponseField name="options" type="PointOptions">
+  Configuration options for this point
+</ResponseField>
+
+```javascript
+console.log(point.options);
+```
+
+## Methods
+
+### point.update()
+
+Update the point with new options.
+
+<ParamField path="options" type="PointOptions | number" required>
+  New point options or y-value
+</ParamField>
+
+<ParamField path="redraw" type="boolean" default="true">
+  Whether to redraw the chart
+</ParamField>
+
+<ParamField path="animation" type="boolean | AnimationOptions">
+  Animation options
+</ParamField>
+
+```javascript
+// Update y-value
+point.update(42);
+
+// Update with options
+point.update({
+  y: 42,
+  color: 'red',
+  name: 'Updated Point'
+});
+
+// Update marker style
+point.update({
+  marker: {
+    enabled: true,
+    radius: 10,
+    fillColor: 'orange'
+  }
+});
+
+// Update without redraw
+point.update(50, false);
+
+// Update with animation
+point.update(75, true, { duration: 1000 });
+```
+
+### point.remove()
+
+Remove the point from the series.
+
+<ParamField path="redraw" type="boolean" default="true">
+  Whether to redraw the chart
+</ParamField>
+
+<ParamField path="animation" type="boolean | AnimationOptions">
+  Animation options
+</ParamField>
+
+```javascript
+// Remove point
+point.remove();
+
+// Remove without redraw
+point.remove(false);
+
+// Remove with animation
+point.remove(true, { duration: 500 });
+```
+
+### point.select()
+
+Select or unselect the point.
+
+<ParamField path="selected" type="boolean" default="undefined">
+  True to select, false to deselect, undefined to toggle
+</ParamField>
+
+<ParamField path="accumulate" type="boolean" default="false">
+  Whether to add to current selection or replace it
+</ParamField>
+
+```javascript
+// Toggle selection
+point.select();
+
+// Select
+point.select(true);
+
+// Deselect
+point.select(false);
+
+// Select multiple points
+point1.select(true, true); // Select and keep previous
+point2.select(true, true); // Add to selection
+```
+
+**Source**: Referenced in `ts/Core/Series/PointBase.ts:84`
+
+### point.setState()
+
+Set the point's visual state.
+
+<ParamField path="state" type="'hover' | 'select' | 'inactive' | ''">
+  The state to set (empty string for normal)
+</ParamField>
+
+<ParamField path="move" type="boolean">
+  Whether to animate to the new state
+</ParamField>
+
+```javascript
+// Set hover state
+point.setState('hover');
+
+// Reset to normal
+point.setState('');
+
+// Set inactive
+point.setState('inactive');
+
+// Set select state with animation
+point.setState('select', true);
+```
+
+**Source**: Referenced in `ts/Core/Series/PointBase.ts:85`
+
+### point.onMouseOver()
+
+Trigger the mouse over event.
+
+<ParamField path="event" type="PointerEvent">
+  Mouse event
+</ParamField>
+
+```javascript
+// Programmatically trigger hover
+point.onMouseOver();
+```
+
+**Source**: Referenced in `ts/Core/Series/PointBase.ts:83`
+
+### point.onMouseOut()
+
+Trigger the mouse out event.
+
+```javascript
+// Programmatically trigger un-hover
+point.onMouseOut();
+```
+
+**Source**: Referenced in `ts/Core/Series/PointBase.ts:82`
+
+### point.importEvents()
+
+Import point events from options.
+
+```javascript
+// Internal method, called automatically
+point.importEvents();
+```
+
+**Source**: Referenced in `ts/Core/Series/PointBase.ts:81`
+
+### point.firePointEvent()
+
+Fire a point event.
+
+<ParamField path="eventType" type="string" required>
+  The event type
+</ParamField>
+
+<ParamField path="eventArgs" type="object">
+  Event arguments
+</ParamField>
+
+<ParamField path="defaultFunction" type="Function">
+  Default event handler
+</ParamField>
+
+```javascript
+// Fire custom event
+point.firePointEvent('customEvent', { data: 'value' });
+```
+
+### point.tooltipFormatter()
+
+Format the tooltip for this point.
+
+<ParamField path="pointFormat" type="string" required>
+  The format string
+</ParamField>
+
+```javascript
+const formatted = point.tooltipFormatter(
+  '<b>{point.name}</b>: {point.y}'
+);
+```
+
+**Returns**: `string`
+
+## Events
+
+Point events are configured in the `plotOptions.series.point.events` or individual point options:
+
+```javascript
+Highcharts.chart('container', {
+  plotOptions: {
+    series: {
+      point: {
+        events: {
+          click: function() {
+            alert('Point clicked: ' + this.category + ', ' + this.y);
+          },
+          mouseOver: function() {
+            this.update({ color: 'red' });
+          },
+          mouseOut: function() {
+            this.update({ color: null });
+          },
+          select: function() {
+            console.log('Point selected:', this.selected);
+          },
+          unselect: function() {
+            console.log('Point unselected');
+          },
+          update: function() {
+            console.log('Point updated to:', this.y);
+          },
+          remove: function() {
+            console.log('Point removed');
+          }
+        }
+      }
+    }
+  },
+  series: [{
+    data: [
+      {
+        y: 10,
+        events: {
+          // Point-specific events
+          click: function() {
+            console.log('Special point clicked');
+          }
+        }
+      },
+      20, 30, 40
+    ]
+  }]
+});
+```
+
+Common point events:
+- `click` - Point clicked
+- `mouseOver` / `mouseOut` - Mouse hover
+- `select` / `unselect` - Selection state change
+- `update` - Point updated
+- `remove` - Point removed
+- `drag` / `drop` - Point dragging (with draggable-points module)
+
+## Example: Interactive Points
+
+```javascript
+const chart = Highcharts.chart('container', {
+  chart: { type: 'scatter' },
+  title: { text: 'Interactive Points' },
+  plotOptions: {
+    series: {
+      allowPointSelect: true,
+      point: {
+        events: {
+          click: function() {
+            const point = this;
+            
+            // Update point on click
+            point.update({
+              y: Math.random() * 100,
+              color: '#' + Math.floor(Math.random()*16777215).toString(16)
+            });
+          },
+          select: function() {
+            console.log('Selected:', this.category, this.y);
+          }
+        }
+      }
+    }
+  },
+  series: [{
+    name: 'Points',
+    data: [
+      { x: 1, y: 10, name: 'Point A' },
+      { x: 2, y: 20, name: 'Point B' },
+      { x: 3, y: 15, name: 'Point C', color: 'red' },
+      { x: 4, y: 25, name: 'Point D' }
+    ]
+  }]
+});
+
+// Programmatic point manipulation
+const series = chart.series[0];
+
+// Find and update highest point
+function highlightMax() {
+  const maxPoint = series.data.reduce((max, p) => 
+    p.y > max.y ? p : max
+  );
+  
+  // Reset all points
+  series.data.forEach(p => p.update({ color: null }));
+  
+  // Highlight max
+  maxPoint.update({
+    color: 'gold',
+    marker: { radius: 10 }
+  });
+}
+
+// Remove low points
+function removeLowPoints(threshold) {
+  series.data.forEach(point => {
+    if (point.y < threshold) {
+      point.remove();
+    }
+  });
+}
+
+// Select points in range
+function selectRange(min, max) {
+  series.data.forEach(point => {
+    if (point.y >= min && point.y <= max) {
+      point.select(true, true);
+    }
+  });
+}
+```
+
+## Example: Point Annotations
+
+```javascript
+Highcharts.chart('container', {
+  chart: { type: 'line' },
+  title: { text: 'Annotated Points' },
+  series: [{
+    data: [
+      {
+        y: 10,
+        marker: {
+          enabled: true,
+          radius: 8,
+          fillColor: 'red'
+        },
+        dataLabels: {
+          enabled: true,
+          format: 'Min: {y}',
+          style: { color: 'red' }
+        }
+      },
+      20, 30,
+      {
+        y: 50,
+        marker: {
+          enabled: true,
+          radius: 8,
+          fillColor: 'green'
+        },
+        dataLabels: {
+          enabled: true,
+          format: 'Max: {y}',
+          style: { color: 'green' }
+        }
+      },
+      40
+    ]
+  }]
+});
+```
+
+## See Also
+
+- [Series Class](/api/series) - Parent series
+- [Series Options](/api/series-options) - Point configuration
+- [Events API](/api/events) - Point events
+- [Chart Class](/api/chart) - Chart instance

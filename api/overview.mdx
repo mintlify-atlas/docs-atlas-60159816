@@ -1,0 +1,146 @@
+---
+title: 'API Overview'
+description: 'Complete reference for the Highcharts JavaScript API'
+---
+
+# Highcharts API Overview
+
+The Highcharts API provides a comprehensive set of classes, methods, and configuration options for creating interactive charts. This reference documentation is generated from the TypeScript source code.
+
+## Core API Classes
+
+Highcharts exposes several key classes that form the foundation of the charting library:
+
+### Chart
+
+The main Chart class is the entry point for creating charts. It manages the entire chart lifecycle, rendering, and interactions.
+
+```javascript
+const chart = Highcharts.chart('container', {
+  title: { text: 'My Chart' },
+  series: [{ data: [1, 3, 2, 4] }]
+});
+```
+
+[View Chart API →](/api/chart)
+
+### Series
+
+Series objects represent data visualizations within a chart. Each series type (line, column, pie, etc.) extends the base Series class.
+
+```javascript
+chart.addSeries({
+  type: 'line',
+  name: 'Sales',
+  data: [29.9, 71.5, 106.4, 129.2]
+});
+```
+
+[View Series API →](/api/series)
+
+### Axis
+
+Axis objects control the x-axis, y-axis, and other dimensional axes. They handle scaling, labeling, and positioning.
+
+```javascript
+chart.xAxis[0].setExtremes(0, 100);
+```
+
+[View Axis API →](/api/axis)
+
+### Point
+
+Point objects represent individual data points in a series. They provide methods for updating, selecting, and removing data.
+
+```javascript
+point.update({ y: 150, color: 'red' });
+```
+
+[View Point API →](/api/point)
+
+## Configuration Options
+
+Highcharts uses a declarative configuration system with deep option objects:
+
+- **[Chart Options](/api/chart-options)** - Rendering container, dimensions, theming
+- **[Series Options](/api/series-options)** - Data, type-specific settings
+- **[Axis Options](/api/axis-options)** - Scale, labels, gridlines
+- **[Plot Options](/api/plot-options)** - Global series defaults
+- **[Responsive Options](/api/responsive-options)** - Adaptive configurations
+
+## Methods & Utilities
+
+Highcharts provides utility functions and event handling:
+
+- **[API Methods](/api/methods)** - Chart manipulation methods
+- **[Events](/api/events)** - Event lifecycle and handlers
+- **[Utilities](/api/utilities)** - Helper functions and formatters
+
+## Factory Pattern
+
+Highcharts uses a factory pattern for instantiation:
+
+```javascript
+// Using the factory function (recommended)
+const chart = Highcharts.chart('container', options);
+
+// Using the constructor
+const chart = new Highcharts.Chart('container', options);
+
+// With callback
+Highcharts.chart('container', options, function(chart) {
+  console.log('Chart loaded:', chart);
+});
+```
+
+## TypeScript Support
+
+The API is written in TypeScript and provides full type definitions:
+
+```typescript
+import * as Highcharts from 'highcharts';
+
+const options: Highcharts.Options = {
+  chart: { type: 'line' },
+  series: [{ type: 'line', data: [1, 2, 3] }]
+};
+
+const chart: Highcharts.Chart = Highcharts.chart('container', options);
+```
+
+## Global Namespace
+
+All Highcharts functionality is exposed through the `Highcharts` global object:
+
+```javascript
+Highcharts.chart()      // Create a chart
+Highcharts.seriesTypes  // Registry of series types
+Highcharts.charts       // Array of all chart instances
+Highcharts.dateFormat() // Utility functions
+```
+
+## Source Code Location
+
+The core API is implemented in:
+
+- **Chart**: `ts/Core/Chart/Chart.ts:285`
+- **Series**: `ts/Core/Series/Series.ts:255`
+- **Axis**: `ts/Core/Axis/Axis.ts:190`
+- **Point**: `ts/Core/Series/Point.ts:120`
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Chart Class" icon="chart-line" href="/api/chart">
+    Explore Chart methods and properties
+  </Card>
+  <Card title="Series Class" icon="chart-area" href="/api/series">
+    Learn about data visualization
+  </Card>
+  <Card title="Configuration" icon="sliders" href="/api/chart-options">
+    Configure chart options
+  </Card>
+  <Card title="Events" icon="bolt" href="/api/events">
+    Handle user interactions
+  </Card>
+</CardGroup>

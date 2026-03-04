@@ -1,0 +1,545 @@
+---
+title: 'Responsive Configuration'
+description: 'Responsive design options for adaptive chart layouts'
+---
+
+# Responsive Configuration
+
+The responsive options allow charts to adapt their configuration based on screen size or other conditions. This enables mobile-friendly, adaptive visualizations.
+
+## Basic Structure
+
+```javascript
+Highcharts.chart('container', {
+  // Default configuration
+  title: { text: 'Desktop Title' },
+  legend: { enabled: true },
+  
+  // Responsive rules
+  responsive: {
+    rules: [{
+      condition: {
+        maxWidth: 500
+      },
+      chartOptions: {
+        title: { text: 'Mobile Title' },
+        legend: { enabled: false }
+      }
+    }]
+  }
+});
+```
+
+## Responsive Rules
+
+### rules
+
+<ParamField path="responsive.rules" type="Array<object>" required>
+  Array of responsive rule objects
+</ParamField>
+
+Each rule contains:
+- **condition** - When to apply the rule
+- **chartOptions** - Options to merge when condition is met
+
+```javascript
+responsive: {
+  rules: [
+    {
+      condition: { maxWidth: 600 },
+      chartOptions: {
+        // Options for small screens
+      }
+    },
+    {
+      condition: { minWidth: 601, maxWidth: 1200 },
+      chartOptions: {
+        // Options for medium screens
+      }
+    },
+    {
+      condition: { minWidth: 1201 },
+      chartOptions: {
+        // Options for large screens
+      }
+    }
+  ]
+}
+```
+
+## Condition Options
+
+### maxWidth
+
+<ParamField path="condition.maxWidth" type="number">
+  Maximum chart width (in pixels) for this rule to apply
+</ParamField>
+
+```javascript
+condition: {
+  maxWidth: 500  // Apply when chart width ≤ 500px
+}
+```
+
+### minWidth
+
+<ParamField path="condition.minWidth" type="number">
+  Minimum chart width (in pixels) for this rule to apply
+</ParamField>
+
+```javascript
+condition: {
+  minWidth: 600  // Apply when chart width ≥ 600px
+}
+```
+
+### maxHeight
+
+<ParamField path="condition.maxHeight" type="number">
+  Maximum chart height (in pixels) for this rule to apply
+</ParamField>
+
+```javascript
+condition: {
+  maxHeight: 400  // Apply when chart height ≤ 400px
+}
+```
+
+### minHeight
+
+<ParamField path="condition.minHeight" type="number">
+  Minimum chart height (in pixels) for this rule to apply
+</ParamField>
+
+### Combined Conditions
+
+```javascript
+condition: {
+  minWidth: 400,
+  maxWidth: 800,
+  minHeight: 300
+}
+```
+
+### Custom Callback
+
+<ParamField path="condition.callback" type="Function">
+  Custom function that returns true when rule should apply
+</ParamField>
+
+```javascript
+condition: {
+  callback: function() {
+    return window.innerWidth < 500 || 
+           /Android|iPhone/.test(navigator.userAgent);
+  }
+}
+```
+
+## Chart Options
+
+### chartOptions
+
+<ParamField path="chartOptions" type="object" required>
+  Chart configuration to merge when condition is met
+</ParamField>
+
+Any chart option can be modified:
+
+```javascript
+chartOptions: {
+  chart: {
+    height: 300,
+    spacing: [5, 5, 5, 5]
+  },
+  title: {
+    text: 'Mobile View',
+    style: { fontSize: '14px' }
+  },
+  legend: {
+    enabled: false
+  },
+  xAxis: {
+    labels: {
+      rotation: -45,
+      style: { fontSize: '10px' }
+    }
+  },
+  yAxis: {
+    title: { text: '' }  // Remove axis title
+  },
+  plotOptions: {
+    series: {
+      dataLabels: { enabled: false }
+    }
+  }
+}
+```
+
+## Common Responsive Patterns
+
+### Mobile-First Design
+
+```javascript
+Highcharts.chart('container', {
+  // Mobile defaults
+  chart: {
+    height: 300
+  },
+  title: {
+    text: 'Chart Title',
+    style: { fontSize: '14px' }
+  },
+  legend: {
+    layout: 'horizontal',
+    align: 'center',
+    verticalAlign: 'bottom'
+  },
+  
+  responsive: {
+    rules: [{
+      // Desktop enhancements
+      condition: { minWidth: 768 },
+      chartOptions: {
+        chart: {
+          height: 400
+        },
+        title: {
+          style: { fontSize: '18px' }
+        },
+        legend: {
+          layout: 'vertical',
+          align: 'right',
+          verticalAlign: 'middle'
+        }
+      }
+    }]
+  }
+});
+```
+
+### Hide Elements on Small Screens
+
+```javascript
+responsive: {
+  rules: [{
+    condition: { maxWidth: 500 },
+    chartOptions: {
+      // Hide legend
+      legend: { enabled: false },
+      
+      // Hide axis titles
+      xAxis: { title: { text: '' }},
+      yAxis: { title: { text: '' }},
+      
+      // Hide data labels
+      plotOptions: {
+        series: {
+          dataLabels: { enabled: false }
+        }
+      },
+      
+      // Hide subtitle
+      subtitle: { text: '' },
+      
+      // Hide credits
+      credits: { enabled: false }
+    }
+  }]
+}
+```
+
+### Adjust Spacing
+
+```javascript
+responsive: {
+  rules: [{
+    condition: { maxWidth: 600 },
+    chartOptions: {
+      chart: {
+        spacing: [5, 5, 5, 5],  // Reduce spacing
+        margin: [40, 10, 60, 40]  // Tighter margins
+      },
+      title: {
+        margin: 10  // Less space below title
+      }
+    }
+  }]
+}
+```
+
+### Simplify for Performance
+
+```javascript
+responsive: {
+  rules: [{
+    condition: { maxWidth: 500 },
+    chartOptions: {
+      // Disable animations
+      chart: {
+        animation: false
+      },
+      plotOptions: {
+        series: {
+          animation: false,
+          // Simplify markers
+          marker: {
+            enabled: false
+          },
+          // Disable shadows
+          shadow: false
+        }
+      }
+    }
+  }]
+}
+```
+
+### Responsive Text Sizing
+
+```javascript
+responsive: {
+  rules: [
+    {
+      condition: { maxWidth: 500 },
+      chartOptions: {
+        title: {
+          style: { fontSize: '12px' }
+        },
+        subtitle: {
+          style: { fontSize: '10px' }
+        },
+        xAxis: {
+          labels: { style: { fontSize: '9px' }},
+          title: { style: { fontSize: '10px' }}
+        },
+        yAxis: {
+          labels: { style: { fontSize: '9px' }},
+          title: { style: { fontSize: '10px' }}
+        },
+        legend: {
+          itemStyle: { fontSize: '9px' }
+        }
+      }
+    },
+    {
+      condition: { minWidth: 1200 },
+      chartOptions: {
+        title: {
+          style: { fontSize: '20px' }
+        },
+        subtitle: {
+          style: { fontSize: '14px' }
+        },
+        xAxis: {
+          labels: { style: { fontSize: '12px' }},
+          title: { style: { fontSize: '14px' }}
+        },
+        yAxis: {
+          labels: { style: { fontSize: '12px' }},
+          title: { style: { fontSize: '14px' }}
+        },
+        legend: {
+          itemStyle: { fontSize: '12px' }
+        }
+      }
+    }
+  ]
+}
+```
+
+## Complete Example
+
+```javascript
+Highcharts.chart('container', {
+  chart: {
+    type: 'column',
+    height: 400
+  },
+  
+  title: {
+    text: 'Responsive Chart Example',
+    style: { fontSize: '16px' }
+  },
+  
+  subtitle: {
+    text: 'Adapts to screen size'
+  },
+  
+  xAxis: {
+    categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+    title: { text: 'Month' },
+    labels: {
+      rotation: 0
+    }
+  },
+  
+  yAxis: {
+    title: { text: 'Value' }
+  },
+  
+  legend: {
+    enabled: true,
+    layout: 'vertical',
+    align: 'right',
+    verticalAlign: 'middle'
+  },
+  
+  plotOptions: {
+    column: {
+      dataLabels: {
+        enabled: true,
+        format: '{point.y}'
+      }
+    }
+  },
+  
+  series: [
+    { name: 'Series 1', data: [49, 71, 106, 129, 144, 176] },
+    { name: 'Series 2', data: [83, 78, 98, 93, 106, 84] }
+  ],
+  
+  // Responsive configuration
+  responsive: {
+    rules: [
+      {
+        // Small screens (mobile)
+        condition: { maxWidth: 500 },
+        chartOptions: {
+          chart: {
+            height: 300,
+            spacing: [5, 5, 5, 5]
+          },
+          title: {
+            style: { fontSize: '12px' }
+          },
+          subtitle: {
+            text: ''  // Hide subtitle
+          },
+          legend: {
+            enabled: false  // Hide legend
+          },
+          xAxis: {
+            title: { text: '' },  // Hide axis title
+            labels: {
+              rotation: -45,
+              style: { fontSize: '9px' }
+            }
+          },
+          yAxis: {
+            title: { text: '' },  // Hide axis title
+            labels: {
+              style: { fontSize: '9px' }
+            }
+          },
+          plotOptions: {
+            column: {
+              dataLabels: {
+                enabled: false  // Hide data labels
+              },
+              pointPadding: 0.05,
+              groupPadding: 0.1
+            }
+          }
+        }
+      },
+      {
+        // Medium screens (tablet)
+        condition: { minWidth: 501, maxWidth: 900 },
+        chartOptions: {
+          chart: {
+            height: 350
+          },
+          title: {
+            style: { fontSize: '14px' }
+          },
+          legend: {
+            layout: 'horizontal',
+            align: 'center',
+            verticalAlign: 'bottom'
+          },
+          xAxis: {
+            labels: {
+              style: { fontSize: '10px' }
+            }
+          },
+          yAxis: {
+            labels: {
+              style: { fontSize: '10px' }
+            }
+          }
+        }
+      },
+      {
+        // Large screens (desktop)
+        condition: { minWidth: 1200 },
+        chartOptions: {
+          chart: {
+            height: 500
+          },
+          title: {
+            style: { fontSize: '20px' }
+          },
+          xAxis: {
+            labels: {
+              style: { fontSize: '13px' }
+            },
+            title: {
+              style: { fontSize: '14px' }
+            }
+          },
+          yAxis: {
+            labels: {
+              style: { fontSize: '13px' }
+            },
+            title: {
+              style: { fontSize: '14px' }
+            }
+          },
+          plotOptions: {
+            column: {
+              dataLabels: {
+                style: { fontSize: '11px' }
+              }
+            }
+          }
+        }
+      }
+    ]
+  }
+});
+```
+
+## Testing Responsive Behavior
+
+```javascript
+// Programmatically test responsive rules
+const chart = Highcharts.chart('container', { /* config */ });
+
+// Trigger reflow on window resize
+window.addEventListener('resize', () => {
+  chart.reflow();
+});
+
+// Check current responsive state
+console.log('Chart width:', chart.chartWidth);
+console.log('Chart height:', chart.chartHeight);
+
+// Force resize
+chart.setSize(400, 300);
+```
+
+## Best Practices
+
+1. **Mobile-First**: Start with mobile configuration, enhance for larger screens
+2. **Performance**: Disable animations and complex features on small devices
+3. **Readability**: Increase font sizes, reduce clutter on small screens
+4. **Touch-Friendly**: Ensure adequate spacing for touch interactions
+5. **Test Multiple Breakpoints**: Cover phone, tablet, desktop sizes
+6. **Progressive Enhancement**: Add features as screen size increases
+
+## See Also
+
+- [Chart Options](/api/chart-options) - Chart configuration
+- [Plot Options](/api/plot-options) - Series defaults
+- [Chart Class](/api/chart) - Reflow and resize methods

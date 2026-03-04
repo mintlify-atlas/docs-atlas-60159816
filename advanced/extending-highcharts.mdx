@@ -1,0 +1,489 @@
+---
+title: Extending Highcharts
+description: Learn how to extend Highcharts functionality through plugins, custom modules, and prototypes
+---
+
+Highcharts is designed with extensibility in mind. You can modify behavior, add new features, and create plugins using the exposed API and prototype system.
+
+## Architecture Overview
+
+Highcharts is built on a modular architecture where major concepts correspond to JavaScript classes:
+
+- `Highcharts.Chart` - Main chart instance
+- `Highcharts.Series` - Series data and rendering
+- `Highcharts.Axis` - Axis functionality
+- `Highcharts.Tooltip` - Tooltip display
+- `Highcharts.Legend` - Legend component
+- `Highcharts.Pointer` - Mouse/touch interaction
+
+<Note>
+See the [full class reference](https://api.highcharts.com/class-reference/classes.list) for all available classes.
+</Note>
+
+## Plugin Structure
+
+All Highcharts plugins should follow this structure:
+
+```javascript
+(function (H) {
+    // Get shortcuts to Highcharts classes
+    const { Chart, Series, Axis } = H;
+
+    // Local variables
+    let pluginState;
+
+    // Plugin initialization
+    function init() {
+        // Setup code
+    }
+
+    // Plugin logic
+    // ...
+
+    init();
+}(Highcharts));
+```
+
+<Warning>
+Use an immediately invoked function expression (IIFE) to avoid polluting the global scope.
+</Warning>
+
+## Using addEvent
+
+The `addEvent` utility allows you to listen to events on classes and instances.
+
+### Class-Level Events
+
+Listen to events on all instances:
+
+```javascript
+H.addEvent(H.Chart, 'load', function(e) {
+    const chart = e.target;
+    console.log('Chart loaded:', chart.options.title.text);
+});
+```
+
+### Instance-Level Events
+
+Listen to events on specific instances:
+
+```javascript
+const chart = Highcharts.chart('container', {
+    // options
+});
+
+H.addEvent(chart, 'redraw', function() {
+    console.log('Chart redrawn');
+});
+```
+
+### Complete Example: Click Handler
+
+```javascript
+(function (H) {
+    H.addEvent(H.Chart, 'load', function(e) {
+        const chart = e.target;
+        
+        // Add click handler to chart container
+        H.addEvent(chart.container, 'click', function(e) {
+            e = chart.pointer.normalize(e);
+            console.log(`Clicked chart at ${e.chartX}, ${e.chartY}`);
+        });
+        
+        // Listen to axis extremes changes
+        H.addEvent(chart.xAxis[0], 'afterSetExtremes', function(e) {
+            console.log(`Set extremes to ${e.min}, ${e.max}`);
+        });
+    });
+}(Highcharts));
+```
+
+<Note>
+Prefer regular functions over arrow functions when using `addEvent`. Highcharts binds `this` to the runtime object, while arrow functions maintain lexical `this`.
+</Note>
+
+## Wrapping Prototype Functions
+
+The `wrap` utility allows you to modify existing functionality:
+
+```javascript
+H.wrap(Parent, 'methodName', function (proceed, ...args) {
+    // Before original function
+    console.log('Before');
+    
+    // Call original function
+    const result = proceed.apply(this, args);
+    
+    // After original function
+    console.log('After');
+    
+    return result;
+});
+```
+
+### Example: Custom Graph Drawing
+
+```javascript
+(function (H) {
+    H.wrap(H.Series.types.line.prototype, 'drawGraph', function (proceed) {
+        // Before drawing
+        console.log('About to draw graph:', typeof this.graph);
+        
+        // Call original function
+        proceed.apply(this, Array.prototype.slice.call(arguments, 1));
+        
+        // After drawing
+        console.log('Finished drawing graph:', typeof this.graph);
+        
+        // Add custom styling
+        if (this.graph) {
+            this.graph.attr({
+                'stroke-dasharray': '5,5'
+            });
+        }
+    });
+}(Highcharts));
+```
+
+### Example: Custom Tooltip Formatting
+
+```javascript
+(function (H) {
+    H.wrap(H.Tooltip.prototype, 'refresh', function (proceed, point) {
+        // Add custom data before showing tooltip
+        if (point.custom === undefined) {
+            point.custom = {
+                timestamp: Date.now(),
+                source: 'custom'
+            };
+        }
+        
+        // Call original refresh
+        proceed.apply(this, Array.prototype.slice.call(arguments, 1));
+    });
+}(Highcharts));
+```
+
+<Warning>
+Regular functions are required for `wrap` because they rely on runtime `this`, `proceed`, and access to the original argument list.
+</Warning>
+
+## Creating a Complete Plugin
+
+Here's a complete plugin that adds trackballs to column series:
+
+```javascript
+/**
+ * Highcharts Trackball Plugin
+ * 
+ * Adds trackball markers to series that don't have markers
+ */
+(function (H) {
+    /**
+     * Wrap tooltip refresh to show trackballs
+     */
+    H.wrap(H.Tooltip.prototype, 'refresh', function (proceed, points) {
+        // Ensure points is an array
+        points = H.splat(points);
+        
+        // Call original refresh
+        proceed.apply(this, Array.prototype.slice.call(arguments, 1));
+        
+        // Add or update trackball for each point
+        H.each(points, function (point) {
+            const series = point.series;
+            const chart = series.chart;
+            
+            // Only add trackball if series doesn't have markers
+            if (!series.options.marker || !series.options.marker.enabled) {
+                const pointX = point.plotX + series.xAxis.pos;
+                const pointY = H.pick(point.plotClose, point.plotY) + series.yAxis.pos;
+                
+                if (!series.trackball) {
+                    // Create trackball
+                    series.trackball = chart.renderer.circle(pointX, pointY, 5)
+                        .attr({
+                            fill: series.color,
+                            stroke: 'white',
+                            'stroke-width': 1,
+                            zIndex: 5
+                        })
+                        .add();
+                } else {
+                    // Update position
+                    series.trackball.attr({
+                        x: pointX,
+                        y: pointY
+                    });
+                }
+            }
+        });
+    });
+    
+    /**
+     * Wrap tooltip hide to remove trackballs
+     */
+    H.wrap(H.Tooltip.prototype, 'hide', function (proceed) {
+        // Call original hide
+        proceed.apply(this);
+        
+        // Destroy all trackballs
+        const series = this.chart.series;
+        H.each(series, function (serie) {
+            if (serie.trackball) {
+                serie.trackball = serie.trackball.destroy();
+            }
+        });
+    });
+}(Highcharts));
+```
+
+## Extending with ES Modules
+
+When using ES modules, you can access and modify modules directly:
+
+```typescript
+import Highcharts from 'highcharts/es-modules/masters/highcharts.src.js';
+import Chart from 'highcharts/es-modules/Core/Chart/Chart.js';
+import Series from 'highcharts/es-modules/Core/Series/Series.js';
+
+// Modify Chart prototype
+Chart.prototype.customMethod = function() {
+    console.log('Custom method called');
+};
+
+// Add to Series
+Highcharts.addEvent(Series, 'afterAnimate', function() {
+    console.log('Series animation complete');
+});
+
+export default Highcharts;
+```
+
+## Creating Custom Series Types
+
+Extend existing series types to create new ones:
+
+```typescript
+import Highcharts from 'highcharts/es-modules/masters/highcharts.src.js';
+import SeriesRegistry from 'highcharts/es-modules/Core/Series/SeriesRegistry.js';
+
+const { seriesTypes } = SeriesRegistry;
+
+class CustomSeries extends seriesTypes.line {
+    // Custom initialization
+    init() {
+        super.init.apply(this, arguments);
+        console.log('Custom series initialized');
+    }
+    
+    // Custom drawing
+    drawGraph() {
+        super.drawGraph.apply(this, arguments);
+        
+        // Add custom rendering
+        if (this.graph) {
+            this.graph.attr({
+                'stroke-dasharray': '10,10'
+            });
+        }
+    }
+}
+
+// Register the series type
+SeriesRegistry.registerSeriesType('custom', CustomSeries);
+
+export default Highcharts;
+```
+
+## Accessing Internal APIs
+
+<Warning>
+Internal APIs (not listed in the official documentation) may change between versions. Test your plugins with new releases.
+</Warning>
+
+```javascript
+// Access renderer
+const renderer = chart.renderer;
+
+// Access pointer
+const pointer = chart.pointer;
+
+// Access internal properties
+const plotArea = {
+    x: chart.plotLeft,
+    y: chart.plotTop,
+    width: chart.plotWidth,
+    height: chart.plotHeight
+};
+
+// Normalize mouse events
+const normalizedEvent = chart.pointer.normalize(mouseEvent);
+```
+
+## Plugin Best Practices
+
+<Steps>
+
+<Step title="Use IIFE Wrapper">
+
+```javascript
+(function (H) {
+    // Plugin code
+}(Highcharts));
+```
+
+</Step>
+
+<Step title="Avoid Global Variables">
+
+```javascript
+// Bad
+var myPluginData = {};
+
+// Good
+(function (H) {
+    let myPluginData = {};
+}(Highcharts));
+```
+
+</Step>
+
+<Step title="Clean Up Resources">
+
+```javascript
+H.addEvent(H.Chart, 'destroy', function() {
+    // Clean up plugin resources
+    if (this.customElements) {
+        this.customElements.forEach(el => el.destroy());
+    }
+});
+```
+
+</Step>
+
+<Step title="Document Your Plugin">
+
+```javascript
+/**
+ * Custom Highcharts Plugin
+ * 
+ * @version 1.0.0
+ * @author Your Name
+ * @license MIT
+ * 
+ * Adds custom functionality to charts
+ */
+(function (H) {
+    // Plugin code
+}(Highcharts));
+```
+
+</Step>
+
+</Steps>
+
+## TypeScript Support
+
+Extend Highcharts types for TypeScript projects:
+
+```typescript
+import Highcharts from 'highcharts';
+
+// Extend Chart interface
+declare module 'highcharts' {
+    interface Chart {
+        customMethod(): void;
+    }
+    
+    interface Series {
+        trackball?: SVGElement;
+    }
+}
+
+// Implement extension
+Highcharts.Chart.prototype.customMethod = function() {
+    console.log('Custom method');
+};
+```
+
+## Common Extension Patterns
+
+### Adding Custom Buttons
+
+```javascript
+H.addEvent(H.Chart, 'load', function() {
+    const chart = this;
+    
+    chart.customButton = chart.renderer.button(
+        'Custom Action',
+        chart.plotLeft,
+        chart.plotTop - 30,
+        function() {
+            alert('Custom button clicked!');
+        }
+    )
+    .attr({
+        zIndex: 3
+    })
+    .add();
+});
+```
+
+### Custom Axis Labels
+
+```javascript
+H.wrap(H.Axis.prototype, 'getSeriesExtremes', function(proceed) {
+    proceed.apply(this, Array.prototype.slice.call(arguments, 1));
+    
+    // Add custom logic to extremes calculation
+    if (this.options.customPadding) {
+        const range = this.dataMax - this.dataMin;
+        this.dataMax += range * 0.1;
+        this.dataMin -= range * 0.1;
+    }
+});
+```
+
+### Custom Data Processing
+
+```javascript
+H.addEvent(H.Series, 'afterSetOptions', function(e) {
+    const options = e.options;
+    
+    // Process custom data format
+    if (options.customData) {
+        options.data = options.customData.map(item => ({
+            x: item.timestamp,
+            y: item.value,
+            custom: item.metadata
+        }));
+    }
+});
+```
+
+## Testing Extensions
+
+```javascript
+// Test your plugin
+const chart = Highcharts.chart('container', {
+    chart: {
+        type: 'line'
+    },
+    series: [{
+        data: [1, 2, 3, 4, 5]
+    }]
+});
+
+// Verify extension
+if (typeof chart.customMethod === 'function') {
+    chart.customMethod();
+    console.log('Extension loaded successfully');
+}
+```
+
+## Resources
+
+- [Class Reference](https://api.highcharts.com/class-reference/classes.list)
+- [Plugin Repository](https://www.highcharts.com/plugin-registry/)
+- [Source Code](https://github.com/highcharts/highcharts)

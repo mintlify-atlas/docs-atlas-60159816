@@ -1,0 +1,326 @@
+---
+title: Installation
+description: Learn how to install and load Highcharts in your project using npm, CDN, ES modules, or local files.
+---
+
+## Installation Methods
+
+There are several ways to install and use Highcharts. Choose the method that best fits your project's needs.
+
+<Note>
+  This guide covers Highcharts Core, Stock, Maps, and Gantt. For Highcharts Dashboards, see the [Dashboards Installation](https://www.highcharts.com/docs/dashboards/installation) guide.
+</Note>
+
+## 1. Install from npm
+
+The recommended way to install Highcharts for modern web applications.
+
+<Steps>
+  <Step title="Install the package">
+    Install Highcharts as a dependency in your project:
+    
+    ```bash
+    npm install highcharts --save
+    ```
+    
+    The npm package includes Highcharts Core, Stock, Maps, Gantt, and all modules.
+  </Step>
+  
+  <Step title="Import in your code">
+    Load Highcharts using CommonJS require:
+    
+    ```javascript
+    var Highcharts = require('highcharts');
+    
+    // Load additional modules
+    require('highcharts/modules/exporting');
+    require('highcharts/modules/export-data');
+    
+    // Create your chart
+    Highcharts.chart('container', {
+      /* Highcharts options */
+    });
+    ```
+    
+    Or using ES6 imports:
+    
+    ```javascript
+    import Highcharts from 'highcharts';
+    import 'highcharts/modules/exporting';
+    import 'highcharts/modules/export-data';
+    
+    Highcharts.chart('container', {
+      // options - see https://api.highcharts.com/highcharts
+    });
+    ```
+  </Step>
+</Steps>
+
+### Load Stock, Maps, or Gantt
+
+Highcharts is already included in Stock, Maps, and Gantt bundles:
+
+<CodeGroup>
+
+```javascript CommonJS - Stock
+var Highcharts = require('highcharts/highstock');
+
+// Load Maps as a module to get both Stock and Maps
+require('highcharts/modules/map');
+```
+
+```javascript CommonJS - Maps
+var Highcharts = require('highcharts/highmaps');
+```
+
+```javascript ES6 - Stock
+import Highcharts from 'highcharts/highstock';
+import 'highcharts/modules/exporting';
+```
+
+```javascript ES6 - Gantt
+import Highcharts from 'highcharts/highcharts-gantt';
+```
+
+</CodeGroup>
+
+<Warning>
+  The Stock, Maps, and Gantt bundles can't run on the same page with each other or with `highcharts`. If you need multiple products on one page, load them as modules instead.
+</Warning>
+
+### Nightly Builds
+
+Access the latest development version before release:
+
+```bash
+npm install --save highcharts/highcharts-dist#nightly
+```
+
+<Warning>
+  Nightly builds are not recommended for production as they may contain bugs and are not considered stable.
+</Warning>
+
+To update from nightly:
+
+```bash
+npm uninstall highcharts && npm install --save highcharts/highcharts-dist#nightly
+```
+
+## 2. Load from CDN
+
+The fastest way to get started without installation.
+
+<Steps>
+  <Step title="Add script tags">
+    Include Highcharts in the `<head>` section of your HTML:
+    
+    ```html
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    ```
+  </Step>
+  
+  <Step title="Add optional modules">
+    Load additional modules as needed:
+    
+    ```html
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+    ```
+  </Step>
+</Steps>
+
+### Version-Specific CDN URLs
+
+Load a specific version or latest minor version:
+
+<CodeGroup>
+
+```html Latest v12
+<script src="https://code.highcharts.com/12/highcharts.js"></script>
+```
+
+```html Specific Version
+<script src="https://code.highcharts.com/12.5.0/highcharts.js"></script>
+```
+
+```html Stock Chart
+<script src="https://code.highcharts.com/stock/highstock.js"></script>
+```
+
+```html Maps
+<script src="https://code.highcharts.com/maps/highmaps.js"></script>
+```
+
+</CodeGroup>
+
+Browse all available files at [code.highcharts.com](https://code.highcharts.com).
+
+## 3. ES6 Modules from CDN
+
+Load Highcharts as ECMAScript modules for modern browsers.
+
+```html
+<script type="module">
+  import Highcharts from 'https://code.highcharts.com/esm/highcharts.js';
+  import 'https://code.highcharts.com/esm/modules/accessibility.js';
+  
+  Highcharts.chart('container', {
+    chart: { type: 'bar' },
+    title: { text: 'Fruit Consumption' },
+    series: [{
+      name: 'Sales',
+      data: [1, 3, 2, 4]
+    }]
+  });
+</script>
+```
+
+### Dynamic Imports with Lazy Loading
+
+Load Highcharts on demand:
+
+```javascript
+const loadHighchartsAndCreateChart = async () => {
+  const { default: Highcharts } = 
+    await import('https://code.highcharts.com/esm/highcharts.js');
+  await import('https://code.highcharts.com/esm/highcharts-more.js');
+  await import('https://code.highcharts.com/esm/modules/exporting.js');
+  
+  Highcharts.chart('container', { /* options */ });
+};
+```
+
+## 4. Custom Builds with Tree Shaking
+
+Reduce bundle size by importing only what you need.
+
+<Steps>
+  <Step title="Import core modules">
+    ```javascript
+    import Chart from 'highcharts/es-modules/Core/Chart/Chart.js';
+    import LineSeries from 'highcharts/es-modules/Series/Line/LineSeries.js';
+    
+    // Create a simple line chart
+    new Chart('container', {
+      series: [{ type: 'line', data: [1, 2, 3] }]
+    });
+    ```
+  </Step>
+  
+  <Step title="Bundle with Webpack">
+    Create a webpack config:
+    
+    ```javascript
+    // webpack.config.js
+    module.exports = {
+      entry: './mychart.js',
+      mode: 'production',
+      output: {
+        filename: 'mybundle.js'
+      }
+    };
+    ```
+    
+    Build the bundle:
+    
+    ```bash
+    npx webpack -c webpack.config.js
+    ```
+  </Step>
+</Steps>
+
+### Size Comparison with Tree Shaking
+
+| Bundle (compiled + gzipped) | Size | Savings |
+|----------------------------|------|--------|
+| highcharts.js | 100,509 bytes | 0% |
+| LineSeries.js | 78,268 bytes | 22% |
+| ColumnSeries.js | 80,046 bytes | 20% |
+| PieSeries.js | 83,085 bytes | 17% |
+
+## 5. Download and Self-Host
+
+Host the files on your own server.
+
+<Steps>
+  <Step title="Download Highcharts">
+    Get the latest version from [highcharts.com/download](https://www.highcharts.com/download/)
+  </Step>
+  
+  <Step title="Place files on your server">
+    Upload the files to your web server (e.g., `/js/highcharts.js`)
+  </Step>
+  
+  <Step title="Reference in HTML">
+    ```html
+    <script src="/js/highcharts.js"></script>
+    <script src="/js/modules/exporting.js"></script>
+    ```
+  </Step>
+</Steps>
+
+## Loading Multiple Products
+
+To use Stock, Maps, and Gantt on the same page, load them as modules:
+
+```html
+<script src="/js/highcharts.js"></script>
+<script src="/js/modules/stock.js"></script>
+<script src="/js/modules/map.js"></script>
+<script src="/js/modules/gantt.js"></script>
+```
+
+<Warning>
+  Don't load `highstock.js`, `highmaps.js`, or `highcharts-gantt.js` together on the same page. They include conflicting code. Use the module approach shown above instead.
+</Warning>
+
+## Legacy Browser Support (IE 11)
+
+For IE 11 and other legacy browsers, use the ES5 build:
+
+```html
+<script src="https://code.highcharts.com/es5/highcharts.js"></script>
+<script src="https://code.highcharts.com/es5/modules/exporting.js"></script>
+```
+
+<Note>
+  The ES5 folder is required for browsers like IE 11 and QtWeb (used by wkhtmltopdf). This version also works with modern browsers.
+</Note>
+
+## Styled Mode (CSS)
+
+When using styled mode with npm, import the CSS files:
+
+```javascript
+import Highcharts from 'highcharts';
+import 'highcharts/css/highcharts.css';
+```
+
+Or with HTML:
+
+```css
+@import url("/css/highcharts.css");
+@import url("/css/themes/dark-unica.css");
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Quick Start" icon="rocket" href="/quickstart">
+    Create your first chart in minutes
+  </Card>
+  
+  <Card title="Your First Chart" icon="chart-simple" href="/your-first-chart">
+    Step-by-step tutorial for beginners
+  </Card>
+  
+  <Card title="Custom Packages" icon="box" href="https://www.highcharts.com/docs/getting-started/how-to-create-custom-highcharts-packages">
+    Build custom Highcharts files to reduce size
+  </Card>
+  
+  <Card title="ES Modules Guide" icon="cube" href="https://highcharts.com/docs/getting-started/installation-with-esm">
+    Detailed guide on ES6 modules and tree shaking
+  </Card>
+</CardGroup>
