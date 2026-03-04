@@ -1,0 +1,159 @@
+{
+  "projectType": "sdk-library",
+  "projectName": "Highcharts",
+  "projectDescription": "JavaScript charting framework for creating interactive charts, stock charts, maps, and Gantt diagrams",
+  "theme": "palm",
+  "primaryColor": "#a6e9bc",
+  "lightColor": "#6d819f",
+  "darkColor": "#f0f7f5",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": [
+              "introduction",
+              "installation",
+              "quickstart",
+              "your-first-chart"
+            ]
+          },
+          {
+            "group": "Core Concepts",
+            "pages": [
+              "concepts/charts",
+              "concepts/series",
+              "concepts/axes",
+              "concepts/data",
+              "concepts/options",
+              "concepts/responsive"
+            ]
+          },
+          {
+            "group": "Chart Types",
+            "pages": [
+              "chart-types/line-area",
+              "chart-types/column-bar",
+              "chart-types/pie-donut",
+              "chart-types/scatter-bubble",
+              "chart-types/heatmap-treemap",
+              "chart-types/stock-charts",
+              "chart-types/maps",
+              "chart-types/gantt"
+            ]
+          },
+          {
+            "group": "Features",
+            "pages": [
+              "features/styling-themes",
+              "features/tooltips-labels",
+              "features/legends",
+              "features/zooming-panning",
+              "features/drilldown",
+              "features/exporting",
+              "features/accessibility",
+              "features/sonification"
+            ]
+          },
+          {
+            "group": "Advanced",
+            "pages": [
+              "advanced/custom-builds",
+              "advanced/extending-highcharts",
+              "advanced/performance",
+              "advanced/server-side",
+              "advanced/typescript"
+            ]
+          },
+          {
+            "group": "Products",
+            "pages": [
+              "products/highstock",
+              "products/highmaps",
+              "products/gantt",
+              "products/dashboards"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Core API",
+            "pages": [
+              "api/overview",
+              "api/chart",
+              "api/series",
+              "api/axis",
+              "api/point"
+            ]
+          },
+          {
+            "group": "Configuration",
+            "pages": [
+              "api/chart-options",
+              "api/series-options",
+              "api/axis-options",
+              "api/plot-options",
+              "api/responsive-options"
+            ]
+          },
+          {
+            "group": "Methods & Events",
+            "pages": [
+              "api/methods",
+              "api/events",
+              "api/utilities"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Examples",
+        "groups": [
+          {
+            "group": "Examples",
+            "pages": [
+              "examples/basic-charts",
+              "examples/dynamic-data",
+              "examples/advanced-features",
+              "examples/integrations"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "70+ chart types including line, area, column, bar, pie, scatter, heatmap, and more",
+    "Stock charts with advanced financial features and technical indicators",
+    "Interactive maps with drill-down capabilities",
+    "Gantt charts for project management and scheduling",
+    "Real-time data updates and dynamic chart modifications",
+    "Responsive design with mobile-friendly touch interactions",
+    "Extensive customization through themes and styling options",
+    "Accessibility features including keyboard navigation and screen reader support",
+    "Export charts to PNG, JPG, SVG, and PDF formats",
+    "Sonification for audio representation of chart data"
+  ],
+  "publicApiSurface": [
+    "Highcharts.chart() - Create a chart",
+    "Highcharts.stockChart() - Create a stock chart",
+    "Highcharts.mapChart() - Create a map chart",
+    "Highcharts.ganttChart() - Create a Gantt chart",
+    "Chart.addSeries() - Add a series to a chart",
+    "Chart.update() - Update chart configuration",
+    "Series.addPoint() - Add a point to a series",
+    "Series.setData() - Set series data",
+    "Axis.setExtremes() - Set axis range",
+    "Point.update() - Update point properties",
+    "Chart.exportChart() - Export chart to image",
+    "Highcharts.setOptions() - Set global options",
+    "Highcharts.merge() - Merge configuration objects",
+    "Highcharts.SVGRenderer - SVG rendering utilities",
+    "Highcharts.dateFormat() - Format dates"
+  ]
+}
